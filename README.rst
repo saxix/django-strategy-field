@@ -5,6 +5,9 @@ django-strategy-field
 DFS is a custome field to enable the implementation of the Strategy Pattern with
 the django models.
 
+The Strategies are displayed in SelectBoxes as standard choice field
+
+
 Example
 =======
 
@@ -28,15 +31,17 @@ Example
     class SMSStrategy(AbstractTransport):
         def send(self):
             ...
+    registry = Registry()
+    registry.register(EmailStrategy)
+    registry.register(SMSStrategy)
 
     class Event(models.Model):
-        sender = StrategyField()
+        sender = StrategyField(registry)
 
 
-    e = Event()
-    e.sender = EmailStrategy
-    e.save()
-
-    e.sender.send()
-    # e.sender.context == e
+    Event.objects.get_or_create(sender=EmailStrategy)
+    ...
+    ...
+    e = Event.objects.get(sender=EmailStrategy)
+    e.sender.send() # e.sender.context == e
 
