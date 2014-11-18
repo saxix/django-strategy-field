@@ -9,6 +9,8 @@ Example
 =======
 
 .. code-block:: python
+
+
     class TransportRegistry(Registry)
         pass
 
@@ -36,3 +38,5 @@ Example
     e.save()
 
     e.sender.send()
+    # e.sender.context == e
+
