@@ -1,0 +1,7 @@
+include README.md
+include CHANGES
+include MANIFEST.in
+include setup.py
+recursive-include docs *
+recursive-include wfp_auth *
+recursive-exclude wfp_auth *.pyc
