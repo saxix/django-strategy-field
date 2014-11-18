@@ -4,14 +4,13 @@ from django.forms import TextInput, ModelForm
 from .models import (DemoModel, DemoMultipleModel,
                      DemoModelProxy, DemoCustomModel, DemoAllModel,
                      DemoMultipleCustomModel)
-# from .fields import CustomMultipleStrategyField, CustomStrategyField
-# from strategy_field.fields import StrategyField
 
 
 class DemoModelForm(ModelForm):
     class Meta:
         model = DemoModelProxy
         widgets = {'sender': TextInput}
+        fields = '__all__'
 
 
 class DemoModelProxyAdmin(admin.ModelAdmin):

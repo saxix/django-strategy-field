@@ -3,5 +3,5 @@ include CHANGES
 include MANIFEST.in
 include setup.py
 recursive-include docs *
-recursive-include wfp_auth *
-recursive-exclude wfp_auth *.pyc
+recursive-include strategy_field *
+recursive-exclude strategy_field *.pyc

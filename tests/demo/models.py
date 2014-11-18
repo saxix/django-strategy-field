@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-import logging
 import six
+import logging
 from django.db import models
-from strategy_field.fields import MultipleStrategyClassField, StrategyClassField, StrategyField, MultipleStrategyField
 from strategy_field.registry import Registry
-# from .fields import CustomStrategyField, CustomMultipleStrategyField
 from strategy_field.utils import import_by_name, fqn
+from strategy_field.fields import (MultipleStrategyClassField, StrategyClassField,
+                                   StrategyField, MultipleStrategyField)
 
 logger = logging.getLogger(__name__)
 
@@ -70,8 +70,8 @@ registry1.register(Strategy1)
 class DemoAllModel(models.Model):
     choice = StrategyClassField(registry)
     multiple = MultipleStrategyClassField(registry)
-    custom = StrategyField(registry)
-    custom_multiple = MultipleStrategyField(registry)
+    custom = StrategyField(registry1)
+    custom_multiple = MultipleStrategyField(registry1)
 
 
 class DemoModel(models.Model):
@@ -83,7 +83,7 @@ class DemoModelNone(models.Model):
 
 
 class DemoModelDefault(models.Model):
-    sender = StrategyClassField(registry, default=lambda: registry[0])
+    sender = StrategyClassField(registry, default='demo.models.Sender1')
 
 
 class DemoModelProxy(DemoModel):

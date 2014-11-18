@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import six
 from django.forms.fields import TypedChoiceField, TypedMultipleChoiceField
-from spreader.utils import fqn
+from .utils import fqn
 from strategy_field.utils import stringify
 
 
