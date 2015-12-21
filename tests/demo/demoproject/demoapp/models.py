@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-import six
 import logging
+
+import six
+
 from django.db import models
+from strategy_field.fields import (MultipleStrategyClassField,
+                                   MultipleStrategyField, StrategyClassField,
+                                   StrategyField)
 from strategy_field.registry import Registry
-from strategy_field.utils import import_by_name, fqn
-from strategy_field.fields import (MultipleStrategyClassField, StrategyClassField,
-                                   StrategyField, MultipleStrategyField)
+from strategy_field.utils import fqn, import_by_name
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +39,7 @@ registry.register(Sender2)
 
 
 class AbstractStrategy(object):
+
     def __init__(self, context):
         self.context = context
 
@@ -49,6 +53,7 @@ class Strategy1(AbstractStrategy):
 
 
 class StrategyRegistry(Registry):
+
     def deserialize(self, value, obj=None):
         ret = []
         if isinstance(value, six.string_types):
@@ -68,31 +73,39 @@ registry1.register(Strategy1)
 
 
 class DemoAllModel(models.Model):
-    choice = StrategyClassField(registry)
-    multiple = MultipleStrategyClassField(registry)
-    custom = StrategyField(registry1)
-    custom_multiple = MultipleStrategyField(registry1)
+    choice = StrategyClassField(registry=registry)
+    multiple = MultipleStrategyClassField(registry=registry)
+    custom = StrategyField(registry=registry1)
+    custom_multiple = MultipleStrategyField(registry=registry1)
 
 
 class DemoModel(models.Model):
-    sender = StrategyClassField(registry)
+    sender = StrategyClassField(registry=registry)
 
 
 class DemoModelNone(models.Model):
-    sender = StrategyClassField(registry, null=True, blank=True)
+    sender = StrategyClassField(registry=registry, null=True, blank=True)
 
 
 class DemoModelDefault(models.Model):
-    sender = StrategyClassField(registry, default='demo.models.Sender1')
+    sender = StrategyClassField(null=True,
+                                registry=registry,
+                                default='demoproject.demoapp.models.Sender1')
+
+
+class DemoModelCallableDefault(models.Model):
+    sender = StrategyClassField(registry=registry, null=True,
+                                default=lambda: 'demoproject.demoapp.models.Sender1')
 
 
 class DemoModelProxy(DemoModel):
+
     class Meta:
         proxy = True
 
 
 class DemoMultipleModel(models.Model):
-    sender = MultipleStrategyClassField(registry)
+    sender = MultipleStrategyClassField(registry=registry)
 
 
 class DemoCustomModel(models.Model):
@@ -101,3 +114,12 @@ class DemoCustomModel(models.Model):
 
 class DemoMultipleCustomModel(models.Model):
     sender = MultipleStrategyField(registry=registry1)
+
+
+class DemoModelContext(models.Model):
+    pass
+
+
+# class DemoModelGetter(models.Model):
+    # fk = models.ForeignKey(DemoModelContext)
+    # sender = StrategyField(registry=registry1, getter=lambda s: s.fk)

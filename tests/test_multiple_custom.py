@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-from fixtures import *  # noqa
-import logging
+# flake8: noqa
+# noqa
 import pytest
-from demo.models import Strategy, DemoMultipleCustomModel, Strategy1
-from strategy_field.utils import fqn
 from django.forms.models import modelform_factory
-
-logger = logging.getLogger(__name__)
+from django.core.urlresolvers import reverse
+from demoproject.demoapp.models import (DemoMultipleCustomModel, Strategy,
+                                        Strategy1,)
+from strategy_field.utils import fqn
 
 
 def pytest_generate_tests(metafunc):
-    func_name = metafunc.function.func_name
+    func_name = metafunc.function.__name__
     values = ids = []
     if 'target' in metafunc.fixturenames:
         if func_name.endswith('_lookup_in'):
@@ -73,19 +73,20 @@ def test_model_load(demo_multiplecustom_model):
 @pytest.mark.django_db
 def test_form_load():
     d = DemoMultipleCustomModel(sender=[Strategy, Strategy1])
-    form_class = modelform_factory(DemoMultipleCustomModel)
+    form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
     form = form_class(instance=d)
     assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
                               u'<td><select multiple="multiple" id="id_sender" name="sender">\n' \
-                              u'<option value="demo.models.Strategy" selected="selected">demo.models.Strategy</option>\n' \
-                              u'<option value="demo.models.Strategy1" selected="selected">demo.models.Strategy1</option>\n' \
+                              u'<option value="demoproject.demoapp.models.Strategy" selected="selected">demoproject.demoapp.models.Strategy</option>\n' \
+                              u'<option value="demoproject.demoapp.models.Strategy1" selected="selected">demoproject.demoapp.models.Strategy1</option>\n' \
                               u'</select></td></tr>'
 
 
 @pytest.mark.django_db
 def test_form_save(demo_multiplecustom_model):
-    form_class = modelform_factory(DemoMultipleCustomModel)
-    form = form_class({'sender': [fqn(demo_multiplecustom_model.sender[0])]}, instance=demo_multiplecustom_model)
+    form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
+    form = form_class({'sender': [fqn(demo_multiplecustom_model.sender[0])]},
+                      instance=demo_multiplecustom_model)
     form.is_valid()
     instance = form.save()
     assert instance.sender == demo_multiplecustom_model.sender
@@ -93,51 +94,55 @@ def test_form_save(demo_multiplecustom_model):
 
 @pytest.mark.django_db
 def test_form_not_valid(demo_multiplecustom_model):
-    form_class = modelform_factory(DemoMultipleCustomModel)
-    form = form_class({'sender': [fqn(DemoMultipleCustomModel)]}, instance=demo_multiplecustom_model)
+    form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
+    form = form_class(
+        {'sender': [fqn(DemoMultipleCustomModel)]}, instance=demo_multiplecustom_model)
     assert not form.is_valid()
     assert form.errors['sender'] == ['Select a valid choice. '
-                                     'demo.models.DemoMultipleCustomModel '
+                                     'demoproject.demoapp.models.DemoMultipleCustomModel '
                                      'is not one of the available choices.']
 
 
 @pytest.mark.django_db
 def test_form_default(demo_multiplecustom_model):
-    form_class = modelform_factory(DemoMultipleCustomModel)
+    form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
     form = form_class(instance=demo_multiplecustom_model)
     assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
                               u'<td><select multiple="multiple" id="id_sender" name="sender">\n' \
-                              u'<option value="demo.models.Strategy" selected="selected">demo.models.Strategy</option>\n' \
-                              u'<option value="demo.models.Strategy1">demo.models.Strategy1</option>\n</select></td></tr>'
+                              u'<option value="demoproject.demoapp.models.Strategy" selected="selected">demoproject.demoapp.models.Strategy</option>\n' \
+                              u'<option value="demoproject.demoapp.models.Strategy1">demoproject.demoapp.models.Strategy1</option>\n</select></td></tr>'
 
 
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_add(webapp, admin_user):
-    res = webapp.get('/admin/demo/demomultiplecustommodel/add/', user=admin_user)
-    res.form['sender'] = ['demo.models.Strategy']
+    res = webapp.get('/demoapp/demomultiplecustommodel/add/', user=admin_user)
+    res.form['sender'].force_value(['demoproject.demoapp.models.Strategy'])
     res.form.submit().follow()
-    assert DemoMultipleCustomModel.objects.filter(sender='demo.models.Strategy').count() == 1
+    assert DemoMultipleCustomModel.objects.filter(
+        sender='demoproject.demoapp.models.Strategy').count() == 1
 
 
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiplecustom_model):
     demo_multiplecustom_model.sender = [Strategy, Strategy1]
     demo_multiplecustom_model.save()
-    res = webapp.get('/admin/demo/demomultiplecustommodel/%s/' % demo_multiplecustom_model.pk, user=admin_user)
+    url = reverse('admin:demoapp_demomultiplecustommodel_change', args=[demo_multiplecustom_model.pk])
+    res = webapp.get(url, user=admin_user)
 
     assert res.context['adminform'].form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
                                                        u'<td><select multiple="multiple" id="id_sender" name="sender">\n' \
-                                                       u'<option value="demo.models.Strategy" selected="selected">demo.models.Strategy</option>\n' \
-                                                       u'<option value="demo.models.Strategy1" selected="selected">demo.models.Strategy1</option>\n</select></td></tr>'
+                                                       u'<option value="demoproject.demoapp.models.Strategy" selected="selected">demoproject.demoapp.models.Strategy</option>\n' \
+                                                       u'<option value="demoproject.demoapp.models.Strategy1" selected="selected">demoproject.demoapp.models.Strategy1</option>\n</select></td></tr>'
 
-    res.form['sender'] = ['demo.models.Strategy', 'demo.models.Strategy1']
+    res.form['sender'] = ['demoproject.demoapp.models.Strategy',
+                          'demoproject.demoapp.models.Strategy1']
     res.form.submit().follow()
-    res = webapp.get('/admin/demo/demomultiplecustommodel/%s/' % demo_multiplecustom_model.pk, user=admin_user)
+    res = webapp.get(url, user=admin_user)
 
     assert res.context['adminform'].form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
                                                        u'<td><select multiple="multiple" id="id_sender" name="sender">\n' \
-                                                       u'<option value="demo.models.Strategy" selected="selected">demo.models.Strategy</option>\n' \
-                                                       u'<option value="demo.models.Strategy1" selected="selected">demo.models.Strategy1</option>\n' \
+                                                       u'<option value="demoproject.demoapp.models.Strategy" selected="selected">demoproject.demoapp.models.Strategy</option>\n' \
+                                                       u'<option value="demoproject.demoapp.models.Strategy1" selected="selected">demoproject.demoapp.models.Strategy1</option>\n' \
                                                        u'</select></td></tr>'
 
 
@@ -151,7 +156,8 @@ def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiplecustom_
 
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_equal(demo_multiplecustom_model, target):
-    assert DemoMultipleCustomModel.objects.get(sender=target(demo_multiplecustom_model)) == demo_multiplecustom_model
+    assert DemoMultipleCustomModel.objects.get(sender=target(
+        demo_multiplecustom_model)) == demo_multiplecustom_model
 
 
 @pytest.mark.django_db

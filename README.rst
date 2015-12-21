@@ -2,10 +2,15 @@
 django-strategy-field
 =====================
 
-DFS is a custome field to enable the implementation of the Strategy Pattern with
-the django models.
+A Django field for storing a reference to a class or type (as opposed to a specific instance)
+
+DFS is a custom field to enable the implementation of the `Strategy Pattern`_ with
+the Django models.
 
 The Strategies are displayed in SelectBoxes as standard choice field
+
+
+.. _Strategy Pattern: http://www.oodesign.com/strategy-pattern.html
 
 
 Example
@@ -44,4 +49,3 @@ Example
     ...
     e = Event.objects.get(sender=EmailStrategy)
     e.sender.send() # e.sender.context == e
-

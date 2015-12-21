@@ -1,7 +1,14 @@
-include README.md
+include README.rst
 include CHANGES
 include MANIFEST.in
+include setup.cfg
 include setup.py
+include tox.ini
+exclude Makefile
+exclude tests/demo/DEMODB.sqlite
+recursive-exclude src *.pyc
+recursive-include requirements *.pip
 recursive-include docs *
-recursive-include strategy_field *
-recursive-exclude strategy_field *.pyc
+recursive-include src *
+recursive-include tests *.coveragerc
+recursive-include tests *.py

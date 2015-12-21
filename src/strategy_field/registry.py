@@ -32,6 +32,8 @@ class Registry(list):
 
     def __contains__(self, y):
         if isinstance(y, six.string_types):
-            y = import_by_name(y)
+            try:
+                y = import_by_name(y)
+            except (ImportError, ValueError):
+                return False
         return super(Registry, self).__contains__(y)
-

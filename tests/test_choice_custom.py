@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
-from fixtures import *  # noqa
-import logging
+# !qa: E501
 import pytest
-from demo.models import DemoCustomModel, Strategy, Strategy1
-from strategy_field.utils import fqn
 from django.forms.models import modelform_factory
-
-logger = logging.getLogger(__name__)
+from django.core.urlresolvers import reverse
+from demoproject.demoapp.models import DemoCustomModel, Strategy, Strategy1
+from strategy_field.utils import fqn
 
 
 def pytest_generate_tests(metafunc):
-    func_name = metafunc.function.func_name
+    func_name = metafunc.function.__name__
     values = ids = []
     if 'target' in metafunc.fixturenames:
         if func_name.endswith('_lookup_in'):
@@ -68,50 +66,50 @@ def test_model_load(democustommodel):
 
 @pytest.mark.django_db
 def test_form_save(democustommodel):
-    form_class = modelform_factory(DemoCustomModel)
+    form_class = modelform_factory(DemoCustomModel, exclude=[])
     form = form_class({'sender': fqn(democustommodel.sender)},
                       instance=democustommodel)
     form.is_valid()
-    print form.errors
     instance = form.save()
     assert instance.sender == democustommodel.sender
 
 
 @pytest.mark.django_db
 def test_form_not_valid(democustommodel):
-    form_class = modelform_factory(DemoCustomModel)
+    form_class = modelform_factory(DemoCustomModel, exclude=[])
     form = form_class({'sender': fqn(DemoCustomModel)}, instance=democustommodel)
     assert not form.is_valid()
     assert form.errors['sender'] == ['Select a valid choice. '
-                                     'demo.models.DemoCustomModel '
+                                     'demoproject.demoapp.models.DemoCustomModel '
                                      'is not one of the available choices.']
 
 
 @pytest.mark.django_db
 def test_form_default(democustommodel):
-    form_class = modelform_factory(DemoCustomModel)
+    form_class = modelform_factory(DemoCustomModel, exclude=[])
     form = form_class(instance=democustommodel)
     assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
                               u'<td><select id="id_sender" name="sender">\n' \
                               u'<option value="">---------</option>\n' \
-                              u'<option value="demo.models.Strategy" selected="selected">demo.models.Strategy</option>\n' \
-                              u'<option value="demo.models.Strategy1">demo.models.Strategy1</option>\n</select></td></tr>'
+                              u'<option value="demoproject.demoapp.models.Strategy" selected="selected">demoproject.demoapp.models.Strategy</option>\n' \
+                              u'<option value="demoproject.demoapp.models.Strategy1">demoproject.demoapp.models.Strategy1</option>\n</select></td></tr>'
 
 
 @pytest.mark.django_db
 def test_admin_demomodel_add(webapp, admin_user):
-    res = webapp.get('/admin/demo/democustommodel/add/', user=admin_user)
-    res.form['sender'] = 'demo.models.Strategy'
+    res = webapp.get('/demoapp/democustommodel/add/', user=admin_user)
+    res.form['sender'] = 'demoproject.demoapp.models.Strategy'
     res.form.submit().follow()
-    assert DemoCustomModel.objects.filter(sender='demo.models.Strategy').count() == 1
+    assert DemoCustomModel.objects.filter(sender='demoproject.demoapp.models.Strategy').count() == 1
 
 
 @pytest.mark.django_db
 def test_admin_demomodel_edit(webapp, admin_user, democustommodel):
-    res = webapp.get('/admin/demo/democustommodel/%s/' % democustommodel.pk, user=admin_user)
-    res.form['sender'] = 'demo.models.Strategy'
+    url = reverse('admin:demoapp_democustommodel_change', args=[democustommodel.pk])
+    res = webapp.get(url, user=admin_user)
+    res.form['sender'] = 'demoproject.demoapp.models.Strategy'
     res.form.submit().follow()
-    assert DemoCustomModel.objects.filter(sender='demo.models.Strategy').count() == 1
+    assert DemoCustomModel.objects.filter(sender='demoproject.demoapp.models.Strategy').count() == 1
 
 
 @pytest.mark.django_db
