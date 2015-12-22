@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
+import six
 from inspect import isclass
 
-import six
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.utils.text import capfirst
+
 from strategy_field.forms import (StrategyFormField,
-                                  StrategyMultipleChoiceFormField)
+                                  StrategyMultipleChoiceFormField,)
 from strategy_field.utils import fqn, import_by_name, stringify
 
 

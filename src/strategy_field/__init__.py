@@ -1,6 +1,6 @@
-import subprocess
 import datetime
 import os
+import subprocess
 
 NAME = 'django-strategy-field'
 VERSION = __version__ = (0, 1, 0, 'final', 0)

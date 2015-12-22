@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import importlib
-from inspect import isclass
 import logging
 import six
+from inspect import isclass
 
 logger = logging.getLogger(__name__)
 

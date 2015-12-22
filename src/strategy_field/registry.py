@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import six
 import logging
-from .utils import import_by_name, fqn, get_attr  # noqa
+import six
 from inspect import isclass
+
+from .utils import fqn, get_attr, import_by_name  # noqa
 
 logger = logging.getLogger(__name__)
 
