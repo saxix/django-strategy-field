@@ -1,4 +1,8 @@
+Release 0.2
+===========
+* Django 1.9 support
+
+
 Release 0.1
 ===========
-
 * initial release

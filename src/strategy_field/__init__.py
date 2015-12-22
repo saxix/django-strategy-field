@@ -3,7 +3,7 @@ import os
 import subprocess
 
 NAME = 'django-strategy-field'
-VERSION = __version__ = (0, 1, 0, 'final', 0)
+VERSION = __version__ = (0, 2, 0, 'final', 0)
 
 
 def get_version():  # pragma: no cover
@@ -40,7 +40,8 @@ def get_git_changeset():  # pragma: no cover
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     git_log = subprocess.Popen('git log --pretty=format:%ct --quiet -1 HEAD',
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                               shell=True, cwd=repo_dir, universal_newlines=True)
+                               shell=True, cwd=repo_dir,
+                               universal_newlines=True)
     timestamp = git_log.communicate()[0]
     try:
         timestamp = datetime.datetime.utcfromtimestamp(int(timestamp))
