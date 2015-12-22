@@ -2,19 +2,30 @@
 django-strategy-field
 =====================
 
-A Django field for storing a reference to a class or type (as opposed to a specific instance)
-
 DFS is a custom field to enable the implementation of the `Strategy Pattern`_ with
 the Django models.
 
 The Strategies are displayed in SelectBoxes as standard choice field
 
-
 .. _Strategy Pattern: http://www.oodesign.com/strategy-pattern.html
 
+This package provides the following custom fields:
 
-Example
-=======
+* StrategyField
+* MultipleStrategyField
+* StrategyClassField
+* MultipleStrategyClassField
+
+ The *StrategyField can be accessed as instance of the model and have an
+ attribute `context` that point to model (reverse relation)
+
+Use case
+========
+
+As example we can imagine an application that manages `Events` that need to be notified to users.
+Each `Occurrence` of `Event` can be notified using different transport, (email, sms,...).
+We want to be able to add/change the way we send notification,
+per event basis and simply using the Django admin panel. 
 
 .. code-block:: python
 
@@ -42,7 +53,6 @@ Example
 
     class Event(models.Model):
         sender = StrategyField(registry)
-
 
     Event.objects.get_or_create(sender=EmailStrategy)
     ...

@@ -187,22 +187,29 @@ class MultipleStrategyClassField(AbstractStrategyField):
 
 
 class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
+    def __get__(self, obj, value):
+        return obj.__dict__.get(self.field.name)
 
-    def __get__(self, obj, type=None):
+    def __set__(self, obj, value):
         # if obj is None:
             # raise AttributeError('Can only be accessed via an instance.')
-        value = obj.__dict__.get(self.field.name)
-        context = self.field.context(obj)
-
+        # return  obj.__dict__[self.field.name] = value
+        # value = obj.__dict__.get(self.field.name)
+        # context = self.field.context(obj)
+        #
         if isinstance(value, self.field.registry.klass):
-            return value
-        elif isclass(value) and issubclass(value, self.field.registry.klass):
-            return value(context)
-        elif isinstance(value, six.string_types):
-            return import_by_name(value)(context)
-        elif value is None:
-            return None
-            # raise ValueError(value)
+            obj.__dict__[self.field.name] = value
+        elif value:
+            if self.field.registry.is_valid(value):
+                if isclass(value):
+                    obj.__dict__[self.field.name] = value(obj)
+                elif isinstance(value, six.string_types):
+                    klass = import_by_name(value)
+                    assert issubclass(klass, self.field.registry.klass)
+                    obj.__dict__[self.field.name] = klass(obj)
+        elif not value:
+            obj.__dict__[self.field.name] = None
+    # raise ValueError(value)
 
 
 class StrategyField(StrategyClassField):

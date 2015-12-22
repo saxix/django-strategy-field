@@ -42,6 +42,11 @@ def test_field():
     assert d.sender == Sender1
 
 
+def test_field():
+    d = DemoModel(sender=Sender1)
+    assert d.sender == Sender1
+
+
 @pytest.mark.django_db
 def test_model_save(target):
     d = DemoModel(sender=target(None))

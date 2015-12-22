@@ -40,8 +40,11 @@ registry.register(Sender2)
 
 class AbstractStrategy(object):
 
-    def __init__(self, context):
+    def __init__(self, context, label=''):
+        if not context:
+            raise ValueError("Invalid context for strategy ('')".format(context))
         self.context = context
+        self.label = label
 
 
 class Strategy(AbstractStrategy):
