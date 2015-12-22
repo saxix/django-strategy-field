@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from fixtures import *  # noqa
-import logging
 import pytest
-from strategy_field.registry import Registry
-from demo.models import AbstractSender, Sender1, Sender2, DemoModel
-from strategy_field.utils import fqn
 
-logger = logging.getLogger(__name__)
+from demoproject.demoapp.models import (AbstractSender, DemoModel, Sender1,
+                                        Sender2,)
+from strategy_field.registry import Registry
+from strategy_field.utils import fqn
 
 
 def test_registry():
@@ -22,6 +20,3 @@ def test_registry_does_not_accept_wrong_classes():
     r = Registry(AbstractSender)
     with pytest.raises(ValueError):
         r.register(DemoModel)
-
-
-

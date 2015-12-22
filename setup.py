@@ -1,49 +1,49 @@
 #!/usr/bin/env python
 import os
+import sys
 import codecs
-from distutils.config import PyPIRCCommand
-from setuptools import setup, find_packages
 
-dirname = 'wfp_auth'
+from setuptools import find_packages, setup
 
-app = __import__(dirname)
-
-
-def read(*parts):
-    here = os.path.abspath(os.path.dirname(__file__))
-    return codecs.open(os.path.join(here, *parts), 'r').read()
+ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__)))
+sys.path.insert(0, os.path.join(ROOT, 'src'))
+app = __import__('strategy_field')
 
 
-PyPIRCCommand.DEFAULT_REPOSITORY = 'http://pypi.wfp.org/pypi/'
+def fread(*parts):
+    return codecs.open(os.path.join(ROOT, *parts), encoding="utf-8").read()
 
-tests_require = read('wfp_auth/requirements/testing.pip')
+install_requires = fread('requirements', 'install.any.pip')
+tests_require = fread('requirements', 'testing.pip')
+dev_require = fread('requirements', 'develop.pip')
 
 setup(
     name=app.NAME,
     version=app.get_version(),
-    url='http://pypi.wfp.org/pypi/%s/' % app.NAME,
-    author='UN World Food Programme',
-    author_email='pasport.competence.centre@wfp.org',
-    license="WFP Property",
-    description='Django application auth ',
-    long_description=read('README.md'),
-    packages=find_packages('.'),
+    url='https://github.com/saxix/django-strategy-field',
+    description="Django custom field to implement the strategy pattern",
+    author='sax',
+    author_email='sax@os4d.org',
+    license='BSD',
+    package_dir={'': 'src'},
+    packages=find_packages('src'),
     include_package_data=True,
-    dependency_links=['http://pypi.wfp.org/simple/'],
-    install_requires=read('wfp_auth/requirements/install.pip'),
-    tests_require=tests_require,
-    keywords='security authentication authorization',
+    install_requires=install_requires,
+    zip_safe=False,
+    extras_require={
+        'tests': tests_require,
+        'dev': dev_require + tests_require,
+    },
     platforms=['linux'],
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'License :: Other/Proprietary License',
         'Environment :: Web Environment',
-        'Framework :: Django :: 1.5',
-        'Framework :: Django :: 1.6',
-        'Framework :: Django :: 1.7c2',
-        'Operating System :: Linux',
+        'Framework :: Django',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Libraries :: Django Modules',
-    ],
-    scripts=[])
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Intended Audience :: Developers'
+    ]
+)

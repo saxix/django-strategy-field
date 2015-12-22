@@ -4,10 +4,6 @@ source = strategy_field
 include =
 
 omit =  strategy_field/__init__.py
-        strategy_field/tests/settings.py
-        strategy_field/tests/fixtures.py
-        strategy_field/tests/conftest.py
-        strategy_field/tests/demo/**
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -29,4 +25,4 @@ exclude_lines =
 ignore_errors = True
 
 [html]
-directory = ~build/coverage
+directory = build/coverage

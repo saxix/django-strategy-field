@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import importlib
-from inspect import isclass
 import logging
 import six
+from inspect import isclass
 
 logger = logging.getLogger(__name__)
 
@@ -58,11 +58,10 @@ def import_by_name(name):
 
     """
     if '.' not in name:
-        raise ValueError(name)
+        raise ValueError("Cannot import '{}'".format(name))
     class_data = name.split(".")
     module_path = ".".join(class_data[:-1])
     class_str = class_data[-1]
-
     module = importlib.import_module(module_path)
     return getattr(module, class_str)
 

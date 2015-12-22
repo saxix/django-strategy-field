@@ -1,44 +1,53 @@
-from django.conf import settings
-import os
-import os.path
-import sys
+import django_webtest
+import pytest
+from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
+                                        DemoModel, DemoMultipleCustomModel,
+                                        DemoMultipleModel, Sender1, Sender2,
+                                        Strategy,)
+
+from strategy_field.registry import Registry
+from strategy_field.utils import fqn
 
 
-def pytest_configure(config):
-    import warnings
-    sys.path.insert(0, os.path.dirname(__file__))
-    warnings.filterwarnings('error',
-                            module=r'(spreader|spreader)')
+@pytest.fixture
+def registry():
+    r = Registry(AbstractSender)
+    r.register(Sender1)
+    r.register(Sender2)
+    return r
 
-    if not settings.configured:
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'demo.settings'
 
-    # http://djangosnippets.org/snippets/646/
-    class InvalidVarException(object):
-        def __mod__(self, missing):
-            try:
-                missing_str = unicode(missing)
-            except:
-                missing_str = 'Failed to create string representation'
-            raise Exception('Unknown template variable %r %s' %
-                            (missing, missing_str))
+@pytest.fixture
+def custom_registry():
+    r = Registry(Strategy)
+    r.register(Strategy)
+    return r
 
-        def __contains__(self, search):
-            if search == '%s':
-                return True
-            return False
 
-    settings.TEMPLATE_DEBUG = True
-    settings.TEMPLATE_STRING_IF_INVALID = InvalidVarException()
+@pytest.fixture
+def demomodel():
+    return DemoModel.objects.get_or_create(sender=Sender1)[0]
 
-    # Disable static compiling in tests
-    settings.STATIC_BUNDLES = {}
 
-    # override a few things with our test specifics
-    settings.INSTALLED_APPS = tuple(settings.INSTALLED_APPS) + (
-        'demo',
-    )
-    # This speeds up the tests considerably, pbkdf2 is by design, slow.
-    settings.PASSWORD_HASHERS = [
-        'django.contrib.auth.hashers.MD5PasswordHasher',
-    ]
+@pytest.fixture
+def democustommodel():
+    return DemoCustomModel.objects.get_or_create(sender=fqn(Strategy))[0]
+
+
+@pytest.fixture
+def demo_multiplecustom_model():
+    return DemoMultipleCustomModel.objects.get_or_create(sender=[fqn(Strategy)])[0]
+
+
+@pytest.fixture
+def demo_multiple_model():
+    return DemoMultipleModel.objects.get_or_create(sender=[Sender1])[0]
+
+
+@pytest.fixture(scope='function')
+def webapp(request):
+    wtm = django_webtest.WebTestMixin()
+    wtm.csrf_checks = False
+    wtm._patch_settings()
+    request.addfinalizer(wtm._unpatch_settings)
+    return django_webtest.DjangoTestApp()
