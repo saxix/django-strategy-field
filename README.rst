@@ -24,8 +24,8 @@ Use case
 
 As example we can imagine an application that manages `Events` that need to be notified to users.
 Each `Occurrence` of `Event` can be notified using different transport, (email, sms,...).
-We want to be able to add/change the way we send notification,
-per event basis and simply using the Django admin panel. 
+We want to be able to add/change the way we send notification, per event basis, simply using
+the Django admin panel. 
 
 .. code-block:: python
 
