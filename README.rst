@@ -2,12 +2,9 @@
 django-strategy-field
 =====================
 
-DFS is a custom field to enable the implementation of the `Strategy Pattern`_ with
-the Django models.
+Set of custom fields useful to implement the `Strategy Pattern`_ with Django models.
 
 The Strategies are displayed in SelectBoxes as standard choice field
-
-.. _Strategy Pattern: http://www.oodesign.com/strategy-pattern.html
 
 This package provides the following custom fields:
 
@@ -17,7 +14,7 @@ This package provides the following custom fields:
 * MultipleStrategyClassField
 
  The *StrategyField can be accessed as instance of the model and have an
- attribute `context` that point to model (reverse relation)
+ attribute `context` that point to model that 'owns' the field (reverse relation)
 
 Use case
 ========
@@ -77,6 +74,7 @@ Project links
 | Download:          |http://pypi.python.org/pypi/django-strategy-field/         |
 +--------------------+---------------+-------------------------------------------+
 
+.. _Strategy Pattern: http://www.oodesign.com/strategy-pattern.html
 
 .. |master-build| image:: https://secure.travis-ci.org/saxix/django-strategy-field.png?branch=master
                     :target: http://travis-ci.org/saxix/django-strategy-field/
