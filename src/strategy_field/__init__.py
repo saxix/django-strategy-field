@@ -3,7 +3,7 @@ import os
 import subprocess
 
 NAME = 'django-strategy-field'
-VERSION = __version__ = (0, 2, 0, 'final', 0)
+VERSION = __version__ = (0, 3, 0, 'alpha', 0)
 
 
 def get_version():  # pragma: no cover

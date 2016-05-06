@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import django
 import six
 from inspect import isclass
 
@@ -183,12 +184,17 @@ class MultipleStrategyClassField(AbstractStrategyField):
             return self.get_prep_value(value)
             # raise TypeError('Lookup type %r not supported.' % lookup_type)
 
+    def get_lookup(self, lookup_name):
+        if lookup_name == 'in':
+            raise TypeError('Lookup type %r not supported.' % lookup_name)
+        return super(MultipleStrategyClassField, self).get_lookup(lookup_name)
+
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
         return AbstractStrategyField.get_choices(self, False, blank_choice)
 
 
 class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
-    def __get__(self, obj, value):
+    def __get__(self, obj, value=None):
         return obj.__dict__.get(self.field.name)
 
     def __set__(self, obj, value):
@@ -254,3 +260,45 @@ class MultipleStrategyFieldDescriptor(MultipleStrategyClassFieldDescriptor):
 
 class MultipleStrategyField(MultipleStrategyClassField):
     descriptor = MultipleStrategyFieldDescriptor
+
+    def get_lookup(self, lookup_name):
+        if lookup_name == 'in':
+            raise TypeError('Lookup type %r not supported.' % lookup_name)
+        return super(MultipleStrategyField, self).get_lookup(lookup_name)
+
+
+if django.VERSION[:2] >= (1, 10):
+    from django.db.models.lookups import Contains, In
+
+    class StrategyFieldLookupMixin(object):
+        def get_prep_lookup(self):
+            value = super(StrategyFieldLookupMixin, self).get_prep_lookup()
+            if value is None:
+                return None
+            if isinstance(value, six.string_types):
+                pass
+            elif isinstance(value, (list, tuple)):
+                value = stringify(value)
+            elif isinstance(value, self.lhs.output_field.registry.klass):
+                value = fqn(value)
+            elif isclass(value) or isinstance(value, object):
+                value = fqn(value)
+            return value
+
+    class StrategyFieldContains(StrategyFieldLookupMixin, Contains):
+        pass
+
+    class StrategyFieldIn(StrategyFieldLookupMixin, In):
+        pass
+
+    class MultipleStrategyFieldContains(StrategyFieldLookupMixin, Contains):
+        pass
+
+    class MultipleStrategyFieldIn(StrategyFieldLookupMixin, In):
+        pass
+
+    StrategyField.register_lookup(StrategyFieldContains)
+    MultipleStrategyField.register_lookup(MultipleStrategyFieldContains)
+
+    StrategyClassField.register_lookup(StrategyFieldContains)
+    MultipleStrategyClassField.register_lookup(MultipleStrategyFieldContains)

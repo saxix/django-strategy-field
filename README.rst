@@ -13,8 +13,9 @@ This package provides the following custom fields:
 * StrategyClassField
 * MultipleStrategyClassField
 
- The *StrategyField can be accessed as instance of the model and have an
- attribute `context` that point to model that 'owns' the field (reverse relation)
+The StrategyField can be accessed as instance of the model with an attribute
+``context`` that points to model that 'owns' the field (inverse relation). So:
+
 
 Use case
 ========
@@ -26,6 +27,9 @@ the Django admin panel.
 
 .. code-block:: python
 
+
+    from strategy_field.registry import Registry
+    from strategy_field.fields import StrategyField
 
     class TransportRegistry(Registry)
         pass
@@ -44,7 +48,7 @@ the Django admin panel.
     class SMSStrategy(AbstractTransport):
         def send(self):
             ...
-    registry = Registry()
+    registry = TransportRegistry()
     registry.register(EmailStrategy)
     registry.register(SMSStrategy)
 

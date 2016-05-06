@@ -42,11 +42,6 @@ def test_field():
     assert d.sender == Sender1
 
 
-def test_field():
-    d = DemoModel(sender=Sender1)
-    assert d.sender == Sender1
-
-
 @pytest.mark.django_db
 def test_model_save(target):
     d = DemoModel(sender=target(None))
@@ -65,7 +60,8 @@ def test_model_save_none():
 def test_model_save_default():
     d = DemoModelDefault()
     d.save()
-    registry = d._meta.get_field_by_name('sender')[0].registry
+    # registry = d._meta.get_field_by_name('sender')[0].registry
+    registry = d._meta.get_field('sender').registry
     assert d.sender == registry[0]
 
 
@@ -73,7 +69,8 @@ def test_model_save_default():
 def test_model_save_default_with_callable():
     d = DemoModelCallableDefault()
     d.save()
-    registry = d._meta.get_field_by_name('sender')[0].registry
+    # registry = d._meta.get_field_by_name('sender')[0].registry
+    registry = d._meta.get_field('sender').registry
     assert d.sender == registry[0]
 
 
@@ -91,7 +88,8 @@ def test_model_load(demomodel):
 
 @pytest.mark.django_db
 def test_form(demomodel, registry):
-    demomodel._meta.get_field_by_name('sender')[0].registry = registry
+    # demomodel._meta.get_field_by_name('sender')[0].registry = registry
+    demomodel._meta.get_field('sender').registry = registry
     form_class = modelform_factory(DemoModel, exclude=[])
     form = form_class(instance=demomodel)
     assert form.fields['sender'].choices[1:] == registry.as_choices()
@@ -120,11 +118,15 @@ def test_form_not_valid(demomodel):
 def test_form_default(demomodel):
     form_class = modelform_factory(DemoModel, exclude=[])
     form = form_class(instance=demomodel)
-    assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
-                              u'<td><select id="id_sender" name="sender">\n' \
-                              u'<option value="">---------</option>\n' \
-                              u'<option value="demoproject.demoapp.models.Sender1" selected="selected">demoproject.demoapp.models.Sender1</option>\n' \
-                              u'<option value="demoproject.demoapp.models.Sender2">demoproject.demoapp.models.Sender2</option>\n</select></td></tr>'
+    assert form.fields['sender'].choices == [(u'', u'---------'),
+                                             ('demoproject.demoapp.models.Sender1', 'demoproject.demoapp.models.Sender1'),
+                                             ('demoproject.demoapp.models.Sender2', 'demoproject.demoapp.models.Sender2')]
+
+    # assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
+    #                           u'<td><select id="id_sender" name="sender" required>\n' \
+    #                           u'<option value="">---------</option>\n' \
+    #                           u'<option value="demoproject.demoapp.models.Sender1" selected="selected">demoproject.demoapp.models.Sender1</option>\n' \
+    #                           u'<option value="demoproject.demoapp.models.Sender2">demoproject.demoapp.models.Sender2</option>\n</select></td></tr>'
 
 
 @pytest.mark.django_db

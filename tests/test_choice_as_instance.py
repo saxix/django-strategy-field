@@ -101,11 +101,11 @@ def test_form_not_valid(democustommodel):
 def test_form_default(democustommodel):
     form_class = modelform_factory(DemoCustomModel, exclude=[])
     form = form_class(instance=democustommodel)
-    assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
-                              u'<td><select id="id_sender" name="sender">\n' \
-                              u'<option value="">---------</option>\n' \
-                              u'<option value="demoproject.demoapp.models.Strategy" selected="selected">demoproject.demoapp.models.Strategy</option>\n' \
-                              u'<option value="demoproject.demoapp.models.Strategy1">demoproject.demoapp.models.Strategy1</option>\n</select></td></tr>'
+    assert form.fields['sender'].choices == [(u'', u'---------'),
+                                             ('demoproject.demoapp.models.Strategy',
+                                              'demoproject.demoapp.models.Strategy'),
+                                             ('demoproject.demoapp.models.Strategy1',
+                                              'demoproject.demoapp.models.Strategy1')]
 
 
 @pytest.mark.django_db
