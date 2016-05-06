@@ -1,16 +1,15 @@
-import django_webtest
 import pytest
-from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
-                                        DemoModel, DemoMultipleCustomModel,
-                                        DemoMultipleModel, Sender1, Sender2,
-                                        Strategy,)
 
-from strategy_field.registry import Registry
-from strategy_field.utils import fqn
 
 
 @pytest.fixture
 def registry():
+    from strategy_field.registry import Registry
+    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
+                                            DemoModel, DemoMultipleCustomModel,
+                                            DemoMultipleModel, Sender1, Sender2,
+                                            Strategy, )
+
     r = Registry(AbstractSender)
     r.register(Sender1)
     r.register(Sender2)
@@ -19,6 +18,12 @@ def registry():
 
 @pytest.fixture
 def custom_registry():
+    from strategy_field.registry import Registry
+    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
+                                            DemoModel, DemoMultipleCustomModel,
+                                            DemoMultipleModel, Sender1, Sender2,
+                                            Strategy, )
+
     r = Registry(Strategy)
     r.register(Strategy)
     return r
@@ -26,26 +31,51 @@ def custom_registry():
 
 @pytest.fixture
 def demomodel():
+    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
+                                            DemoModel, DemoMultipleCustomModel,
+                                            DemoMultipleModel, Sender1, Sender2,
+                                            Strategy, )
+
     return DemoModel.objects.get_or_create(sender=Sender1)[0]
 
 
 @pytest.fixture
 def democustommodel():
+    from strategy_field.utils import fqn
+
+    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
+                                            DemoModel, DemoMultipleCustomModel,
+                                            DemoMultipleModel, Sender1, Sender2,
+                                            Strategy, )
+
     return DemoCustomModel.objects.get_or_create(sender=fqn(Strategy))[0]
 
 
 @pytest.fixture
 def demo_multiplecustom_model():
+    from strategy_field.utils import fqn
+    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
+                                            DemoModel, DemoMultipleCustomModel,
+                                            DemoMultipleModel, Sender1, Sender2,
+                                            Strategy, )
+
     return DemoMultipleCustomModel.objects.get_or_create(sender=[fqn(Strategy)])[0]
 
 
 @pytest.fixture
 def demo_multiple_model():
+    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
+                                            DemoModel, DemoMultipleCustomModel,
+                                            DemoMultipleModel, Sender1, Sender2,
+                                            Strategy, )
+
     return DemoMultipleModel.objects.get_or_create(sender=[Sender1])[0]
 
 
 @pytest.fixture(scope='function')
 def webapp(request):
+    import django_webtest
+
     wtm = django_webtest.WebTestMixin()
     wtm.csrf_checks = False
     wtm._patch_settings()
