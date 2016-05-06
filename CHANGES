@@ -2,7 +2,7 @@ Release 0.3 (dev)
 =================
 * Django 1.10 support
 * dropped support django 1.7
-
+* do not need Registry
 
 Release 0.2
 ===========

@@ -16,6 +16,20 @@ This package provides the following custom fields:
 The StrategyField can be accessed as instance of the model with an attribute
 ``context`` that points to model that 'owns' the field (inverse relation). So:
 
+Example
+=======
+
+.. code-block:: python
+
+    from strategy_field.fields import StrategyField
+    from django.core.mail.backends.filebased.EmailBackend
+
+
+    class Event(models.Model):
+        backend = StrategyField()
+
+    Event(sender='django.core.mail.backends.filebased.EmailBackend')
+
 
 Use case
 ========
@@ -27,6 +41,7 @@ the Django admin panel.
 
 .. code-block:: python
 
+    from strategy_field.fields import StrategyField
 
     from strategy_field.registry import Registry
     from strategy_field.fields import StrategyField

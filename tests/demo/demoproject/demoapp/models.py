@@ -2,6 +2,8 @@
 import logging
 
 import six
+from django.core.mail.backends.base import BaseEmailBackend
+from django.core.mail.backends.filebased import EmailBackend
 
 from django.db import models
 from strategy_field.fields import (MultipleStrategyClassField,
@@ -39,7 +41,6 @@ registry.register(Sender2)
 
 
 class AbstractStrategy(object):
-
     def __init__(self, context, label=''):
         if not context:
             raise ValueError("Invalid context for strategy ('')".format(context))
@@ -56,7 +57,6 @@ class Strategy1(AbstractStrategy):
 
 
 class StrategyRegistry(Registry):
-
     def deserialize(self, value, obj=None):
         ret = []
         if isinstance(value, six.string_types):
@@ -102,7 +102,6 @@ class DemoModelCallableDefault(models.Model):
 
 
 class DemoModelProxy(DemoModel):
-
     class Meta:
         proxy = True
 
@@ -123,6 +122,13 @@ class DemoModelContext(models.Model):
     pass
 
 
-# class DemoModelGetter(models.Model):
-    # fk = models.ForeignKey(DemoModelContext)
-    # sender = StrategyField(registry=registry1, getter=lambda s: s.fk)
+# funny code. just for tests
+def factory(klass, context):
+    if issubclass(klass, BaseEmailBackend):
+        return klass(file_path='')
+    return klass()
+
+
+class DemoModelNoRegistry(models.Model):
+    klass = StrategyClassField(blank=True, null=True)
+    instance = StrategyField(factory=factory, blank=True, null=True)
