@@ -1,10 +1,25 @@
 # Django settings for demoproject project.
 import os
+import django
 
 here = os.path.dirname(__file__)
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+
+if django.VERSION[1] >= 10:
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                # ... some options here ...
+            },
+        },
+    ]
+else:
+    TEMPLATE_DIRS = ['demo/templates']
+
 
 DATABASES = {
     'default': {

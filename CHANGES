@@ -1,3 +1,10 @@
+Release 0.3 (07 May 2016)
+=========================
+* Django 1.10 support
+* dropped support django 1.7
+* do not need Registry
+
+
 Release 0.2
 ===========
 * Django 1.9 support

@@ -60,7 +60,8 @@ def test_model_load(demo_multiple_model):
 
 @pytest.mark.django_db
 def test_form(demo_multiple_model, registry):
-    demo_multiple_model._meta.get_field_by_name('sender')[0].registry = registry
+    # demo_multiple_model._meta.get_field_by_name('sender')[0].registry = registry
+    demo_multiple_model._meta.get_field('sender').registry = registry
     form_class = modelform_factory(DemoMultipleModel, exclude=[])
     form = form_class(instance=demo_multiple_model)
     assert form.fields['sender'].choices == registry.as_choices()
@@ -89,10 +90,10 @@ def test_form_not_valid(demo_multiple_model):
 def test_form_default(demo_multiple_model):
     form_class = modelform_factory(DemoMultipleModel, exclude=[])
     form = form_class(instance=demo_multiple_model)
-    assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
-                              u'<td><select multiple="multiple" id="id_sender" name="sender">\n' \
-                              u'<option value="demoproject.demoapp.models.Sender1" selected="selected">demoproject.demoapp.models.Sender1</option>\n' \
-                              u'<option value="demoproject.demoapp.models.Sender2">demoproject.demoapp.models.Sender2</option>\n</select></td></tr>'
+    assert form.fields['sender'].choices == [('demoproject.demoapp.models.Sender1',
+                                              'demoproject.demoapp.models.Sender1'),
+                                             ('demoproject.demoapp.models.Sender2',
+                                              'demoproject.demoapp.models.Sender2')]
 
 
 @pytest.mark.django_db
@@ -111,14 +112,6 @@ def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiple_model)
     res.form.submit().follow()
     assert DemoMultipleModel.objects.filter(sender='demoproject.demoapp.models.Sender2').count() == 1
 
-#
-# @pytest.mark.django_db
-# def test_admin_demo_multiple_model_validate(webapp, admin_user, demo_multiple_model):
-#     res = webapp.get('/admin/demo/demomultiplemodel/%s/' % demo_multiple_model.pk, user=admin_user)
-#     res.form['sender'] = ['invalid']
-#     res = res.form.submit()
-#     assert 'Select a valid choice' in res.context['adminform'].form.errors['sender'][0]
-
 
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_equal(demo_multiple_model, target):
@@ -133,4 +126,4 @@ def test_demo_multiple_model_lookup_contains(demo_multiple_model, target):
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_in(demo_multiple_model, target):
     with pytest.raises(TypeError):
-        assert DemoMultipleModel.objects.get(sender__in=target(demo_multiple_model)) == demo_multiple_model
+        assert DemoMultipleModel.objects.get(sender__in=[target(demo_multiple_model)]) == demo_multiple_model

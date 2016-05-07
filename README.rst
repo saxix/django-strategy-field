@@ -2,12 +2,9 @@
 django-strategy-field
 =====================
 
-DFS is a custom field to enable the implementation of the `Strategy Pattern`_ with
-the Django models.
+Set of custom fields useful to implement the `Strategy Pattern`_ with Django models.
 
 The Strategies are displayed in SelectBoxes as standard choice field
-
-.. _Strategy Pattern: http://www.oodesign.com/strategy-pattern.html
 
 This package provides the following custom fields:
 
@@ -16,8 +13,23 @@ This package provides the following custom fields:
 * StrategyClassField
 * MultipleStrategyClassField
 
- The *StrategyField can be accessed as instance of the model and have an
- attribute `context` that point to model (reverse relation)
+The StrategyField can be accessed as instance of the model with an attribute
+``context`` that points to model that 'owns' the field (inverse relation). So:
+
+Example
+=======
+
+.. code-block:: python
+
+    from strategy_field.fields import StrategyField
+    from django.core.mail.backends.filebased.EmailBackend
+
+
+    class Event(models.Model):
+        backend = StrategyField()
+
+    Event(sender='django.core.mail.backends.filebased.EmailBackend')
+
 
 Use case
 ========
@@ -29,6 +41,10 @@ the Django admin panel.
 
 .. code-block:: python
 
+    from strategy_field.fields import StrategyField
+
+    from strategy_field.registry import Registry
+    from strategy_field.fields import StrategyField
 
     class TransportRegistry(Registry)
         pass
@@ -47,7 +63,7 @@ the Django admin panel.
     class SMSStrategy(AbstractTransport):
         def send(self):
             ...
-    registry = Registry()
+    registry = TransportRegistry()
     registry.register(EmailStrategy)
     registry.register(SMSStrategy)
 
@@ -77,6 +93,7 @@ Project links
 | Download:          |http://pypi.python.org/pypi/django-strategy-field/         |
 +--------------------+---------------+-------------------------------------------+
 
+.. _Strategy Pattern: http://www.oodesign.com/strategy-pattern.html
 
 .. |master-build| image:: https://secure.travis-ci.org/saxix/django-strategy-field.png?branch=master
                     :target: http://travis-ci.org/saxix/django-strategy-field/
