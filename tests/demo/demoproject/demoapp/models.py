@@ -3,7 +3,6 @@ import logging
 
 import six
 from django.core.mail.backends.base import BaseEmailBackend
-from django.core.mail.backends.filebased import EmailBackend
 
 from django.db import models
 from strategy_field.fields import (MultipleStrategyClassField,

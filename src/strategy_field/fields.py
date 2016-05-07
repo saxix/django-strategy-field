@@ -3,12 +3,13 @@ import django
 import six
 from inspect import isclass
 
+from django.core.exceptions import ValidationError
 from django.core.validators import BaseValidator
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH, NOT_PROVIDED
 from django.utils.deconstruct import deconstructible
 from django.utils.text import capfirst
-from django.utils.translation import ugettext_lazy as _, ungettext_lazy
+from django.utils.translation import ugettext_lazy as _
 
 from strategy_field.forms import (StrategyFormField,
                                   StrategyMultipleChoiceFormField, )
@@ -17,31 +18,47 @@ from strategy_field.utils import fqn, import_by_name, stringify
 NOCONTEXT = object()
 
 
+def get_class(value):
+    if not value:
+        pass
+    elif isinstance(value, six.string_types):
+        value = import_by_name(value)
+    elif isclass(value):
+        pass
+    elif isinstance(value, object):
+        value = type(value)
+    else:
+        raise ValueError(value)
+    return value
+
+
 @deconstructible
-class RegistryValidator(BaseValidator):
+class ClassnameValidator(BaseValidator):
+    message = _('Ensure this value is valid class name (it is %(show_value)s).')
+    code = 'classname'
+
+    def compare(self, a, b):
+        try:
+            get_class(a)
+        except (ImportError, TypeError):
+            return True
+        return False
+
+
+@deconstructible
+class RegistryValidator(ClassnameValidator):
     message = _('Ensure this value is registered (it is %(show_value)s).')
     code = 'registry'
-
-    def _get_class(self, value):
-        if isinstance(value, six.string_types):
-            value = import_by_name(value)
-        elif isclass(value):
-            pass
-        elif isinstance(value, object):
-            value = type(value)
-        else:
-            raise ValueError(value)
-        return value
 
     def compare(self, value, registry):
         if value is None:
             return False
         elif isinstance(value, (list, tuple)):
             for c in value:
-                if not issubclass(self._get_class(value), registry.klass):
+                if not issubclass(get_class(value), registry.klass):
                     return False
         else:
-            value = self._get_class(value)
+            value = get_class(value)
         return not issubclass(value, registry.klass)
 
 
@@ -51,11 +68,14 @@ class StrategyClassFieldDescriptor(object):
 
     def __get__(self, obj, type=None):
         value = obj.__dict__.get(self.field.name)
-
-        if isclass(value):
-            return value
-        elif isinstance(value, six.string_types):
-            return import_by_name(value)
+        try:
+            return get_class(value)
+        except:
+            raise ValidationError(value)
+            # if isclass(value):
+            #     return value
+            # elif isinstance(value, six.string_types):
+            #     return import_by_name(value)
 
     def __set__(self, obj, value):
         obj.__dict__[self.field.name] = value
@@ -90,6 +110,7 @@ class AbstractStrategyField(models.Field):
 
         self.registry = kwargs.pop("registry", None)
         super(AbstractStrategyField, self).__init__(*args, **kwargs)
+        self.validators.append(ClassnameValidator(None))
         if self.registry:
             self.validators.append(RegistryValidator(self.registry))
 
@@ -159,10 +180,10 @@ class StrategyClassField(AbstractStrategyField):
     def get_prep_value(self, value):
         if value is None:
             return None
-        if isinstance(value, six.string_types):
-            return value
-        if isclass(value) or isinstance(value, object):
-            return fqn(value)
+        # if isinstance(value, six.string_types):
+        #     return value
+        # if isclass(value) or isinstance(value, object):
+        #     return fqn(value)
         return fqn(value)
 
     def get_prep_lookup(self, lookup_type, value):
@@ -171,6 +192,8 @@ class StrategyClassField(AbstractStrategyField):
         elif lookup_type == 'in':
             return [self.get_prep_value(v) for v in value]
         elif lookup_type == 'contains':
+            return self.get_prep_value(value)
+        elif lookup_type == 'icontains':
             return self.get_prep_value(value)
         else:
             raise TypeError('Lookup type %r not supported.' % lookup_type)
@@ -193,6 +216,8 @@ class MultipleStrategyClassField(AbstractStrategyField):
             return self.get_prep_value(value)
         elif lookup_type == 'in':
             raise TypeError('Lookup type %r not supported.' % lookup_type)
+        elif lookup_type == 'icontains':
+            return self.get_prep_value(value)
         elif lookup_type == 'contains':
             return self.get_prep_value(value)
 
@@ -211,12 +236,13 @@ class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
 
     def __set__(self, obj, value):
         if not value:
-            obj.__dict__[self.field.name] = None
-
-        elif isinstance(value, six.string_types):
-            value = import_by_name(value)
-        elif isclass(value):
-            value = value
+            value = None
+        else:
+            value = get_class(value)
+        # elif isinstance(value, six.string_types):
+        #     value = import_by_name(value)
+        # elif isclass(value):
+        #     value = value
 
         if isclass(value):
             value = self.field.factory(value, obj)
@@ -274,7 +300,7 @@ class MultipleStrategyField(MultipleStrategyClassField):
 
 
 if django.VERSION[:2] >= (1, 10):
-    from django.db.models.lookups import Contains, In
+    from django.db.models.lookups import Contains, In, IContains
 
 
     class StrategyFieldLookupMixin(object):
@@ -292,25 +318,28 @@ if django.VERSION[:2] >= (1, 10):
                 value = fqn(value)
             return value
 
-
-    class StrategyFieldContains(StrategyFieldLookupMixin, Contains):
+    class StrategyFieldContains(StrategyFieldLookupMixin, IContains):
         pass
 
+    class StrategyFieldIContains(StrategyFieldLookupMixin, Contains):
+        pass
 
     class StrategyFieldIn(StrategyFieldLookupMixin, In):
         pass
 
-
     class MultipleStrategyFieldContains(StrategyFieldLookupMixin, Contains):
         pass
 
+    class StrategyFieldContains(StrategyFieldLookupMixin, IContains):
+        pass
 
     class MultipleStrategyFieldIn(StrategyFieldLookupMixin, In):
         pass
 
-
     StrategyField.register_lookup(StrategyFieldContains)
+    StrategyField.register_lookup(StrategyFieldIContains)
     MultipleStrategyField.register_lookup(MultipleStrategyFieldContains)
 
     StrategyClassField.register_lookup(StrategyFieldContains)
+    StrategyClassField.register_lookup(StrategyFieldIContains)
     MultipleStrategyClassField.register_lookup(MultipleStrategyFieldContains)

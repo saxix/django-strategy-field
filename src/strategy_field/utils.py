@@ -36,6 +36,8 @@ def fqn(o):
     :return: class name
     """
     parts = []
+    if isinstance(o, six.string_types):
+        return o
     if not hasattr(o, '__module__'):
         raise ValueError('Invalid argument `%s`' % o)
     parts.append(o.__module__)

@@ -1,14 +1,10 @@
 import pytest
 
 
-
 @pytest.fixture
 def registry():
     from strategy_field.registry import Registry
-    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
-                                            DemoModel, DemoMultipleCustomModel,
-                                            DemoMultipleModel, Sender1, Sender2,
-                                            Strategy, )
+    from demoproject.demoapp.models import (AbstractSender, Sender1, Sender2)
 
     r = Registry(AbstractSender)
     r.register(Sender1)
@@ -19,10 +15,7 @@ def registry():
 @pytest.fixture
 def custom_registry():
     from strategy_field.registry import Registry
-    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
-                                            DemoModel, DemoMultipleCustomModel,
-                                            DemoMultipleModel, Sender1, Sender2,
-                                            Strategy, )
+    from demoproject.demoapp.models import (Strategy, )
 
     r = Registry(Strategy)
     r.register(Strategy)
@@ -31,10 +24,7 @@ def custom_registry():
 
 @pytest.fixture
 def demomodel():
-    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
-                                            DemoModel, DemoMultipleCustomModel,
-                                            DemoMultipleModel, Sender1, Sender2,
-                                            Strategy, )
+    from demoproject.demoapp.models import (DemoModel, Sender1, )
 
     return DemoModel.objects.get_or_create(sender=Sender1)[0]
 
@@ -43,10 +33,7 @@ def demomodel():
 def democustommodel():
     from strategy_field.utils import fqn
 
-    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
-                                            DemoModel, DemoMultipleCustomModel,
-                                            DemoMultipleModel, Sender1, Sender2,
-                                            Strategy, )
+    from demoproject.demoapp.models import (DemoCustomModel, Strategy, )
 
     return DemoCustomModel.objects.get_or_create(sender=fqn(Strategy))[0]
 
@@ -54,20 +41,14 @@ def democustommodel():
 @pytest.fixture
 def demo_multiplecustom_model():
     from strategy_field.utils import fqn
-    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
-                                            DemoModel, DemoMultipleCustomModel,
-                                            DemoMultipleModel, Sender1, Sender2,
-                                            Strategy, )
+    from demoproject.demoapp.models import (DemoMultipleCustomModel, Strategy, )
 
     return DemoMultipleCustomModel.objects.get_or_create(sender=[fqn(Strategy)])[0]
 
 
 @pytest.fixture
 def demo_multiple_model():
-    from demoproject.demoapp.models import (AbstractSender, DemoCustomModel,
-                                            DemoModel, DemoMultipleCustomModel,
-                                            DemoMultipleModel, Sender1, Sender2,
-                                            Strategy, )
+    from demoproject.demoapp.models import (DemoMultipleModel, Sender1)
 
     return DemoMultipleModel.objects.get_or_create(sender=[Sender1])[0]
 
