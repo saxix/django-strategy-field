@@ -1,3 +1,7 @@
+Release 0.4
+===========
+* fixes bug wit DRF
+
 Release 0.3 (07 May 2016)
 =========================
 * Django 1.10 support

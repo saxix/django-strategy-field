@@ -106,7 +106,7 @@ class DemoModelProxy(DemoModel):
 
 
 class DemoMultipleModel(models.Model):
-    sender = MultipleStrategyClassField(registry=registry)
+    sender = MultipleStrategyClassField(registry=registry, null=True, blank=True)
 
 
 class DemoCustomModel(models.Model):

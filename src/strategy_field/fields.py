@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import django
 import six
 from inspect import isclass
 
+import django
 from django.core.exceptions import ValidationError
 from django.core.validators import BaseValidator
 from django.db import models
@@ -12,7 +12,7 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
 from strategy_field.forms import (StrategyFormField,
-                                  StrategyMultipleChoiceFormField, )
+                                  StrategyMultipleChoiceFormField,)
 from strategy_field.utils import fqn, import_by_name, stringify
 
 NOCONTEXT = object()
@@ -95,7 +95,7 @@ class MultipleStrategyClassFieldDescriptor(object):
         if isinstance(value, (list, tuple)):
             ret = []
             for v in value:
-                if isinstance(v, six.string_types):
+                if isinstance(v, six.string_types) and v:
                     v = import_by_name(v)
                 ret.append(v)
             return ret
@@ -203,6 +203,13 @@ class MultipleStrategyClassField(AbstractStrategyField):
     descriptor = MultipleStrategyClassFieldDescriptor
     form_class = StrategyMultipleChoiceFormField
 
+    def validate(self, value, model_instance):
+        return value in self.registry
+
+    def get_db_prep_save(self, value, connection):
+        value = filter(lambda x: x, value)
+        return super(MultipleStrategyClassField, self).get_db_prep_save(value, connection)
+
     def get_prep_value(self, value):
         if value is None:
             return None
@@ -302,7 +309,6 @@ class MultipleStrategyField(MultipleStrategyClassField):
 if django.VERSION[:2] >= (1, 10):
     from django.db.models.lookups import Contains, In, IContains
 
-
     class StrategyFieldLookupMixin(object):
         def get_prep_lookup(self):
             value = super(StrategyFieldLookupMixin, self).get_prep_lookup()
@@ -328,9 +334,6 @@ if django.VERSION[:2] >= (1, 10):
         pass
 
     class MultipleStrategyFieldContains(StrategyFieldLookupMixin, Contains):
-        pass
-
-    class StrategyFieldContains(StrategyFieldLookupMixin, IContains):
         pass
 
     class MultipleStrategyFieldIn(StrategyFieldLookupMixin, In):
