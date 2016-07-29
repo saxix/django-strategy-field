@@ -1,5 +1,7 @@
 # Django settings for demoproject project.
 import os
+import random
+
 import django
 
 here = os.path.dirname(__file__)
@@ -19,7 +21,6 @@ if django.VERSION[1] >= 10:
     ]
 else:
     TEMPLATE_DIRS = ['demo/templates']
-
 
 DATABASES = {
     'default': {
@@ -64,3 +65,4 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'demoproject.demoapp.apps.DemoConfig')
+

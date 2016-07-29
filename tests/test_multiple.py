@@ -40,6 +40,32 @@ def test_field():
 
 
 @pytest.mark.django_db
+def test_basic():
+    d = DemoMultipleModel(sender=Sender1)
+    d.save()
+    assert d.sender == [Sender1]
+
+    d = DemoMultipleModel(sender=[Sender1])
+    d.save()
+    assert d.sender == [Sender1]
+
+    d = DemoMultipleModel()
+    d.sender = Sender1
+    d.save()
+    assert d.sender == [Sender1]
+
+    d = DemoMultipleModel()
+    d.sender = [Sender1]
+    d.save()
+    assert d.sender == [Sender1]
+
+    d = DemoMultipleModel()
+    d.sender = [Sender1, Sender2]
+    d.save()
+    assert d.sender == [Sender1, Sender2]
+
+
+@pytest.mark.django_db
 def test_model_save(target):
     d = DemoMultipleModel(sender=target(None))
     d.save()

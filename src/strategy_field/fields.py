@@ -105,6 +105,7 @@ class MultipleStrategyClassFieldDescriptor(object):
 
 
 class AbstractStrategyField(models.Field):
+# class AbstractStrategyField(models.CharField):
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 200
 
@@ -202,6 +203,9 @@ class StrategyClassField(AbstractStrategyField):
 class MultipleStrategyClassField(AbstractStrategyField):
     descriptor = MultipleStrategyClassFieldDescriptor
     form_class = StrategyMultipleChoiceFormField
+
+    def validate(self, value, model_instance):
+        return value in self.registry
 
     def get_prep_value(self, value):
         if value is None:

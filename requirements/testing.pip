@@ -17,3 +17,4 @@ readme==0.7.1
 setuptools==21.0.0
 tox==2.3.1
 WebTest==2.0.21
+djangorestframework
