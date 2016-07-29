@@ -34,4 +34,5 @@ urlpatterns = (
     url(r'api/m/$', DemoMultipleModelView.as_view({'get': 'list',
                                            'post': 'create'}), name='multiple'),
 
+
 )

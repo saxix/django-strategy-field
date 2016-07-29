@@ -2,10 +2,12 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+
+import six
 from rest_framework import serializers
 from rest_framework.viewsets import ModelViewSet
 
-from demoproject.demoapp.models import DemoMultipleModel, DemoModel
+from demoproject.demoapp.models import DemoMultipleModel, DemoModel, DemoModelNone
 from strategy_field.utils import fqn, stringify
 
 logger = logging.getLogger(__name__)
@@ -22,10 +24,10 @@ class MultipleStrategyClassFieldDrf(serializers.CharField):
 
 
 class DemoModelSerializer(serializers.ModelSerializer):
-    sender = StrategyClassFieldDrf()
+    sender = StrategyClassFieldDrf(required=False)
 
     class Meta:
-        model = DemoModel
+        model = DemoModelNone
 
 
 class DemoMultipleModelSerializer(serializers.ModelSerializer):
@@ -37,7 +39,7 @@ class DemoMultipleModelSerializer(serializers.ModelSerializer):
 
 class DemoModelView(ModelViewSet):
     serializer_class = DemoModelSerializer
-    queryset = DemoModel.objects.all()
+    queryset = DemoModelNone.objects.all()
 
 
 class DemoMultipleModelView(ModelViewSet):

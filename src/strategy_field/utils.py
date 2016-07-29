@@ -73,7 +73,7 @@ def stringify(value):
     # if isinstance(value, six.string_types):
     #     value = value.split(',')
     for v in value:
-        if isinstance(v, six.string_types):
+        if isinstance(v, six.string_types) and v:
             ret.append(v)
         else:
             ret.append(fqn(v))
