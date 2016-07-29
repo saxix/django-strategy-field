@@ -105,7 +105,6 @@ class MultipleStrategyClassFieldDescriptor(object):
 
 
 class AbstractStrategyField(models.Field):
-# class AbstractStrategyField(models.CharField):
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 200
 
@@ -306,7 +305,6 @@ class MultipleStrategyField(MultipleStrategyClassField):
 if django.VERSION[:2] >= (1, 10):
     from django.db.models.lookups import Contains, In, IContains
 
-
     class StrategyFieldLookupMixin(object):
         def get_prep_lookup(self):
             value = super(StrategyFieldLookupMixin, self).get_prep_lookup()
@@ -332,9 +330,6 @@ if django.VERSION[:2] >= (1, 10):
         pass
 
     class MultipleStrategyFieldContains(StrategyFieldLookupMixin, Contains):
-        pass
-
-    class StrategyFieldContains(StrategyFieldLookupMixin, IContains):
         pass
 
     class MultipleStrategyFieldIn(StrategyFieldLookupMixin, In):

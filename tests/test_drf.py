@@ -14,7 +14,6 @@ from strategy_field.utils import fqn, stringify
 logger = logging.getLogger(__name__)
 
 
-
 @pytest.mark.django_db
 def test_get_single(webapp):
     x = G(DemoModel)

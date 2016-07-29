@@ -15,18 +15,10 @@ class StrategyClassFieldDrf(serializers.CharField):
     def to_representation(self, value):
         return fqn(value)
 
-    def to_internal_value(self, data):
-        return super(StrategyClassFieldDrf, self).to_internal_value(data)
-
 
 class MultipleStrategyClassFieldDrf(serializers.CharField):
     def to_representation(self, value):
         return stringify(value)
-
-    def to_internal_value(self, data):
-        # FIXME: remove this line
-        # import pdb; pdb.set_trace()
-        return super(MultipleStrategyClassFieldDrf, self).to_internal_value(data)
 
 
 class DemoModelSerializer(serializers.ModelSerializer):

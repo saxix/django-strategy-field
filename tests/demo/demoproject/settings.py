@@ -1,6 +1,5 @@
 # Django settings for demoproject project.
 import os
-import random
 
 import django
 
