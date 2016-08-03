@@ -1,3 +1,8 @@
+Release 0.6 (dev)
+=================
+*
+
+
 Release 0.5
 ===========
 * fixes bugs for empty or null values in MultipleStrategyClassField
