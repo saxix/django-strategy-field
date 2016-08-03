@@ -42,7 +42,6 @@ def democustommodel():
 def demo_multiplecustom_model():
     from strategy_field.utils import fqn
     from demoproject.demoapp.models import (DemoMultipleCustomModel, Strategy, )
-
     return DemoMultipleCustomModel.objects.get_or_create(sender=[fqn(Strategy)])[0]
 
 

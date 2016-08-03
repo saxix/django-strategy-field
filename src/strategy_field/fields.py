@@ -207,7 +207,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
         return value in self.registry
 
     def get_db_prep_save(self, value, connection):
-        value = filter(lambda x: x, value) if value is not None else None  # GG: avoid the TypeError NoneType iterable
+        value = list(filter(lambda x: x, value) )if value is not None else None  # GG: avoid the TypeError NoneType
         return super(MultipleStrategyClassField, self).get_db_prep_save(value, connection)
 
     def get_prep_value(self, value):
