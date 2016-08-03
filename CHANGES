@@ -1,5 +1,5 @@
-Release 0.5 (dev)
-=================
+Release 0.5
+===========
 * fixes bugs for empty or null values in MultipleStrategyClassField
 * dropped support for python3.3
 
