@@ -3,15 +3,8 @@ sudo: false
 python:
     - 3.5
 env:
-  - TOXENV=py27-d17
   - TOXENV=py27-d18
   - TOXENV=py27-d19
-
-  - TOXENV=py33-d17
-  - TOXENV=py33-d18
-
-  - TOXENV=py34-d18
-  - TOXENV=py34-d19
 
   - TOXENV=py35-d18
   - TOXENV=py35-d19
@@ -20,7 +13,7 @@ install:
   - pip install tox "coverage<4.0" python-coveralls>=2.5 coveralls>=0.5 codecov
 
 script:
-  - tox -e $TOXENV --recreate -- py.test tests/ -v --capture=no --cov=strategy_field --cov-report=xml --cov-config=tests/.coveragerc
+  - tox -re $TOXENV -- py.test tests/ --create-db -v --capture=no --cov=strategy_field --cov-report=xml --cov-config=tests/.coveragerc
 
 before_success:
   - coverage erase

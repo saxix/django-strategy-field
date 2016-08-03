@@ -48,8 +48,8 @@ def test_get_multiple(webapp):
     assert res.json['sender'] == ''
 
     x = G(DemoMultipleModel, sender=None)
-    # res = webapp.get('/api/m/' + str(x.id) + '/')
-    # assert res.json['sender'] == ''
+    res = webapp.get('/api/m/' + str(x.id) + '/')
+    assert res.json['sender'] is None
 
 
 @pytest.mark.django_db
