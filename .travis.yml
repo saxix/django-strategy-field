@@ -13,8 +13,7 @@ install:
   - pip install tox "coverage<4.0" python-coveralls>=2.5 coveralls>=0.5 codecov
 
 script:
-  - tox -re $TOXENV -- py.test tests/ --create-db -v --capture=no --cov=strategy_field --cov-report=xml
-  --cov-config=tests/.coveragerc
+  - tox -re $TOXENV -- py.test tests/ --create-db -v --capture=no --cov=strategy_field --cov-report=xml --cov-config=tests/.coveragerc
 
 before_success:
   - coverage erase
