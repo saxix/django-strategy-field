@@ -34,6 +34,30 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("target", values, ids=ids)
 
 
+def test_field_none():
+    d = DemoMultipleModel(sender=None)
+    assert d.sender is None
+
+
+@pytest.mark.django_db
+def test_field_none_saved():
+    d = DemoMultipleModel(sender=None)
+    d.sender = None
+    d.save()
+    assert d.sender is None
+
+
+def test_field_empty():
+    d = DemoMultipleModel(sender=[])
+    assert d.sender == []
+
+
+def test_field_empty_len():
+    expected = 0
+    d = DemoMultipleModel(sender=[])
+    assert d.sender.__len__() == expected
+
+
 def test_field():
     d = DemoMultipleModel(sender=Sender1)
     assert d.sender == [Sender1]
