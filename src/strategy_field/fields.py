@@ -91,7 +91,7 @@ class MultipleStrategyClassFieldDescriptor(object):
         if isinstance(value, six.string_types):
             value = value.split(',')
         if not isinstance(value, (list, tuple)):
-            value = [value] if value is not None else None  # GG: avoid [None]
+            value = [value] if value is not None else None
         if isinstance(value, (list, tuple)):
             ret = []
             for v in value:
@@ -207,7 +207,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
         return value in self.registry
 
     def get_db_prep_save(self, value, connection):
-        value = list(filter(lambda x: x, value) )if value is not None else None  # GG: avoid the TypeError NoneType
+        value = list(filter(lambda x: x, value) )if value is not None else None
         return super(MultipleStrategyClassField, self).get_db_prep_save(value, connection)
 
     def get_prep_value(self, value):
