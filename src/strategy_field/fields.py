@@ -274,7 +274,7 @@ class MultipleStrategyFieldDescriptor(MultipleStrategyClassFieldDescriptor):
     def __get__(self, obj, type=None):
         value = obj.__dict__.get(self.field.name)
 
-        if isinstance(value, six.string_types) or isinstance(value, (list, tuple)):
+        if value and isinstance(value, six.string_types) or isinstance(value, (list, tuple)):
             ret = []
             if isinstance(value, six.string_types):
                 value = value.split(',')

@@ -1,6 +1,7 @@
 Release 0.6 (dev)
 =================
-*
+* Registry now accept strings as fully qualified class name as argument or None to by-pass class checking
+* new `contrib` package with some helper class
 
 
 Release 0.5
