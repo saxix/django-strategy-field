@@ -5,12 +5,12 @@ import six
 from django.core.exceptions import ValidationError
 from django.forms.fields import ChoiceField, TypedMultipleChoiceField
 
-from strategy_field.utils import fqn, stringify
+from strategy_field.utils import fqn, stringify, get_display_string
 
 
 class StrategyFormField(ChoiceField):
-
     def __init__(self, *args, **kwargs):
+        self.display_attribute = kwargs.pop('display_attribute', None)
         self.registry = kwargs.pop('registry')
         self.empty_value = kwargs.pop('empty_value', '')
         super(StrategyFormField, self).__init__(*args, **kwargs)
@@ -44,7 +44,6 @@ class StrategyFormField(ChoiceField):
                 code='invalid_choice',
                 params={'value': value},
             )
-        return value
 
     def clean(self, value):
         value = super(StrategyFormField, self).clean(value)
@@ -52,13 +51,11 @@ class StrategyFormField(ChoiceField):
 
 
 class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
-
     def __init__(self, *args, **kwargs):
         self.registry = kwargs.pop('registry')
-        super(StrategyMultipleChoiceFormField, self).__init__(*args, **kwargs)
+        self.display_attribute = kwargs.pop('display_attribute', None)
 
-    # def _get_choices(self):
-    #     return super(StrategyMultipleChoiceFormField, self)._get_choices()
+        super(StrategyMultipleChoiceFormField, self).__init__(*args, **kwargs)
 
     def prepare_value(self, value):
         ret = value

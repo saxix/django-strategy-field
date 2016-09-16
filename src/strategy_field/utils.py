@@ -7,6 +7,17 @@ from inspect import isclass
 logger = logging.getLogger(__name__)
 
 
+def get_display_string(klass, display_attribute):
+    if display_attribute and hasattr(klass, display_attribute):
+        attr = getattr(klass, display_attribute)
+        if callable(attr):
+            return attr()
+        else:
+            return attr
+
+    return fqn(klass)
+
+
 def get_attr(obj, attr, default=None):
     """Recursive get object's attribute. May use dot notation.
 

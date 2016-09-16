@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # flake8: noqa
 import pytest
-from demoproject.demoapp.models import Sender2
+from demoproject.demoapp.models import Sender2, SenderNotRegistered
 from django.forms.models import modelform_factory
 from django.core.urlresolvers import reverse
 from demoproject.demoapp.models import (DemoModel, DemoModelDefault,
                                         DemoModelCallableDefault,
-                                        DemoModelNone, Sender1,)
+                                        DemoModelNone, Sender1, )
 from strategy_field.utils import fqn
 
 
@@ -119,8 +119,10 @@ def test_form_default(demomodel):
     form_class = modelform_factory(DemoModel, exclude=[])
     form = form_class(instance=demomodel)
     assert form.fields['sender'].choices == [(u'', u'---------'),
-                                             ('demoproject.demoapp.models.Sender1', 'demoproject.demoapp.models.Sender1'),
-                                             ('demoproject.demoapp.models.Sender2', 'demoproject.demoapp.models.Sender2')]
+                                             ('demoproject.demoapp.models.Sender1',
+                                              'demoproject.demoapp.models.Sender1'),
+                                             ('demoproject.demoapp.models.Sender2',
+                                              'demoproject.demoapp.models.Sender2')]
 
     # assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
     #                           u'<td><select id="id_sender" name="sender" required>\n' \
@@ -174,3 +176,19 @@ def test_demomodel_lookup_contains(demomodel, target):
 @pytest.mark.django_db
 def test_demomodel_lookup_in(demomodel, target):
     assert DemoModel.objects.get(sender__in=target(demomodel)) == demomodel
+
+
+@pytest.mark.django_db
+def test_display_attribute(demomodel, registry, monkeypatch):
+    monkeypatch.setattr(SenderNotRegistered, 'label',
+                        classmethod(lambda s: fqn(s).split('.')[-1]),
+                        raising=False)
+
+    DemoModel._meta.get_field('sender').display_attribute = 'label'
+    DemoModel._meta.get_field('sender').registry = registry
+    registry.register(SenderNotRegistered)
+
+    form_class = modelform_factory(DemoModel, exclude=[])
+    form = form_class(instance=demomodel)
+
+    assert form.fields['sender'].choices[-1][1] == 'SenderNotRegistered'

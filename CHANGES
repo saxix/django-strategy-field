@@ -1,5 +1,6 @@
 Release 0.6 (dev)
 =================
+* fixes display in Admin site change list
 * Registry now accept strings as fully qualified class name as argument or None to by-pass class checking
 * new `contrib` package with some helper class
 
