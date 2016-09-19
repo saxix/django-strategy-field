@@ -16,7 +16,27 @@ def test_registry():
     assert Sender2 not in r
 
 
-def test_registry_does_not_accept_wrong_classes():
+def test_registry_check_classes():
     r = Registry(AbstractSender)
     with pytest.raises(ValueError):
         r.register(DemoModel)
+
+
+def test_registry_bypass_class_check():
+    r = Registry(None)
+    r.register(DemoModel)
+    r.register(AbstractSender)
+    r.register(Sender1)
+
+    assert Sender1 in r
+    assert AbstractSender in r
+    assert DemoModel in r
+
+
+def test_registry_string():
+    r = Registry('demoproject.demoapp.models.AbstractSender')
+    r.register(Sender1)
+
+    assert Sender1 in r
+    assert fqn(Sender1) in r
+    assert Sender2 not in r

@@ -12,8 +12,8 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
 from strategy_field.forms import (StrategyFormField,
-                                  StrategyMultipleChoiceFormField,)
-from strategy_field.utils import fqn, import_by_name, stringify
+                                  StrategyMultipleChoiceFormField, )
+from strategy_field.utils import fqn, import_by_name, stringify, get_display_string
 
 NOCONTEXT = object()
 
@@ -91,7 +91,7 @@ class MultipleStrategyClassFieldDescriptor(object):
         if isinstance(value, six.string_types):
             value = value.split(',')
         if not isinstance(value, (list, tuple)):
-            value = [value] if value is not None else None  # GG: avoid [None]
+            value = [value] if value is not None else None
         if isinstance(value, (list, tuple)):
             ret = []
             for v in value:
@@ -106,6 +106,7 @@ class MultipleStrategyClassFieldDescriptor(object):
 
 class AbstractStrategyField(models.Field):
     def __init__(self, *args, **kwargs):
+        self.display_attribute = kwargs.pop('display_attribute', None)
         kwargs['max_length'] = 200
 
         self.registry = kwargs.pop("registry", None)
@@ -120,12 +121,14 @@ class AbstractStrategyField(models.Field):
         cls._meta.add_field(self)
         setattr(cls, self.name, self.descriptor(self))
 
+
     def get_internal_type(self):
         return 'CharField'
 
     def _get_choices(self):
         if self.registry:
-            return self.registry.as_choices()
+            return [(klass, get_display_string(klass, self.display_attribute))
+                    for klass in self.registry]
         return []
 
     def _set_choices(self, value):
@@ -135,7 +138,9 @@ class AbstractStrategyField(models.Field):
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
         first_choice = blank_choice if include_blank else []
-        return first_choice + [(k, k) for k, v in self.choices]
+
+        return first_choice + [(fqn(klass), l)
+                               for klass, l in self.choices]
 
     def validate(self, value, model_instance):
         return value in self.registry
@@ -149,6 +154,7 @@ class AbstractStrategyField(models.Field):
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
         defaults = {'required': not self.blank,
                     'label': capfirst(self.verbose_name),
+                    'display_attribute': self.display_attribute,
                     'help_text': self.help_text,
                     'registry': self.registry}
         if self.has_default():
@@ -164,8 +170,8 @@ class AbstractStrategyField(models.Field):
             defaults['empty_value'] = None
         form_class = choices_form_class or self.form_class
         for k in list(kwargs):
-            if k not in ('empty_value', 'choices', 'required',
-                         'registry',
+            if k not in ('empty_value', 'required', 'choices',
+                         'registry', 'display_attribute',
                          'widget', 'label', 'initial', 'help_text',
                          'error_messages', 'show_hidden_initial'):
                 del kwargs[k]
@@ -207,7 +213,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
         return value in self.registry
 
     def get_db_prep_save(self, value, connection):
-        value = list(filter(lambda x: x, value) )if value is not None else None  # GG: avoid the TypeError NoneType
+        value = list(filter(lambda x: x, value)) if value is not None else None
         return super(MultipleStrategyClassField, self).get_db_prep_save(value, connection)
 
     def get_prep_value(self, value):
@@ -274,7 +280,7 @@ class MultipleStrategyFieldDescriptor(MultipleStrategyClassFieldDescriptor):
     def __get__(self, obj, type=None):
         value = obj.__dict__.get(self.field.name)
 
-        if isinstance(value, six.string_types) or isinstance(value, (list, tuple)):
+        if value and isinstance(value, six.string_types) or isinstance(value, (list, tuple)):
             ret = []
             if isinstance(value, six.string_types):
                 value = value.split(',')
@@ -309,6 +315,7 @@ class MultipleStrategyField(MultipleStrategyClassField):
 if django.VERSION[:2] >= (1, 10):
     from django.db.models.lookups import Contains, In, IContains
 
+
     class StrategyFieldLookupMixin(object):
         def get_prep_lookup(self):
             value = super(StrategyFieldLookupMixin, self).get_prep_lookup()
@@ -324,20 +331,26 @@ if django.VERSION[:2] >= (1, 10):
                 value = fqn(value)
             return value
 
+
     class StrategyFieldContains(StrategyFieldLookupMixin, IContains):
         pass
+
 
     class StrategyFieldIContains(StrategyFieldLookupMixin, Contains):
         pass
 
+
     class StrategyFieldIn(StrategyFieldLookupMixin, In):
         pass
+
 
     class MultipleStrategyFieldContains(StrategyFieldLookupMixin, Contains):
         pass
 
+
     class MultipleStrategyFieldIn(StrategyFieldLookupMixin, In):
         pass
+
 
     StrategyField.register_lookup(StrategyFieldContains)
     StrategyField.register_lookup(StrategyFieldIContains)

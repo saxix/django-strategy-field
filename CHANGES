@@ -1,3 +1,12 @@
+Release 1.0
+===========
+* add 'display_attribute' to customize how registered classes should be displayed
+* fixes display in Admin site change list
+* Registry now accept string as fully qualified class name as argument or None to by-pass class checking
+* Registry.register() now accept string as fully qualified class name as argument to allow a kind of  "lazy" registration
+* new `contrib` package with some helper class
+
+
 Release 0.5
 ===========
 * fixes bugs for empty or null values in MultipleStrategyClassField

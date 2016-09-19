@@ -63,7 +63,7 @@ the Django admin panel.
     class SMSStrategy(AbstractTransport):
         def send(self):
             ...
-    registry = TransportRegistry()
+    registry = TransportRegistry(AbstractTransport)
     registry.register(EmailStrategy)
     registry.register(SMSStrategy)
 

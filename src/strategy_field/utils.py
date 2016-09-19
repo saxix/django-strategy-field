@@ -7,6 +7,17 @@ from inspect import isclass
 logger = logging.getLogger(__name__)
 
 
+def get_display_string(klass, display_attribute):
+    if display_attribute and hasattr(klass, display_attribute):
+        attr = getattr(klass, display_attribute)
+        if callable(attr):
+            return attr()
+        else:
+            return attr
+
+    return fqn(klass)
+
+
 def get_attr(obj, attr, default=None):
     """Recursive get object's attribute. May use dot notation.
 
@@ -65,7 +76,13 @@ def import_by_name(name):
     module_path = ".".join(class_data[:-1])
     class_str = class_data[-1]
     module = importlib.import_module(module_path)
-    return getattr(module, class_str)
+    try:
+        return getattr(module, class_str)
+    except AttributeError as e:
+        raise AttributeError('Unable to import {}. '
+                             '{} does not have {} attribute'.format(name,
+                                                                    module,
+                                                                    class_str))
 
 
 def stringify(value):
