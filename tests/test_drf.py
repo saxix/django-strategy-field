@@ -5,7 +5,7 @@ import logging
 
 import pytest
 from django_dynamic_fixture import G
-from rest_framework.serializers import reverse
+from rest_framework.reverse import reverse
 
 from demoproject.demoapp.models import (DemoMultipleModel, Sender1,
                                         Sender2, DemoModelNone)
@@ -28,11 +28,11 @@ def test_get_single(webapp):
 @pytest.mark.django_db
 def test_post_single(webapp):
     url = reverse('single')
-    res = webapp.post(url, {'sender': fqn(Sender1)})
+    res = webapp.post(url, params={'sender': fqn(Sender1)})
     assert res.json['sender'] == fqn(Sender1)
     assert DemoModelNone.objects.get(pk=res.json['id']).sender == Sender1
 
-    res = webapp.post(url, {'sender': ''})
+    res = webapp.post(url, params={'sender': ''})
     assert res.json['sender'] is None
     assert DemoModelNone.objects.get(pk=res.json['id']).sender is None
 
@@ -56,10 +56,10 @@ def test_get_multiple(webapp):
 def test_post_multiple(webapp):
     url = reverse('multiple')
 
-    res = webapp.post(url, {'sender': fqn(Sender1)})
+    res = webapp.post(url, params={'sender': fqn(Sender1)})
     assert res.json['sender'] == fqn(Sender1)
     assert DemoMultipleModel.objects.get(pk=res.json['id']).sender == [Sender1]
 
-    res = webapp.post(url, {'sender': stringify([Sender1, Sender2])})
+    res = webapp.post(url, params={'sender': stringify([Sender1, Sender2])})
     assert res.json['sender'] == stringify([Sender1, Sender2])
     assert DemoMultipleModel.objects.get(pk=res.json['id']).sender == [Sender1, Sender2]
