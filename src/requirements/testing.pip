@@ -1,8 +1,8 @@
-coverage==4.1b2
-django-dynamic-fixture==1.8.5
+coverage
+django-dynamic-fixture
 django-webtest
-pytest-cov==2.2.1
-pytest-django==2.9.1
-pytest-echo==1.4
-pytest-pythonpath==0.7
+pytest-cov
+pytest-django
+pytest-echo
+pytest-pythonpath
 djangorestframework

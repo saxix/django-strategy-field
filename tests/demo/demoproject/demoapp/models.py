@@ -5,6 +5,8 @@ import six
 from django.core.mail.backends.base import BaseEmailBackend
 
 from django.db import models
+from django.utils.deconstruct import deconstructible
+
 from strategy_field.fields import (MultipleStrategyClassField,
                                    MultipleStrategyField, StrategyClassField,
                                    StrategyField)
@@ -85,6 +87,22 @@ class DemoModel(models.Model):
     sender = StrategyClassField(registry=registry)
 
 
+def aa():
+    # this is a bit strange, @see https://code.djangoproject.com/ticket/22436#comment:15
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] in ('makemigrations', 'migrate'):
+        return None # Hide ourselves from Django migrations
+    def upload_to(instance):
+        return instance._registry
+    return upload_to
+
+
+class DemoCallableModel(models.Model):
+    _registry = registry
+
+    sender = StrategyClassField(registry=aa())
+
+
 class DemoModelNone(models.Model):
     sender = StrategyClassField(registry=registry, null=True, blank=True)
 
@@ -94,10 +112,13 @@ class DemoModelDefault(models.Model):
                                 registry=registry,
                                 default='demoproject.demoapp.models.Sender1')
 
+def cc():
+    return 'demoproject.demoapp.models.Sender1'
 
 class DemoModelCallableDefault(models.Model):
     sender = StrategyClassField(registry=registry, null=True,
-                                default=lambda: 'demoproject.demoapp.models.Sender1')
+                                default=cc
+                                )
 
 
 class DemoModelProxy(DemoModel):

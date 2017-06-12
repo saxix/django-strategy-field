@@ -1,29 +1,44 @@
 language: python
 sudo: false
 python:
-    - 3.5
-env:
-  - TOXENV=py27-d18
-  - TOXENV=py27-d19
-  - TOXENV=py27-d110
-  - TOXENV=py27-d111
+  - 2.7
+  - 3.4
+  - 3.5
+  - 3.6
+  - pypy
 
-  - TOXENV=py35-d18
-  - TOXENV=py35-d19
-  - TOXENV=py35-d110
-  - TOXENV=py35-d111
+env:
+  - DJANGO=1.8
+  - DJANGO=1.9
+  - DJANGO=1.10
+  - DJANGO=1.11
+
+
+matrix:
+  exclude:
+    - python: 2.7
+      env: DJANGO=2.0
+
+    - python: 3.4
+      env: DJANGO=2.0
+
+    - python: 3.6
+      env: DJANGO=1.8
+    - python: 3.6
+      env: DJANGO=1.9
+    - python: 3.6
+      env: DJANGO=1.10
 
 
 install:
   - pip install tox "coverage<4.0" python-coveralls>=2.5 coveralls>=0.5 codecov
 
 script:
-  - tox -re $TOXENV -- py.test tests/ --create-db -v --capture=no --cov=strategy_field --cov-report=xml --cov-config=tests/.coveragerc
+  - tox -e "py${TRAVIS_PYTHON_VERSION//.}-d${DJANGO//.}-${DB}" -- py.test tests/ --create-db -v --capture=no --cov=strategy_field --cov-report=xml --cov-config=tests/.coveragerc
 
 before_success:
   - coverage erase
 
 after_success:
   - coverage combine
-  - coveralls
   - codecov

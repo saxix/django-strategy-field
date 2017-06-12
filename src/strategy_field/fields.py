@@ -109,6 +109,7 @@ class MultipleStrategyClassFieldDescriptor(object):
         obj.__dict__[self.field.name] = value
 
 
+# @deconstructible
 class AbstractStrategyField(models.Field):
     def __init__(self, *args, **kwargs):
         self.display_attribute = kwargs.pop('display_attribute', None)
@@ -126,9 +127,14 @@ class AbstractStrategyField(models.Field):
         cls._meta.add_field(self)
         setattr(cls, self.name, self.descriptor(self))
 
+    def __eq__(self, other):
+        return self.registry == other.registry
 
     def get_internal_type(self):
         return 'CharField'
+
+    def _check_choices(self):
+        return []
 
     def _get_choices(self):
         if self.registry:
@@ -151,9 +157,12 @@ class AbstractStrategyField(models.Field):
         return value in self.registry
 
     def deconstruct(self):
-        name, path, args, kwargs = super(
-            AbstractStrategyField, self).deconstruct()
+        name, path, args, kwargs = super(AbstractStrategyField, self).deconstruct()
         del kwargs["max_length"]
+        if "registry" in kwargs:
+            del kwargs["registry"]
+        if "choices" in kwargs:
+            del kwargs["choices"]
         return name, path, args, kwargs
 
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
