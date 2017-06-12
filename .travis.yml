@@ -5,9 +5,14 @@ python:
 env:
   - TOXENV=py27-d18
   - TOXENV=py27-d19
+  - TOXENV=py27-d110
+  - TOXENV=py27-d111
 
   - TOXENV=py35-d18
   - TOXENV=py35-d19
+  - TOXENV=py35-d110
+  - TOXENV=py35-d111
+
 
 install:
   - pip install tox "coverage<4.0" python-coveralls>=2.5 coveralls>=0.5 codecov
