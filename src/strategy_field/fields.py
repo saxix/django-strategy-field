@@ -67,6 +67,9 @@ class StrategyClassFieldDescriptor(object):
         self.field = field
 
     def __get__(self, obj, type=None):
+        if obj is None:
+            return None
+
         value = obj.__dict__.get(self.field.name)
         try:
             return get_class(value)
@@ -86,6 +89,8 @@ class MultipleStrategyClassFieldDescriptor(object):
         self.field = field
 
     def __get__(self, obj, type=None):
+        if obj is None:
+            return None
         value = obj.__dict__.get(self.field.name)
 
         if isinstance(value, six.string_types):
@@ -245,6 +250,8 @@ class MultipleStrategyClassField(AbstractStrategyField):
 
 class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
     def __get__(self, obj, value=None):
+        if obj is None:
+            return None
         return obj.__dict__.get(self.field.name)
 
     def __set__(self, obj, value):
@@ -278,6 +285,8 @@ class StrategyField(StrategyClassField):
 
 class MultipleStrategyFieldDescriptor(MultipleStrategyClassFieldDescriptor):
     def __get__(self, obj, type=None):
+        if obj is None:
+            return []
         value = obj.__dict__.get(self.field.name)
 
         if value and isinstance(value, six.string_types) or isinstance(value, (list, tuple)):
