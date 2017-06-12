@@ -42,9 +42,7 @@ the Django admin panel.
 .. code-block:: python
 
     from strategy_field.fields import StrategyField
-
     from strategy_field.registry import Registry
-    from strategy_field.fields import StrategyField
 
     class TransportRegistry(Registry)
         pass
@@ -77,6 +75,35 @@ the Django admin panel.
     e.sender.send() # e.sender.context == e
 
 
+More examples
+-------------
+
+Use callable
+~~~~~~~~~~~~
+
+.. code-block:: python
+
+    from strategy_field.fields import StrategyField
+    from strategy_field.registry import Registry
+
+    registry1 = Registry()
+    registry2 = Registry()
+
+    class A(model):
+        sender = StrategyField(registry=lambda model: model._registry)
+        class Meta:
+            abstract = True
+
+    class C1(A):
+        _registry = registry1
+        class Meta:
+            abstract = True
+
+    class C2(A):
+        _registry = registry2
+        class Meta:
+            abstract = True
+
 
 Project links
 =============
@@ -96,14 +123,14 @@ Project links
 .. _Strategy Pattern: http://www.oodesign.com/strategy-pattern.html
 
 .. |master-build| image:: https://secure.travis-ci.org/saxix/django-strategy-field.png?branch=master
-                    :target: http://travis-ci.org/saxix/django-strategy-field/
+:target: http://travis-ci.org/saxix/django-strategy-field/
 
 .. |master-cov| image:: https://codecov.io/github/saxix/django-strategy-field/coverage.svg?branch=master
-                    :target: https://codecov.io/github/saxix/django-strategy-field?branch=develop
+:target: https://codecov.io/github/saxix/django-strategy-field?branch=develop
 
 
 .. |dev-build| image:: https://secure.travis-ci.org/saxix/django-strategy-field.png?branch=develop
-                    :target: http://travis-ci.org/saxix/django-strategy-field/
+:target: http://travis-ci.org/saxix/django-strategy-field/
 
 .. |dev-cov| image:: https://codecov.io/github/saxix/django-strategy-field/coverage.svg?branch=develop
-                    :target: https://codecov.io/github/saxix/django-strategy-field?branch=develop
+:target: https://codecov.io/github/saxix/django-strategy-field?branch=develop

@@ -26,7 +26,10 @@ class Registry(list):
 
     def is_valid(self, value):
         if value and isinstance(value, six.string_types):
-            value = import_by_name(value)
+            try:
+                value = import_by_name(value)
+            except ImportError:
+                return False
 
         if self.klass:
             return (isclass(value) and issubclass(value, self.klass)) or \
@@ -39,17 +42,22 @@ class Registry(list):
             self._choices = sorted((fqn(klass), fqn(klass)) for klass in self)
         return self._choices
 
-    def append(self, x):
-        if isinstance(x, six.string_types):
-            x = import_by_name(x)
+    def append(self, class_or_fqn):
+        if isinstance(class_or_fqn, six.string_types):
+            cls = import_by_name(class_or_fqn)
+        else:
+            cls = class_or_fqn
 
-        if self.klass and not issubclass(x, self.klass):
-            raise ValueError("%s is not a subtype of %s" % (x, self.klass))
+        if cls == self.klass:
+            return
 
-        if get_attr(x, 'Meta.abstract'):
-            raise ValueError
+        if self.klass and not issubclass(cls, self.klass):
+            raise ValueError("'%s' is not a subtype of %s" % (class_or_fqn, self.klass))
 
-        super(Registry, self).append(x)
+        if get_attr(class_or_fqn, 'Meta.abstract'):
+            raise ValueError("Abstract class '%s' cannot be registered" % class_or_fqn)
+
+        super(Registry, self).append(cls)
         self._choices = None
 
     register = append

@@ -111,6 +111,7 @@ class MultipleStrategyClassFieldDescriptor(object):
 
 # @deconstructible
 class AbstractStrategyField(models.Field):
+    registry = None
     def __init__(self, *args, **kwargs):
         self.display_attribute = kwargs.pop('display_attribute', None)
         kwargs['max_length'] = 200
@@ -124,6 +125,8 @@ class AbstractStrategyField(models.Field):
     def contribute_to_class(self, cls, name, private_only=False, virtual_only=NOT_PROVIDED):
         self.set_attributes_from_name(name)
         self.model = cls
+        if callable(self.registry):
+            self.registry = self.registry(cls)
         cls._meta.add_field(self)
         setattr(cls, self.name, self.descriptor(self))
 

@@ -87,14 +87,19 @@ class DemoModel(models.Model):
     sender = StrategyClassField(registry=registry)
 
 
+# def aa():
+#     this is a bit strange, @see https://code.djangoproject.com/ticket/22436#comment:15
+    # import sys
+    # if len(sys.argv) > 1 and sys.argv[1] in ('makemigrations', 'migrate'):
+    #     return None # Hide ourselves from Django migrations
+    # def upload_to(instance):
+    #     return instance._registry
+    # return upload_to
 def aa():
-    # this is a bit strange, @see https://code.djangoproject.com/ticket/22436#comment:15
-    import sys
-    if len(sys.argv) > 1 and sys.argv[1] in ('makemigrations', 'migrate'):
-        return None # Hide ourselves from Django migrations
-    def upload_to(instance):
-        return instance._registry
-    return upload_to
+    def cc(s):
+        return s._registry
+
+    return cc
 
 
 class DemoCallableModel(models.Model):
