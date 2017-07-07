@@ -24,11 +24,14 @@ class Registry(list):
             return import_by_name(self._klass)
         return self._klass
 
+    def get_name(self, entry):
+        return str(entry)
+
     def is_valid(self, value):
         if value and isinstance(value, six.string_types):
             try:
                 value = import_by_name(value)
-            except ImportError:
+            except (ImportError, ValueError, AttributeError):
                 return False
 
         if self.klass:
@@ -54,11 +57,9 @@ class Registry(list):
         if self.klass and not issubclass(cls, self.klass):
             raise ValueError("'%s' is not a subtype of %s" % (class_or_fqn, self.klass))
 
-        if get_attr(class_or_fqn, 'Meta.abstract'):
-            raise ValueError("Abstract class '%s' cannot be registered" % class_or_fqn)
-
         super(Registry, self).append(cls)
         self._choices = None
+        return class_or_fqn
 
     register = append
 
