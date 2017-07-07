@@ -24,11 +24,14 @@ class Registry(list):
             return import_by_name(self._klass)
         return self._klass
 
+    def get_name(self, entry):
+        return str(entry)
+
     def is_valid(self, value):
         if value and isinstance(value, six.string_types):
             try:
                 value = import_by_name(value)
-            except ImportError:
+            except (ImportError, ValueError, AttributeError):
                 return False
 
         if self.klass:
@@ -56,7 +59,7 @@ class Registry(list):
 
         super(Registry, self).append(cls)
         self._choices = None
-        return  class_or_fqn
+        return class_or_fqn
 
     register = append
 
