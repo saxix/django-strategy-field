@@ -1,25 +1,34 @@
 #!/usr/bin/env python
 import os
-import sys
+import re
 import codecs
 
 from setuptools import find_packages, setup
 
 ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__)))
-sys.path.insert(0, os.path.join(ROOT, 'src'))
-app = __import__('strategy_field')
+init = os.path.join(ROOT, "src", "strategy_field", "__init__.py")
+
+def get_version(*file_paths):
+    """Retrieves the version from django_mb/__init__.py"""
+    filename = os.path.join(os.path.dirname(__file__), *file_paths)
+    version_file = open(filename).read()
+    version_match = re.search(r"^__version__ = [\"]([^\"]*)[\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
 
 
 def fread(*parts):
-    return codecs.open(os.path.join(ROOT, *parts), encoding="utf-8").read()
+    return [l[:-1] for l in codecs.open(os.path.join(ROOT, *parts), encoding="utf-8").readlines() if l[0] != '#']
 
-install_requires = fread('requirements', 'install.any.pip')
-tests_require = fread('requirements', 'testing.pip')
-dev_require = fread('requirements', 'develop.pip')
+install_requires = fread('src/requirements', 'install.any.pip')
+tests_require = fread('src/requirements', 'testing.pip')
+dev_require = fread('src/requirements', 'develop.pip')
 
 setup(
-    name=app.NAME,
-    version=app.get_version(),
+    name='django-strategy-field',
+    version=get_version(init),
     url='https://github.com/saxix/django-strategy-field',
     description="Django custom field to implement the strategy pattern",
     author='sax',
@@ -38,12 +47,17 @@ setup(
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
+        'Framework :: Django :: 1.8',
+        'Framework :: Django :: 1.9',
+        'Framework :: Django :: 1.10',
+        'Framework :: Django :: 1.11',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Intended Audience :: Developers'
     ]
 )

@@ -1,0 +1,6 @@
+isort
+pdbpp
+virtualenv>15
+wheel
+flake8
+flake8-putty

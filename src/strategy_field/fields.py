@@ -67,6 +67,9 @@ class StrategyClassFieldDescriptor(object):
         self.field = field
 
     def __get__(self, obj, type=None):
+        if obj is None:
+            return None
+
         value = obj.__dict__.get(self.field.name)
         try:
             return get_class(value)
@@ -86,6 +89,8 @@ class MultipleStrategyClassFieldDescriptor(object):
         self.field = field
 
     def __get__(self, obj, type=None):
+        if obj is None:
+            return None
         value = obj.__dict__.get(self.field.name)
 
         if isinstance(value, six.string_types):
@@ -104,7 +109,9 @@ class MultipleStrategyClassFieldDescriptor(object):
         obj.__dict__[self.field.name] = value
 
 
+# @deconstructible
 class AbstractStrategyField(models.Field):
+    registry = None
     def __init__(self, *args, **kwargs):
         self.display_attribute = kwargs.pop('display_attribute', None)
         kwargs['max_length'] = 200
@@ -118,12 +125,19 @@ class AbstractStrategyField(models.Field):
     def contribute_to_class(self, cls, name, private_only=False, virtual_only=NOT_PROVIDED):
         self.set_attributes_from_name(name)
         self.model = cls
+        if callable(self.registry):
+            self.registry = self.registry(cls)
         cls._meta.add_field(self)
         setattr(cls, self.name, self.descriptor(self))
 
+    def __eq__(self, other):
+        return self.registry == other.registry
 
     def get_internal_type(self):
         return 'CharField'
+
+    def _check_choices(self):
+        return []
 
     def _get_choices(self):
         if self.registry:
@@ -146,9 +160,12 @@ class AbstractStrategyField(models.Field):
         return value in self.registry
 
     def deconstruct(self):
-        name, path, args, kwargs = super(
-            AbstractStrategyField, self).deconstruct()
+        name, path, args, kwargs = super(AbstractStrategyField, self).deconstruct()
         del kwargs["max_length"]
+        if "registry" in kwargs:
+            del kwargs["registry"]
+        if "choices" in kwargs:
+            del kwargs["choices"]
         return name, path, args, kwargs
 
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
@@ -245,6 +262,8 @@ class MultipleStrategyClassField(AbstractStrategyField):
 
 class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
     def __get__(self, obj, value=None):
+        if obj is None:
+            return None
         return obj.__dict__.get(self.field.name)
 
     def __set__(self, obj, value):
@@ -278,6 +297,8 @@ class StrategyField(StrategyClassField):
 
 class MultipleStrategyFieldDescriptor(MultipleStrategyClassFieldDescriptor):
     def __get__(self, obj, type=None):
+        if obj is None:
+            return []
         value = obj.__dict__.get(self.field.name)
 
         if value and isinstance(value, six.string_types) or isinstance(value, (list, tuple)):

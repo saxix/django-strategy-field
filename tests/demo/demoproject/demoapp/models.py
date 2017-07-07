@@ -5,6 +5,8 @@ import six
 from django.core.mail.backends.base import BaseEmailBackend
 
 from django.db import models
+from django.utils.deconstruct import deconstructible
+
 from strategy_field.fields import (MultipleStrategyClassField,
                                    MultipleStrategyField, StrategyClassField,
                                    StrategyField)
@@ -85,6 +87,17 @@ class DemoModel(models.Model):
     sender = StrategyClassField(registry=registry)
 
 
+def aa():
+    def cc(s):
+        return registry
+
+    return cc
+
+
+class DemoCallableModel(models.Model):
+    sender = StrategyClassField(registry=aa())
+
+
 class DemoModelNone(models.Model):
     sender = StrategyClassField(registry=registry, null=True, blank=True)
 
@@ -95,9 +108,14 @@ class DemoModelDefault(models.Model):
                                 default='demoproject.demoapp.models.Sender1')
 
 
+def cc():
+    return 'demoproject.demoapp.models.Sender1'
+
+
 class DemoModelCallableDefault(models.Model):
     sender = StrategyClassField(registry=registry, null=True,
-                                default=lambda: 'demoproject.demoapp.models.Sender1')
+                                default=cc
+                                )
 
 
 class DemoModelProxy(DemoModel):

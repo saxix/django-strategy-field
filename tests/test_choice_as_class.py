@@ -76,7 +76,8 @@ def test_model_save_default_with_callable():
 
 @pytest.mark.django_db
 def test_model_get_or_create(target):
-    d, __ = DemoModel.objects.get_or_create(sender=target(None))
+    t = target(None)
+    d, __ = DemoModel.objects.get_or_create(sender=t)
     assert d.sender == Sender1
 
 

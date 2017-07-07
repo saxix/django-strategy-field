@@ -28,6 +28,7 @@ class DemoModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DemoModelNone
+        exclude = []
 
 
 class DemoMultipleModelSerializer(serializers.ModelSerializer):
@@ -35,6 +36,7 @@ class DemoMultipleModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DemoMultipleModel
+        exclude = []
 
 
 class DemoModelView(ModelViewSet):
