@@ -1,5 +1,7 @@
 Release 1.1 (dev)
 =================
+* add support django 2.0
+* drop support django <= 1.8
 * registry can be callable
 * do not register class used as Registry base class
 

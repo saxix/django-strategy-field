@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 class Registry(list):
-    klass = None
 
     def __init__(self, *args):
         self._klass = args[0]
