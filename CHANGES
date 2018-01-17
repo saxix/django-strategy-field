@@ -1,5 +1,12 @@
-Release 1.1 (dev)
-=================
+Release 1.1.1
+=============
+* fixes django 2.0 compatibility
+
+
+Release 1.1
+===========
+* add support django 2.0
+* drop support django <= 1.8
 * registry can be callable
 * do not register class used as Registry base class
 

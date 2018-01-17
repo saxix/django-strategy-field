@@ -7,6 +7,13 @@ from .demoapp.models import (DemoAllModel, DemoCustomModel, DemoModel,
                              DemoMultipleModel, DemoModelDefault,
                              DemoModelCallableDefault)
 
+try:
+    from django.urls import reverse  # django 2.0
+except ImportError:   # django 1.9
+    from django.core.urlresolvers import reverse
+
+
+
 autodiscover()
 
 
@@ -24,7 +31,7 @@ for m in (DemoAllModel, DemoCustomModel, DemoModel, DemoModelProxy,
     public_site.register(m)
 
 urlpatterns = (
-    url(r'', include(public_site.urls)),
+    url(r'', public_site.urls),
 
     url(r'api/s/(?P<pk>.*)/$', DemoModelView.as_view({'get': 'retrieve'})),
     url(r'api/s/$', DemoModelView.as_view({'get': 'list',

@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import BaseValidator
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH, NOT_PROVIDED
+from django import forms
 from django.utils.deconstruct import deconstructible
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
@@ -195,6 +196,9 @@ class AbstractStrategyField(models.Field):
         defaults.update(kwargs)
         return form_class(**defaults)
 
+
+class RegexFormField(forms.CharField):
+    pass
 
 class StrategyClassField(AbstractStrategyField):
     form_class = StrategyFormField

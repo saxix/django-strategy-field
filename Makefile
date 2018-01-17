@@ -35,6 +35,3 @@ endif
 demo:
 	cd tests/demo && ./manage.py syncdb
 	cd tests/demo && ./manage.py runserver
-
-rtd:
-	curl -X POST http://readthedocs.wfp.org/build/wfp-django-auth

@@ -123,14 +123,14 @@ Project links
 .. _Strategy Pattern: http://www.oodesign.com/strategy-pattern.html
 
 .. |master-build| image:: https://secure.travis-ci.org/saxix/django-strategy-field.png?branch=master
-:target: http://travis-ci.org/saxix/django-strategy-field/
+    :target: http://travis-ci.org/saxix/django-strategy-field/
 
 .. |master-cov| image:: https://codecov.io/github/saxix/django-strategy-field/coverage.svg?branch=master
-:target: https://codecov.io/github/saxix/django-strategy-field?branch=develop
+    :target: https://codecov.io/github/saxix/django-strategy-field?branch=develop
 
 
 .. |dev-build| image:: https://secure.travis-ci.org/saxix/django-strategy-field.png?branch=develop
-:target: http://travis-ci.org/saxix/django-strategy-field/
+    :target: http://travis-ci.org/saxix/django-strategy-field/
 
 .. |dev-cov| image:: https://codecov.io/github/saxix/django-strategy-field/coverage.svg?branch=develop
-:target: https://codecov.io/github/saxix/django-strategy-field?branch=develop
+    :target: https://codecov.io/github/saxix/django-strategy-field?branch=develop
