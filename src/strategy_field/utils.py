@@ -7,7 +7,18 @@ from inspect import isclass
 logger = logging.getLogger(__name__)
 
 
-def get_display_string(klass, display_attribute):
+def get_class(value):
+    if not value:
+        return value
+    elif isinstance(value, six.string_types):
+        return import_by_name(value)
+    elif isclass(value):
+        return value
+    else:
+        return type(value)
+
+
+def get_display_string(klass, display_attribute=None):
     if display_attribute and hasattr(klass, display_attribute):
         attr = getattr(klass, display_attribute)
         if callable(attr):
@@ -21,17 +32,6 @@ def get_display_string(klass, display_attribute):
 def get_attr(obj, attr, default=None):
     """Recursive get object's attribute. May use dot notation.
 
-    >>> class C(object): pass
-    >>> a = C()
-    >>> a.b = C()
-    >>> a.b.c = 4
-    >>> get_attr(a, 'b.c')
-    4
-
-    >>> get_attr(a, 'b.c.y', None)
-
-    >>> get_attr(a, 'b.c.y', 1)
-    1
     """
     if '.' not in attr:
         return getattr(obj, attr, default)

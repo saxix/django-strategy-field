@@ -1,36 +1,26 @@
 # -*- coding: utf-8 -*-
+import logging
 import six
 from inspect import isclass
 
-import django
+from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import BaseValidator
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH, NOT_PROVIDED
-from django import forms
+from django.db.models.lookups import Contains, IContains, In
 from django.utils.deconstruct import deconstructible
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
 from strategy_field.forms import (StrategyFormField,
                                   StrategyMultipleChoiceFormField, )
-from strategy_field.utils import fqn, import_by_name, stringify, get_display_string
+from strategy_field.utils import (fqn, get_display_string, import_by_name,
+                                  stringify, get_class)
 
 NOCONTEXT = object()
 
-
-def get_class(value):
-    if not value:
-        pass
-    elif isinstance(value, six.string_types):
-        value = import_by_name(value)
-    elif isclass(value):
-        pass
-    elif isinstance(value, object):
-        value = type(value)
-    else:
-        raise ValueError(value)
-    return value
+logger = logging.getLogger(__name__)
 
 
 @deconstructible
@@ -74,7 +64,8 @@ class StrategyClassFieldDescriptor(object):
         value = obj.__dict__.get(self.field.name)
         try:
             return get_class(value)
-        except:
+        except Exception as e:
+            logger.exception(e)
             raise ValidationError(value)
             # if isclass(value):
             #     return value
@@ -113,6 +104,7 @@ class MultipleStrategyClassFieldDescriptor(object):
 # @deconstructible
 class AbstractStrategyField(models.Field):
     registry = None
+
     def __init__(self, *args, **kwargs):
         self.display_attribute = kwargs.pop('display_attribute', None)
         kwargs['max_length'] = 200
@@ -200,6 +192,7 @@ class AbstractStrategyField(models.Field):
 class RegexFormField(forms.CharField):
     pass
 
+
 class StrategyClassField(AbstractStrategyField):
     form_class = StrategyFormField
     descriptor = StrategyClassFieldDescriptor
@@ -213,17 +206,17 @@ class StrategyClassField(AbstractStrategyField):
         #     return fqn(value)
         return fqn(value)
 
-    def get_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'exact':
-            return self.get_prep_value(value)
-        elif lookup_type == 'in':
-            return [self.get_prep_value(v) for v in value]
-        elif lookup_type == 'contains':
-            return self.get_prep_value(value)
-        elif lookup_type == 'icontains':
-            return self.get_prep_value(value)
-        else:
-            raise TypeError('Lookup type %r not supported.' % lookup_type)
+    # def get_prep_lookup(self, lookup_type, value):
+    #     if lookup_type == 'exact':
+    #         return self.get_prep_value(value)
+    #     elif lookup_type == 'in':
+    #         return [self.get_prep_value(v) for v in value]
+    #     elif lookup_type == 'contains':
+    #         return self.get_prep_value(value)
+    #     elif lookup_type == 'icontains':
+    #         return self.get_prep_value(value)
+    #     else:
+    #         raise TypeError('Lookup type %r not supported.' % lookup_type)
 
 
 class MultipleStrategyClassField(AbstractStrategyField):
@@ -245,15 +238,15 @@ class MultipleStrategyClassField(AbstractStrategyField):
         elif isinstance(value, six.string_types):
             return value
 
-    def get_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'exact':
-            return self.get_prep_value(value)
-        elif lookup_type == 'in':
-            raise TypeError('Lookup type %r not supported.' % lookup_type)
-        elif lookup_type == 'icontains':
-            return self.get_prep_value(value)
-        elif lookup_type == 'contains':
-            return self.get_prep_value(value)
+    # def get_prep_lookup(self, lookup_type, value):
+    #     if lookup_type == 'exact':
+    #         return self.get_prep_value(value)
+    #     elif lookup_type == 'in':
+    #         raise TypeError('Lookup type %r not supported.' % lookup_type)
+    #     elif lookup_type == 'icontains':
+    #         return self.get_prep_value(value)
+    #     elif lookup_type == 'contains':
+    #         return self.get_prep_value(value)
 
     def get_lookup(self, lookup_name):
         if lookup_name == 'in':
@@ -337,50 +330,46 @@ class MultipleStrategyField(MultipleStrategyClassField):
         return super(MultipleStrategyField, self).get_lookup(lookup_name)
 
 
-if django.VERSION[:2] >= (1, 10):
-    from django.db.models.lookups import Contains, In, IContains
+class StrategyFieldLookupMixin(object):
+    def get_prep_lookup(self):
+        value = super(StrategyFieldLookupMixin, self).get_prep_lookup()
+        if value is None:
+            return None
+        if isinstance(value, six.string_types):
+            pass
+        elif isinstance(value, (list, tuple)):
+            value = stringify(value)
+        elif isinstance(value, self.lhs.output_field.registry.klass):
+            value = fqn(value)
+        elif isclass(value) or isinstance(value, object):
+            value = fqn(value)
+        return value
 
 
-    class StrategyFieldLookupMixin(object):
-        def get_prep_lookup(self):
-            value = super(StrategyFieldLookupMixin, self).get_prep_lookup()
-            if value is None:
-                return None
-            if isinstance(value, six.string_types):
-                pass
-            elif isinstance(value, (list, tuple)):
-                value = stringify(value)
-            elif isinstance(value, self.lhs.output_field.registry.klass):
-                value = fqn(value)
-            elif isclass(value) or isinstance(value, object):
-                value = fqn(value)
-            return value
+class StrategyFieldContains(StrategyFieldLookupMixin, IContains):
+    pass
 
 
-    class StrategyFieldContains(StrategyFieldLookupMixin, IContains):
-        pass
+class StrategyFieldIContains(StrategyFieldLookupMixin, Contains):
+    pass
 
 
-    class StrategyFieldIContains(StrategyFieldLookupMixin, Contains):
-        pass
+class StrategyFieldIn(StrategyFieldLookupMixin, In):
+    pass
 
 
-    class StrategyFieldIn(StrategyFieldLookupMixin, In):
-        pass
+class MultipleStrategyFieldContains(StrategyFieldLookupMixin, Contains):
+    pass
 
 
-    class MultipleStrategyFieldContains(StrategyFieldLookupMixin, Contains):
-        pass
+class MultipleStrategyFieldIn(StrategyFieldLookupMixin, In):
+    pass
 
 
-    class MultipleStrategyFieldIn(StrategyFieldLookupMixin, In):
-        pass
+StrategyField.register_lookup(StrategyFieldContains)
+StrategyField.register_lookup(StrategyFieldIContains)
+MultipleStrategyField.register_lookup(MultipleStrategyFieldContains)
 
-
-    StrategyField.register_lookup(StrategyFieldContains)
-    StrategyField.register_lookup(StrategyFieldIContains)
-    MultipleStrategyField.register_lookup(MultipleStrategyFieldContains)
-
-    StrategyClassField.register_lookup(StrategyFieldContains)
-    StrategyClassField.register_lookup(StrategyFieldIContains)
-    MultipleStrategyClassField.register_lookup(MultipleStrategyFieldContains)
+StrategyClassField.register_lookup(StrategyFieldContains)
+StrategyClassField.register_lookup(StrategyFieldIContains)
+MultipleStrategyClassField.register_lookup(MultipleStrategyFieldContains)

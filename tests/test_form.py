@@ -1,7 +1,6 @@
 import pytest
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.forms import modelform_factory
 
 from strategy_field.forms import StrategyFormField
 from strategy_field.utils import fqn

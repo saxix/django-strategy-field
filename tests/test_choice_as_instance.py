@@ -2,7 +2,7 @@
 # !qa: E501
 import pytest
 from django.forms.models import modelform_factory
-from demoproject.urls import reverse
+from demoproject.compat import reverse
 from demoproject.demoapp.models import DemoCustomModel, Strategy, Strategy1
 from strategy_field.utils import fqn
 

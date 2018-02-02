@@ -1,3 +1,10 @@
+Release 1.2
+=============
+* drop support django < 1.10
+* add support for DjangoRestFramework `contrib.drf`
+* improved test suite
+
+
 Release 1.1.1
 =============
 * fixes django 2.0 compatibility
