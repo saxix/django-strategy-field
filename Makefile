@@ -11,7 +11,7 @@ mkbuilddir:
 	@mkdir -p ${BUILDDIR}
 
 clean:
-	rm -fr ${BUILDDIR} dist src/*.egg-info .coverage coverage.xml .eggs .pytest_cache
+	rm -fr ${BUILDDIR} dist src/*.egg-info .coverage coverage.xml .eggs .pytest_cache *.log
 	find src -name __pycache__ -o -name "*.py?" -o -name "*.orig" -prune | xargs rm -rf
 	find tests -name __pycache__ -o -name "*.py?" -o -name "*.orig" -prune | xargs rm -rf
 
