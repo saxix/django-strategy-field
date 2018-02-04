@@ -11,12 +11,12 @@ mkbuilddir:
 	@mkdir -p ${BUILDDIR}
 
 clean:
-	rm -fr ${BUILDDIR} dist src/*.egg-info .coverage coverage.xml .eggs
+	rm -fr ${BUILDDIR} dist src/*.egg-info .coverage coverage.xml .eggs .pytest_cache
 	find src -name __pycache__ -o -name "*.py?" -o -name "*.orig" -prune | xargs rm -rf
 	find tests -name __pycache__ -o -name "*.py?" -o -name "*.orig" -prune | xargs rm -rf
 
 fullclean:
-	rm -fr .tox .cache
+	rm -fr .tox .cache DEMODB.sqlite
 	$(MAKE) clean
 
 
