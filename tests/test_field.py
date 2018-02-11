@@ -11,11 +11,11 @@ from demoproject.demoapp.models import DemoModelNoRegistry
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.django_db
-def test_valid_class():
-    d = DemoModelNoRegistry(klass='a.b.c')
-    with pytest.raises(ValidationError):
-        d.clean_fields()
+# @pytest.mark.django_db
+# def test_valid_class():
+#     d = DemoModelNoRegistry(klass='a.b.c')
+#     with pytest.raises(ValidationError):
+#         d.clean_fields()
 
 
 class Dummy:

@@ -1,5 +1,7 @@
 Release 1.2
 =============
+* add `import_error` attribute
+* BACKWARD INCONPATIBLE: do not raise exception if ImportError
 * drop support django < 1.10
 * add support for DjangoRestFramework `contrib.drf`
 * improved test suite

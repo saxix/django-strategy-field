@@ -22,6 +22,11 @@ NOCONTEXT = object()
 
 logger = logging.getLogger(__name__)
 
+try:
+    ModuleNotFoundError
+except:
+    ModuleNotFoundError = ImportError
+
 
 @deconstructible
 class ClassnameValidator(BaseValidator):
@@ -64,6 +69,11 @@ class StrategyClassFieldDescriptor(object):
         value = obj.__dict__.get(self.field.name)
         try:
             return get_class(value)
+        except (AttributeError, ModuleNotFoundError, ImportError):
+            if callable(self.field.import_error):
+                self.field.import_error(value)
+            else:
+                return self.field.import_error
         except Exception as e:
             logger.exception(e)
             raise ValidationError(value)
@@ -107,6 +117,7 @@ class AbstractStrategyField(models.Field):
 
     def __init__(self, *args, **kwargs):
         self.display_attribute = kwargs.pop('display_attribute', None)
+        self.import_error = kwargs.pop('import_error', None)
         kwargs['max_length'] = 200
 
         self.registry = kwargs.pop("registry", None)
@@ -258,6 +269,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
 
 
 class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
+
     def __get__(self, obj, value=None):
         if obj is None:
             return None
@@ -267,11 +279,16 @@ class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
         if not value:
             value = None
         else:
-            value = get_class(value)
-        # elif isinstance(value, six.string_types):
-        #     value = import_by_name(value)
-        # elif isclass(value):
-        #     value = value
+            try:
+                value = get_class(value)
+            except (AttributeError, ModuleNotFoundError):
+                if callable(self.field.import_error):
+                    value = self.field.import_error(value)
+                else:
+                    value = self.field.import_error
+            except Exception as e:
+                logger.exception(e)
+                raise ValidationError(value)
 
         if isclass(value):
             value = self.field.factory(value, obj)

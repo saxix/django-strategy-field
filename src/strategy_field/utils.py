@@ -21,7 +21,9 @@ def get_class(value):
 def get_display_string(klass, display_attribute=None):
     if display_attribute and hasattr(klass, display_attribute):
         attr = getattr(klass, display_attribute)
-        if callable(attr):
+        if attr is None:
+            return fqn(klass)
+        elif callable(attr):
             return attr()
         else:
             return attr
