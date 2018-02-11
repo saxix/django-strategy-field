@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import ast
 import os
 import re
 import codecs
@@ -8,15 +9,14 @@ from setuptools import find_packages, setup
 ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__)))
 init = os.path.join(ROOT, "src", "strategy_field", "__init__.py")
 
-def get_version(*file_paths):
-    """Retrieves the version from django_mb/__init__.py"""
-    filename = os.path.join(os.path.dirname(__file__), *file_paths)
-    version_file = open(filename).read()
-    version_match = re.search(r"^__version__ = [\"]([^\"]*)[\"]",
-                              version_file, re.M)
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError("Unable to find version string.")
+
+_version_re = re.compile(r'__version__\s+=\s+(.*)')
+_name_re = re.compile(r'NAME\s+=\s+(.*)')
+
+with open(init, 'rb') as f:
+    content = f.read().decode('utf-8')
+    version = str(ast.literal_eval(_version_re.search(content).group(1)))
+    name = str(ast.literal_eval(_name_re.search(content).group(1)))
 
 
 def fread(*parts):
@@ -27,8 +27,8 @@ tests_require = fread('src/requirements', 'testing.pip')
 dev_require = fread('src/requirements', 'develop.pip')
 
 setup(
-    name='django-strategy-field',
-    version=get_version(init),
+    name=name,
+    version=version,
     url='https://github.com/saxix/django-strategy-field',
     description="Django custom field to implement the strategy pattern",
     author='sax',
@@ -47,10 +47,9 @@ setup(
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Framework :: Django :: 1.8',
-        'Framework :: Django :: 1.9',
         'Framework :: Django :: 1.10',
         'Framework :: Django :: 1.11',
+        'Framework :: Django :: 2.0',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',

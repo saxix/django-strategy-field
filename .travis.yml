@@ -7,7 +7,6 @@ python:
   - 3.6
 
 env:
-  - DJANGO=1.9
   - DJANGO=1.10
   - DJANGO=1.11
   - DJANGO=2.0
@@ -22,16 +21,14 @@ matrix:
       env: DJANGO=2.0
 
     - python: 3.6
-      env: DJANGO=1.9
-    - python: 3.6
       env: DJANGO=1.10
 
 
 install:
-  - pip install tox "coverage<4.0" codecov
+  - pip install tox codecov
 
 script:
-  - tox -e "py${TRAVIS_PYTHON_VERSION//.}-d${DJANGO//.}" -- py.test tests/ --create-db -v --capture=no --cov=strategy_field --cov-report=xml --cov-config=tests/.coveragerc
+  - tox -e "d${DJANGO//.}-py${TRAVIS_PYTHON_VERSION//.}" -- py.test tests/ --create-db
 
 before_success:
   - coverage erase

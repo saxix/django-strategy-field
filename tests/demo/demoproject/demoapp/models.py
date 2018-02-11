@@ -50,7 +50,12 @@ class AbstractStrategy(object):
 
 
 class Strategy(AbstractStrategy):
-    pass
+    label = 'strategy'
+    
+    @classmethod
+    def verbose_name(self):
+        return "Verbose Name"
+    
 
 
 class Strategy1(AbstractStrategy):

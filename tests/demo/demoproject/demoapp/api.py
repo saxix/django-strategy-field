@@ -7,24 +7,25 @@ import six
 from rest_framework import serializers
 from rest_framework.viewsets import ModelViewSet
 
-from demoproject.demoapp.models import DemoMultipleModel, DemoModel, DemoModelNone
+from demoproject.demoapp.models import DemoMultipleModel, DemoModel, DemoModelNone, registry
+from strategy_field.contrib.drf import DrfStrategyField, DrfMultipleStrategyField
 from strategy_field.utils import fqn, stringify
 
 logger = logging.getLogger(__name__)
 
 
-class StrategyClassFieldDrf(serializers.CharField):
-    def to_representation(self, value):
-        return fqn(value)
+# class StrategyClassFieldDrf(serializers.CharField):
+#     def to_representation(self, value):
+#         return fqn(value)
 
 
-class MultipleStrategyClassFieldDrf(serializers.CharField):
-    def to_representation(self, value):
-        return stringify(value)
+# class MultipleStrategyClassFieldDrf(serializers.CharField):
+#     def to_representation(self, value):
+#         return stringify(value)
 
 
 class DemoModelSerializer(serializers.ModelSerializer):
-    sender = StrategyClassFieldDrf(required=False)
+    sender = DrfStrategyField(registry, required=False)
 
     class Meta:
         model = DemoModelNone
@@ -32,7 +33,7 @@ class DemoModelSerializer(serializers.ModelSerializer):
 
 
 class DemoMultipleModelSerializer(serializers.ModelSerializer):
-    sender = MultipleStrategyClassFieldDrf()
+    sender = DrfMultipleStrategyField(registry)
 
     class Meta:
         model = DemoMultipleModel

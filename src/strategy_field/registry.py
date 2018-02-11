@@ -12,10 +12,11 @@ logger = logging.getLogger(__name__)
 
 class Registry(list):
 
-    def __init__(self, *args):
-        self._klass = args[0]
+    def __init__(self, base_class, *args, **kwargs):
+        self._klass = base_class
+        self._label_attribute = kwargs.get('label_attribute', None)
         self._choices = None
-        list.__init__(self, *args[1:])
+        list.__init__(self, *args[:])
 
     @cached_property
     def klass(self):
@@ -24,7 +25,7 @@ class Registry(list):
         return self._klass
 
     def get_name(self, entry):
-        return str(entry)
+        return get_display_string(entry, self._label_attribute)
 
     def is_valid(self, value):
         if value and isinstance(value, six.string_types):
@@ -41,7 +42,7 @@ class Registry(list):
 
     def as_choices(self):
         if not self._choices:
-            self._choices = sorted((fqn(klass), fqn(klass)) for klass in self)
+            self._choices = sorted((fqn(klass), self.get_name(klass)) for klass in self)
         return self._choices
 
     def append(self, class_or_fqn):
@@ -55,6 +56,9 @@ class Registry(list):
 
         if self.klass and not issubclass(cls, self.klass):
             raise ValueError("'%s' is not a subtype of %s" % (class_or_fqn, self.klass))
+
+        if cls in self:
+            return
 
         super(Registry, self).append(cls)
         self._choices = None
