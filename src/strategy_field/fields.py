@@ -69,9 +69,9 @@ class StrategyClassFieldDescriptor(object):
         value = obj.__dict__.get(self.field.name)
         try:
             return get_class(value)
-        except (AttributeError, ModuleNotFoundError, ImportError):
+        except (AttributeError, ModuleNotFoundError, ImportError) as e:
             if callable(self.field.import_error):
-                self.field.import_error(value)
+                self.field.import_error(value, e)
             else:
                 return self.field.import_error
         except Exception as e:
@@ -281,9 +281,9 @@ class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
         else:
             try:
                 value = get_class(value)
-            except (AttributeError, ModuleNotFoundError):
+            except (AttributeError, ModuleNotFoundError, ImportError) as e:
                 if callable(self.field.import_error):
-                    value = self.field.import_error(value)
+                    value = self.field.import_error(value, e)
                 else:
                     value = self.field.import_error
             except Exception as e:
