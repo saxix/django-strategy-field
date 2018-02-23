@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
+from operator import itemgetter
+
 import six
 from inspect import isclass
 
@@ -145,8 +147,10 @@ class AbstractStrategyField(models.Field):
 
     def _get_choices(self):
         if self.registry:
-            return [(klass, get_display_string(klass, self.display_attribute))
-                    for klass in self.registry]
+            return sorted([(klass, get_display_string(klass, self.display_attribute))
+                    for klass in self.registry], key=itemgetter(1))
+            # return [(klass, get_display_string(klass, self.display_attribute))
+            #         for klass in self.registry]
         return []
 
     def _set_choices(self, value):
