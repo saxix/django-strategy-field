@@ -191,5 +191,4 @@ def test_display_attribute(demomodel, registry, monkeypatch):
 
     form_class = modelform_factory(DemoModel, exclude=[])
     form = form_class(instance=demomodel)
-
-    assert form.fields['sender'].choices[-1][1] == 'SenderNotRegistered'
+    assert form.fields['sender'].choices[1][1] == 'SenderNotRegistered'
