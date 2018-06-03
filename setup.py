@@ -31,6 +31,7 @@ setup(
     version=version,
     url='https://github.com/saxix/django-strategy-field',
     description="Django custom field to implement the strategy pattern",
+    long_description=open("README.rst").read(),
     author='sax',
     author_email='sax@os4d.org',
     license='BSD',
