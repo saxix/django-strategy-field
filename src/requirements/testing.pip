@@ -1,6 +1,7 @@
 coverage
-django-dynamic-fixture
-django-webtest
+# django-dynamic-fixture # see tox.ini
+# django-webtest # see tox.ini
+# djangorestframework # see tox.ini
 pdbpp
 pytest-cov
 pytest-django
