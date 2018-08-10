@@ -136,8 +136,10 @@ class AbstractStrategyField(models.Field):
         cls._meta.add_field(self)
         setattr(cls, self.name, self.descriptor(self))
 
-    def __eq__(self, other):
-        return self.registry == other.registry
+    # def __eq__(self, other):
+    #     if isinstance(other, Field):
+    #         return self.creation_counter == other.creation_counter
+    #     return self.registry == other.registry
 
     def get_internal_type(self):
         return 'CharField'

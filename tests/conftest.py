@@ -53,11 +53,12 @@ def demo_multiple_model():
 
 
 @pytest.fixture(scope='function')
-def webapp(request):
-    import django_webtest
-
+def webapp(django_app):
+    return django_app
+    # import django_webtest
+    #
     wtm = django_webtest.WebTestMixin()
     wtm.csrf_checks = False
     wtm._patch_settings()
-    request.addfinalizer(wtm._unpatch_settings)
-    return django_webtest.DjangoTestApp()
+    # request.addfinalizer(wtm._unpatch_settings)
+#     return django_webtest.DjangoTestApp()
