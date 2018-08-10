@@ -1,6 +1,6 @@
 Release 1.3.2 (dev)
 ===================
-*
+* fixes wrong `__eq__`   implementation
 
 Release 1.3.1
 =============
