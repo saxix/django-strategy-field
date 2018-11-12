@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import six
-
 from django.core.exceptions import ValidationError
 from django.forms.fields import ChoiceField, TypedMultipleChoiceField
 
@@ -16,13 +14,13 @@ class StrategyFormField(ChoiceField):
         super(StrategyFormField, self).__init__(*args, **kwargs)
 
     def prepare_value(self, value):
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             return value
         if value:
             return fqn(value)
 
     def bound_data(self, data, initial):
-        if isinstance(data, six.string_types):
+        if isinstance(data, str):
             return data
         return fqn(data)
 
@@ -59,7 +57,7 @@ class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
 
     def prepare_value(self, value):
         ret = value
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             ret = [value]
         if isinstance(value, (list, tuple)):
             ret = stringify(value)

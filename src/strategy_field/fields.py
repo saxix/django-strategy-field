@@ -2,7 +2,6 @@
 import logging
 from operator import itemgetter
 
-import six
 from inspect import isclass
 
 from django import forms
@@ -23,11 +22,6 @@ from strategy_field.utils import (fqn, get_display_string, import_by_name,
 NOCONTEXT = object()
 
 logger = logging.getLogger(__name__)
-
-try:
-    ModuleNotFoundError
-except:
-    ModuleNotFoundError = ImportError
 
 
 @deconstructible
@@ -97,14 +91,14 @@ class MultipleStrategyClassFieldDescriptor(object):
             return None
         value = obj.__dict__.get(self.field.name)
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = value.split(',')
         if not isinstance(value, (list, tuple)):
             value = [value] if value is not None else None
         if isinstance(value, (list, tuple)):
             ret = []
             for v in value:
-                if isinstance(v, six.string_types) and v:
+                if isinstance(v, str) and v:
                     v = import_by_name(v)
                 ret.append(v)
             return ret
@@ -190,8 +184,7 @@ class AbstractStrategyField(models.Field):
                 defaults['show_hidden_initial'] = True
             else:
                 defaults['initial'] = self.get_default()
-        include_blank = (self.blank or
-                         not (self.has_default() or 'initial' in kwargs))
+        include_blank = (self.blank or not (self.has_default() or 'initial' in kwargs))
         defaults['choices'] = self.get_choices(include_blank=include_blank)
         if self.null:
             defaults['empty_value'] = None
@@ -252,7 +245,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
             return None
         elif isinstance(value, (list, tuple)):
             return stringify(value)
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, str):
             return value
 
     # def get_prep_lookup(self, lookup_type, value):
@@ -321,12 +314,12 @@ class MultipleStrategyFieldDescriptor(MultipleStrategyClassFieldDescriptor):
             return []
         value = obj.__dict__.get(self.field.name)
 
-        if value and isinstance(value, six.string_types) or isinstance(value, (list, tuple)):
+        if value and isinstance(value, str) or isinstance(value, (list, tuple)):
             ret = []
-            if isinstance(value, six.string_types):
+            if isinstance(value, str):
                 value = value.split(',')
             for v in value:
-                if isinstance(v, six.string_types):
+                if isinstance(v, str):
                     v = import_by_name(v)
 
                 if isclass(v):
@@ -358,7 +351,7 @@ class StrategyFieldLookupMixin(object):
         value = super(StrategyFieldLookupMixin, self).get_prep_lookup()
         if value is None:
             return None
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             pass
         elif isinstance(value, (list, tuple)):
             value = stringify(value)

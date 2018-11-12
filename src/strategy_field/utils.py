@@ -80,7 +80,7 @@ def import_by_name(name):
     module = importlib.import_module(module_path)
     try:
         return getattr(module, class_str)
-    except AttributeError as e:
+    except AttributeError:
         raise AttributeError('Unable to import {}. '
                              '{} does not have {} attribute'.format(name,
                                                                     module,
