@@ -1,7 +1,7 @@
 Release 2.0
 =============
 * dropped support django<2.0
-* dropped support python<3
+* dropped support python<3.6
 * updates `fqn()` to handle functions
 * `import_by_name` caching
 
