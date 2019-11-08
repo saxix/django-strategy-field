@@ -61,12 +61,12 @@ the Django admin panel.
     class SMSStrategy(AbstractTransport):
         def send(self):
             ...
-    registry = TransportRegistry(AbstractTransport)
+    registry = TransportRegistry(AbstractStrategy)
     registry.register(EmailStrategy)
     registry.register(SMSStrategy)
 
     class Event(models.Model):
-        sender = StrategyField(registry)
+        sender = StrategyField(registry=registry)
 
     Event.objects.get_or_create(sender=EmailStrategy)
     ...
