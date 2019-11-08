@@ -2,8 +2,30 @@
 import importlib
 import logging
 from inspect import isclass
+import types
 
 logger = logging.getLogger(__name__)
+
+
+class ModulesCache(dict):
+    def __missing__(self, name):
+        if '.' not in name:
+            raise ValueError("Cannot import '{}'".format(name))
+
+        module_path, class_str = name.rsplit(".", 1)
+        module = importlib.import_module(module_path)
+        try:
+            handler = getattr(module, class_str)
+            self[name] = handler
+            return handler
+        except AttributeError:
+            raise AttributeError('Unable to import {}. '
+                                 '{} does not have {} attribute'.format(name,
+                                                                        module,
+                                                                        class_str))
+
+
+_cache = ModulesCache()
 
 
 def get_class(value):
@@ -55,6 +77,8 @@ def fqn(o):
     parts.append(o.__module__)
     if isclass(o):
         parts.append(o.__name__)
+    elif isinstance(o, types.FunctionType):
+        parts.append(o.__name__)
     else:
         parts.append(o.__class__.__name__)
     return ".".join(parts)
@@ -71,19 +95,21 @@ def import_by_name(name):
     :return:
 
     """
-    if '.' not in name:
-        raise ValueError("Cannot import '{}'".format(name))
-    class_data = name.split(".")
-    module_path = ".".join(class_data[:-1])
-    class_str = class_data[-1]
-    module = importlib.import_module(module_path)
-    try:
-        return getattr(module, class_str)
-    except AttributeError:
-        raise AttributeError('Unable to import {}. '
-                             '{} does not have {} attribute'.format(name,
-                                                                    module,
-                                                                    class_str))
+    return _cache[name]
+
+    # if '.' not in name:
+    #     raise ValueError("Cannot import '{}'".format(name))
+    # class_data = name.split(".")
+    # module_path = ".".join(class_data[:-1])
+    # class_str = class_data[-1]
+    # module = importlib.import_module(module_path)
+    # try:
+    #     return getattr(module, class_str)
+    # except AttributeError:
+    #     raise AttributeError('Unable to import {}. '
+    #                          '{} does not have {} attribute'.format(name,
+    #                                                                 module,
+    #                                                                 class_str))
 
 
 def stringify(value):
