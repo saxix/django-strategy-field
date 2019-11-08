@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import importlib
 import logging
-import six
 from inspect import isclass
 
 logger = logging.getLogger(__name__)
@@ -10,7 +9,7 @@ logger = logging.getLogger(__name__)
 def get_class(value):
     if not value:
         return value
-    elif isinstance(value, six.string_types):
+    elif isinstance(value, str):
         return import_by_name(value)
     elif isclass(value):
         return value
@@ -49,7 +48,7 @@ def fqn(o):
     :return: class name
     """
     parts = []
-    if isinstance(o, six.string_types):
+    if isinstance(o, str):
         return o
     if not hasattr(o, '__module__'):
         raise ValueError('Invalid argument `%s`' % o)
@@ -92,7 +91,7 @@ def stringify(value):
     # if isinstance(value, six.string_types):
     #     value = value.split(',')
     for v in value:
-        if isinstance(v, six.string_types) and v:
+        if isinstance(v, str) and v:
             ret.append(v)
         else:
             ret.append(fqn(v))

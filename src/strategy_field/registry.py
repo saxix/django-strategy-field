@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-import six
 from inspect import isclass
 
 from django.utils.functional import cached_property
@@ -20,7 +19,7 @@ class Registry(list):
 
     @cached_property
     def klass(self):
-        if isinstance(self._klass, six.string_types):
+        if isinstance(self._klass, str):
             return import_by_name(self._klass)
         return self._klass
 
@@ -28,7 +27,7 @@ class Registry(list):
         return get_display_string(entry, self._label_attribute)
 
     def is_valid(self, value):
-        if value and isinstance(value, six.string_types):
+        if value and isinstance(value, str):
             try:
                 value = import_by_name(value)
             except (ImportError, ValueError, AttributeError):
@@ -46,7 +45,7 @@ class Registry(list):
         return self._choices
 
     def append(self, class_or_fqn):
-        if isinstance(class_or_fqn, six.string_types):
+        if isinstance(class_or_fqn, str):
             cls = import_by_name(class_or_fqn)
         else:
             cls = class_or_fqn
@@ -67,7 +66,7 @@ class Registry(list):
     register = append
 
     def __contains__(self, y):
-        if isinstance(y, six.string_types):
+        if isinstance(y, str):
             try:
                 y = import_by_name(y)
             except (ImportError, ValueError):
