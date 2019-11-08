@@ -1,16 +1,37 @@
 # -*- coding: utf-8 -*-
 import importlib
 import logging
-import six
 from inspect import isclass
+import types
 
 logger = logging.getLogger(__name__)
+
+
+class ModulesCache(dict):
+    def __missing__(self, name):
+        if '.' not in name:
+            raise ValueError("Cannot import '{}'".format(name))
+
+        module_path, class_str = name.rsplit(".", 1)
+        module = importlib.import_module(module_path)
+        try:
+            handler = getattr(module, class_str)
+            self[name] = handler
+            return handler
+        except AttributeError:
+            raise AttributeError('Unable to import {}. '
+                                 '{} does not have {} attribute'.format(name,
+                                                                        module,
+                                                                        class_str))
+
+
+_cache = ModulesCache()
 
 
 def get_class(value):
     if not value:
         return value
-    elif isinstance(value, six.string_types):
+    elif isinstance(value, str):
         return import_by_name(value)
     elif isclass(value):
         return value
@@ -49,12 +70,14 @@ def fqn(o):
     :return: class name
     """
     parts = []
-    if isinstance(o, six.string_types):
+    if isinstance(o, str):
         return o
     if not hasattr(o, '__module__'):
         raise ValueError('Invalid argument `%s`' % o)
     parts.append(o.__module__)
     if isclass(o):
+        parts.append(o.__name__)
+    elif isinstance(o, types.FunctionType):
         parts.append(o.__name__)
     else:
         parts.append(o.__class__.__name__)
@@ -72,19 +95,21 @@ def import_by_name(name):
     :return:
 
     """
-    if '.' not in name:
-        raise ValueError("Cannot import '{}'".format(name))
-    class_data = name.split(".")
-    module_path = ".".join(class_data[:-1])
-    class_str = class_data[-1]
-    module = importlib.import_module(module_path)
-    try:
-        return getattr(module, class_str)
-    except AttributeError as e:
-        raise AttributeError('Unable to import {}. '
-                             '{} does not have {} attribute'.format(name,
-                                                                    module,
-                                                                    class_str))
+    return _cache[name]
+
+    # if '.' not in name:
+    #     raise ValueError("Cannot import '{}'".format(name))
+    # class_data = name.split(".")
+    # module_path = ".".join(class_data[:-1])
+    # class_str = class_data[-1]
+    # module = importlib.import_module(module_path)
+    # try:
+    #     return getattr(module, class_str)
+    # except AttributeError:
+    #     raise AttributeError('Unable to import {}. '
+    #                          '{} does not have {} attribute'.format(name,
+    #                                                                 module,
+    #                                                                 class_str))
 
 
 def stringify(value):
@@ -92,7 +117,7 @@ def stringify(value):
     # if isinstance(value, six.string_types):
     #     value = value.split(',')
     for v in value:
-        if isinstance(v, six.string_types) and v:
+        if isinstance(v, str) and v:
             ret.append(v)
         else:
             ret.append(fqn(v))

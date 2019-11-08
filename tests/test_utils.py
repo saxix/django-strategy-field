@@ -57,6 +57,6 @@ def test_stringify():
 def test_fqn():
     assert fqn(DemoModel) == 'demoproject.demoapp.models.DemoModel'
     assert fqn('demoproject.demoapp.models.DemoModel') == 'demoproject.demoapp.models.DemoModel'
-    assert fqn(fqn) == 'strategy_field.utils.function'
+    assert fqn(fqn) == 'strategy_field.utils.fqn'
     with pytest.raises(ValueError):
         assert fqn(2)
