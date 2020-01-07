@@ -3,7 +3,7 @@
 import pytest
 from demoproject.demoapp.models import Sender2, SenderNotRegistered
 from django.forms.models import modelform_factory
-from demoproject.compat import reverse
+from django.urls import reverse
 from demoproject.demoapp.models import (DemoModel, DemoModelDefault,
                                         DemoModelCallableDefault,
                                         DemoModelNone, Sender1, )

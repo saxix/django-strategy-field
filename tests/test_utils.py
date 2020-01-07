@@ -60,3 +60,10 @@ def test_fqn():
     assert fqn(fqn) == 'strategy_field.utils.fqn'
     with pytest.raises(ValueError):
         assert fqn(2)
+
+def test_fqn2():
+    with pytest.raises(ValueError):
+        assert fqn(None)
+
+    with pytest.raises(ValueError):
+        assert fqn(2)

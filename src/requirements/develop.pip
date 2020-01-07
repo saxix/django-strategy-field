@@ -3,3 +3,4 @@ virtualenv>15
 wheel
 flake8
 flake8-putty
+django-dynamic-fixture

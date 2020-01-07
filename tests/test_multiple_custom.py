@@ -3,7 +3,7 @@
 # noqa
 import pytest
 from django.forms.models import modelform_factory
-from demoproject.compat import reverse
+from django.urls import reverse
 from demoproject.demoapp.models import (DemoMultipleCustomModel, Strategy,
                                         Strategy1,)
 from strategy_field.utils import fqn

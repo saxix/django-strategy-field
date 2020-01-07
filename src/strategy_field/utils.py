@@ -73,7 +73,7 @@ def fqn(o):
     if isinstance(o, str):
         return o
     if not hasattr(o, '__module__'):
-        raise ValueError('Invalid argument `%s`' % o)
+        raise ValueError('Invalid argument: `%s` is a invalid python name' % o)
     parts.append(o.__module__)
     if isclass(o):
         parts.append(o.__name__)
