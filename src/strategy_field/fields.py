@@ -5,13 +5,10 @@ from operator import itemgetter
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.validators import BaseValidator
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH, NOT_PROVIDED
 from django.db.models.lookups import Contains, IContains, In
-from django.utils.deconstruct import deconstructible
 from django.utils.text import capfirst
-from django.utils.translation import ugettext_lazy as _
 
 from strategy_field.forms import (StrategyFormField,
                                   StrategyMultipleChoiceFormField,)
@@ -124,7 +121,8 @@ class AbstractStrategyField(models.Field):
 
     choices = property(_get_choices, _set_choices)
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None, **kwargs):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
+                    limit_choices_to=None, **kwargs):
         first_choice = blank_choice if include_blank else []
 
         return first_choice + [(fqn(klass), l)
@@ -233,7 +231,8 @@ class MultipleStrategyClassField(AbstractStrategyField):
             raise TypeError('Lookup type %r not supported.' % lookup_name)
         return super(MultipleStrategyClassField, self).get_lookup(lookup_name)
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None, **kwargs):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
+                    limit_choices_to=None, **kwargs):
         return AbstractStrategyField.get_choices(self, False, blank_choice)
 
 

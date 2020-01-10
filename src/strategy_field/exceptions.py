@@ -23,6 +23,7 @@ class StrategyClassError(ValueError):
 class StrategyImportError(ImportError):
     pass
 
+
 class StrategyAttributeError(AttributeError):
     default_message = 'Unable to import %(name)s. %(module)s does not have %(class_str)s attribute'
 
