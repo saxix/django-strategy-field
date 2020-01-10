@@ -5,7 +5,7 @@ class StrategyNameError(ValueError):
         self.name = str(name)
         self.message = message or self.default_message
 
-    def __str__(self):
+    def __repr__(self):
         return self.message % self.name
 
 
@@ -16,7 +16,7 @@ class StrategyClassError(ValueError):
         self.name = str(name)
         self.message = message or self.default_message
 
-    def __str__(self):
+    def __repr__(self):
         return self.message % self.name
 
 
@@ -32,5 +32,5 @@ class StrategyAttributeError(AttributeError):
         self.class_str = class_str
         self.message = message or self.default_message
 
-    def __str__(self):
+    def __repr__(self):
         return self.message % (self.name, self.module, self.class_str)

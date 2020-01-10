@@ -17,40 +17,11 @@ from strategy_field.forms import (StrategyFormField,
                                   StrategyMultipleChoiceFormField,)
 from strategy_field.utils import (fqn, get_class, get_display_string,
                                   import_by_name, stringify,)
+from strategy_field.validators import RegistryValidator, ClassnameValidator
 
 NOCONTEXT = object()
 
 logger = logging.getLogger(__name__)
-
-
-@deconstructible
-class ClassnameValidator(BaseValidator):
-    message = _('Ensure this value is valid class name (it is %(show_value)s).')
-    code = 'classname'
-
-    def compare(self, a, b):
-        try:
-            get_class(a)
-        except (ImportError, TypeError):
-            return True
-        return False
-
-
-@deconstructible
-class RegistryValidator(ClassnameValidator):
-    message = _('Ensure this value is registered (it is %(show_value)s).')
-    code = 'registry'
-
-    def compare(self, value, registry):
-        if value is None:
-            return False
-        elif isinstance(value, (list, tuple)):
-            for c in value:
-                if not issubclass(get_class(value), registry.klass):
-                    return False
-        else:
-            value = get_class(value)
-        return not issubclass(value, registry.klass)
 
 
 class StrategyClassFieldDescriptor(object):
