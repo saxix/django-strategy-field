@@ -153,7 +153,7 @@ class AbstractStrategyField(models.Field):
 
     choices = property(_get_choices, _set_choices)
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None, **kwargs):
         first_choice = blank_choice if include_blank else []
 
         return first_choice + [(fqn(klass), l)
@@ -262,7 +262,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
             raise TypeError('Lookup type %r not supported.' % lookup_name)
         return super(MultipleStrategyClassField, self).get_lookup(lookup_name)
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None, **kwargs):
         return AbstractStrategyField.get_choices(self, False, blank_choice)
 
 

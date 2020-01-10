@@ -1,5 +1,5 @@
 class StrategyNameError(ValueError):
-    default_message = "Cannot import '%s': must be a valid python dotted name."
+    default_message = "Invalid value '%s': must be a valid python dotted name."
 
     def __init__(self, name, message=None):
         self.name = str(name)
@@ -21,6 +21,9 @@ class StrategyClassError(ValueError):
 
 
 class StrategyImportError(ImportError):
+    pass
+
+class StrategyAttributeError(AttributeError):
     default_message = 'Unable to import %(name)s. %(module)s does not have %(class_str)s attribute'
 
     def __init__(self, name, module, class_str, message=None):
