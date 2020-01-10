@@ -4,7 +4,7 @@ from inspect import isclass
 
 from django.utils.functional import cached_property
 
-from .utils import fqn, get_attr, import_by_name, get_display_string  # noqa
+from .utils import fqn, get_attr, get_display_string, import_by_name  # noqa
 
 logger = logging.getLogger(__name__)
 

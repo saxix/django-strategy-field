@@ -3,10 +3,11 @@ name = "django-strategy-field"
 version = "2.1.0"
 description = ""
 authors = ["sax <s.apostolico@gmail.com>"]
-homepage="https://github.com/saxix/django-strategy-field"
 license = "MIT"
 readme = "README.rst"
 repository = "https://github.com/saxix/django-strategy-field"
+homepage="https://github.com/saxix/django-strategy-field"
+keywords = ['django', 'strategy']
 classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',

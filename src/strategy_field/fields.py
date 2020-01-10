@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-from operator import itemgetter
-
 from inspect import isclass
+from operator import itemgetter
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -15,9 +14,9 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
 from strategy_field.forms import (StrategyFormField,
-                                  StrategyMultipleChoiceFormField, )
-from strategy_field.utils import (fqn, get_display_string, import_by_name,
-                                  stringify, get_class)
+                                  StrategyMultipleChoiceFormField,)
+from strategy_field.utils import (fqn, get_class, get_display_string,
+                                  import_by_name, stringify,)
 
 NOCONTEXT = object()
 
