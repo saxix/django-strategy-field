@@ -1,5 +1,11 @@
+Release 2.1
+===========
+* add support python 3.8
+* move to pyproject.toml and poetry
+
+
 Release 2.0
-=============
+===========
 * dropped support django<2.0
 * dropped support python<3.6
 * updates `fqn()` to handle functions

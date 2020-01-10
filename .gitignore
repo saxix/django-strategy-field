@@ -10,5 +10,4 @@
 /build
 /*.log
 codecov.yml
-/pyproject.toml
 /poetry.lock
