@@ -21,6 +21,7 @@ def test_get_display_string():
     assert get_display_string(Strategy, 'label') == 'strategy'
     assert get_display_string(Strategy1, 'label') == 'demoproject.demoapp.models.Strategy1'
     assert get_display_string(Strategy, 'verbose_name') == 'Verbose Name'
+    assert get_display_string(Strategy, 'none') == 'demoproject.demoapp.models.Strategy'
 
 
 def test_get_attr():

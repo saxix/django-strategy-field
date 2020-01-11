@@ -51,7 +51,8 @@ class AbstractStrategy(object):
 
 class Strategy(AbstractStrategy):
     label = 'strategy'
-    
+    none = None
+
     @classmethod
     def verbose_name(self):
         return "Verbose Name"
