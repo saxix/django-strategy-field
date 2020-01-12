@@ -4,7 +4,8 @@ import logging
 import types
 from inspect import isclass
 
-from strategy_field.exceptions import StrategyClassError, StrategyNameError, StrategyAttributeError
+from strategy_field.exceptions import (StrategyAttributeError,
+                                       StrategyClassError, StrategyNameError,)
 
 logger = logging.getLogger(__name__)
 

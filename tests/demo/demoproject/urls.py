@@ -2,10 +2,11 @@ from django.conf.urls import url
 from django.contrib.admin import AdminSite, autodiscover
 
 from demoproject.demoapp.api import DemoModelView, DemoMultipleModelView
+
 from .demoapp.models import (DemoAllModel, DemoCustomModel, DemoModel,
+                             DemoModelCallableDefault, DemoModelDefault,
                              DemoModelProxy, DemoMultipleCustomModel,
-                             DemoMultipleModel, DemoModelDefault,
-                             DemoModelCallableDefault)
+                             DemoMultipleModel,)
 
 autodiscover()
 

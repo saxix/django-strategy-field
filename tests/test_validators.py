@@ -11,7 +11,6 @@ def test_classnamevalidator():
         v('error')
 
 
-
 def test_RegistryValidator(registry):
     v = RegistryValidator(registry)
     assert v('demoproject.demoapp.models.Sender1')

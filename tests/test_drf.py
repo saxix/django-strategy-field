@@ -7,9 +7,9 @@ import pytest
 from django_dynamic_fixture import G
 from rest_framework.reverse import reverse
 
-from demoproject.demoapp.models import (DemoMultipleModel, Sender1,
-                                        Sender2, DemoModelNone, Strategy)
-from strategy_field.utils import fqn, stringify
+from demoproject.demoapp.models import (DemoModelNone, DemoMultipleModel,
+                                        Sender1, Sender2, Strategy,)
+from strategy_field.utils import fqn
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +70,6 @@ def test_post_multiple(webapp):
 
     res = webapp.post(url,
                       expect_errors=True,
-                      params={'sender': [fqn(Sender1),fqn(DemoModelNone)]})
+                      params={'sender': [fqn(Sender1), fqn(DemoModelNone)]})
     assert res.status_code == 400
     assert res.json['sender'] == ['Invalid entry `%s`' % fqn(DemoModelNone)]

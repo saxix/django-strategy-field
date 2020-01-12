@@ -13,9 +13,8 @@ from django.utils.text import capfirst
 from strategy_field.exceptions import StrategyNameError
 from strategy_field.forms import (StrategyFormField,
                                   StrategyMultipleChoiceFormField,)
-from strategy_field.utils import (fqn, get_class, get_display_string,
-                                  import_by_name, stringify,)
-from strategy_field.validators import RegistryValidator, ClassnameValidator
+from strategy_field.utils import fqn, get_class, get_display_string, stringify
+from strategy_field.validators import ClassnameValidator, RegistryValidator
 
 NOCONTEXT = object()
 

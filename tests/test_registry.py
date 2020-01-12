@@ -2,7 +2,7 @@
 import pytest
 
 from demoproject.demoapp.models import (AbstractSender, DemoModel, Sender1,
-                                        Sender2, )
+                                        Sender2,)
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn
 
@@ -79,4 +79,4 @@ def test_registry_contains():
     r.register(fqn(Sender2))
     assert Sender1 in r
     assert fqn(Sender1) in r
-    assert not 'a.b.c' in r
+    assert 'a.b.c' not in r

@@ -2,7 +2,10 @@
 import collections
 
 import pytest
-from strategy_field.fields import StrategyClassField, MultipleStrategyClassField, StrategyField, MultipleStrategyField
+
+from strategy_field.fields import (MultipleStrategyClassField,
+                                   MultipleStrategyField, StrategyClassField,
+                                   StrategyField,)
 
 
 @pytest.mark.parametrize("field", [StrategyClassField,

@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from demoproject.demoapp.models import DemoModel, Strategy1, Strategy, DemoModelNone
-from strategy_field.utils import get_class, fqn, get_display_string, get_attr, import_by_name, stringify
+from demoproject.demoapp.models import (DemoModel, DemoModelNone, Strategy,
+                                        Strategy1,)
+from strategy_field.utils import (fqn, get_attr, get_class, get_display_string,
+                                  import_by_name, stringify,)
 
 
 def test_get_class():
-    assert get_class(None) == None
+    assert get_class(None) is None
     assert get_class('') == ''
     assert get_class(fqn(DemoModel)) == DemoModel
     assert get_class(DemoModel) == DemoModel
@@ -39,7 +41,6 @@ def test_get_attr():
     assert str(get_attr(a, 'b', 1)) == 'c'
 
 
-
 def test_import_by_name():
     assert import_by_name('demoproject.demoapp.models.DemoModel') == DemoModel
     with pytest.raises(AttributeError):
@@ -61,6 +62,7 @@ def test_fqn():
     assert fqn(fqn) == 'strategy_field.utils.fqn'
     with pytest.raises(ValueError):
         assert fqn(2)
+
 
 def test_fqn2():
     with pytest.raises(ValueError):

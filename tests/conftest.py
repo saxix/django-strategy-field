@@ -1,7 +1,3 @@
-import os
-import sys
-from pathlib import Path
-
 import pytest
 
 
@@ -61,8 +57,8 @@ def webapp(django_app):
     return django_app
     # import django_webtest
     #
-    wtm = django_webtest.WebTestMixin()
-    wtm.csrf_checks = False
-    wtm._patch_settings()
+    # wtm = django_webtest.WebTestMixin()
+    # wtm.csrf_checks = False
+    # wtm._patch_settings()
     # request.addfinalizer(wtm._unpatch_settings)
 #     return django_webtest.DjangoTestApp()

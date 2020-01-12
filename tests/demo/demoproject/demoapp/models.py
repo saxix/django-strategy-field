@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 import logging
-
 import six
-from django.core.mail.backends.base import BaseEmailBackend
 
+from django.core.mail.backends.base import BaseEmailBackend
 from django.db import models
-from django.utils.deconstruct import deconstructible
 
 from strategy_field.fields import (MultipleStrategyClassField,
                                    MultipleStrategyField, StrategyClassField,
-                                   StrategyField)
+                                   StrategyField,)
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn, import_by_name
 
@@ -56,7 +54,6 @@ class Strategy(AbstractStrategy):
     @classmethod
     def verbose_name(self):
         return "Verbose Name"
-    
 
 
 class Strategy1(AbstractStrategy):

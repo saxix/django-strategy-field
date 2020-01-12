@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # flake8: noqa
 import pytest
-from demoproject.demoapp.models import Sender2, SenderNotRegistered
 from django.forms.models import modelform_factory
 from django.urls import reverse
-from demoproject.demoapp.models import (DemoModel, DemoModelDefault,
-                                        DemoModelCallableDefault,
-                                        DemoModelNone, Sender1, )
+
+from demoproject.demoapp.models import (DemoModel, DemoModelCallableDefault,
+                                        DemoModelDefault, DemoModelNone,
+                                        Sender1, Sender2, SenderNotRegistered,)
 from strategy_field.utils import fqn
 
 

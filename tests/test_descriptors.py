@@ -1,11 +1,7 @@
-#  :copyright: Copyright (c) 2018-2020. Stefano Apostolico - All Rights Reserved
-#  :license: Business Source License -
-#  Unauthorized copying of this file, via any medium is strictly prohibited
-#  Written by Stefano Apostolico <s.apostolico@gmail.com>, January 2020
-from unittest.mock import Mock
-
-from strategy_field.fields import StrategyClassFieldDescriptor, MultipleStrategyClassFieldDescriptor, \
-    StrategyFieldDescriptor, MultipleStrategyFieldDescriptor
+from strategy_field.fields import (MultipleStrategyClassFieldDescriptor,
+                                   MultipleStrategyFieldDescriptor,
+                                   StrategyClassFieldDescriptor,
+                                   StrategyFieldDescriptor,)
 from strategy_field.utils import fqn
 
 
@@ -77,7 +73,7 @@ def test_multiplestrategyclassfielddescriptor():
 
 def test_strategyfielddescriptor():
     desc1 = StrategyFieldDescriptor(type("Field", (MockField,), {'name': 'strategy'}))
-    desc2 = StrategyFieldDescriptor(type("Field", (MockField,), {'name': 'errored'}))
+    # desc2 = StrategyFieldDescriptor(type("Field", (MockField,), {'name': 'errored'}))
     desc3 = StrategyFieldDescriptor(type("Field", (MockField,), {'name': 'errored',
                                                                  'import_error': lambda *a: None}))
 
@@ -105,7 +101,7 @@ def test_strategyfielddescriptor():
 def test_MultipleStrategyFieldDescriptor():
     desc0 = MultipleStrategyFieldDescriptor(type("Field", (MockField,), {'name': 'strategy'}))
     desc1 = MultipleStrategyFieldDescriptor(type("Field", (MockField,), {'name': 'strategy1'}))
-    desc2 = MultipleStrategyFieldDescriptor(type("Field", (MockField,), {'name': 'strategy2'}))
+    # desc2 = MultipleStrategyFieldDescriptor(type("Field", (MockField,), {'name': 'strategy2'}))
     desc3 = MultipleStrategyFieldDescriptor(type("Field", (MockField,), {'name': 'errored'}))
     desc4 = MultipleStrategyFieldDescriptor(type("Field", (MockField,), {'name': 'errored',
                                                                          'import_error': lambda *a: 22}))

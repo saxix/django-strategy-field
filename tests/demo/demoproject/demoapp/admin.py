@@ -2,13 +2,12 @@
 from django.contrib import admin
 from django.forms import ModelForm, TextInput
 
-from .models import (DemoAllModel, DemoCustomModel, DemoModel, DemoModelProxy,
-                     DemoMultipleCustomModel, DemoMultipleModel,
-                     DemoModelCallableDefault, DemoModelDefault)
+from .models import (DemoAllModel, DemoCustomModel, DemoModel,
+                     DemoModelCallableDefault, DemoModelDefault, DemoModelProxy,
+                     DemoMultipleCustomModel, DemoMultipleModel,)
 
 
 class DemoModelForm(ModelForm):
-
     class Meta:
         model = DemoModelProxy
         widgets = {'sender': TextInput}
@@ -18,7 +17,6 @@ class DemoModelForm(ModelForm):
 class DemoModelProxyAdmin(admin.ModelAdmin):
     form = DemoModelForm
 
-# admin.site.register(DemoAllModel)
 
 for s in (admin.site,):
     s.register(DemoModelProxy, DemoModelProxyAdmin)
