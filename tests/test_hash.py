@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-import collections
-
 import pytest
+from collections.abc import Hashable
 
 from strategy_field.fields import (MultipleStrategyClassField,
                                    MultipleStrategyField, StrategyClassField,
@@ -12,4 +10,4 @@ from strategy_field.fields import (MultipleStrategyClassField,
                                    MultipleStrategyClassField, StrategyField,
                                    MultipleStrategyField])
 def test_is_hashable(field):
-    assert isinstance(field(), collections.Hashable)
+    assert isinstance(field(), Hashable)

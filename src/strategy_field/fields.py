@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
 import logging
-from inspect import isclass
-from operator import itemgetter
-
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH, NOT_PROVIDED
 from django.db.models.lookups import Contains, IContains, In
 from django.utils.text import capfirst
+from inspect import isclass
+from operator import itemgetter
 
 from strategy_field.exceptions import StrategyNameError
 from strategy_field.forms import (StrategyFormField,
@@ -88,7 +86,7 @@ class AbstractStrategyField(models.Field):
         kwargs['max_length'] = 200
 
         self.registry = kwargs.pop("registry", None)
-        super(AbstractStrategyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.validators.append(ClassnameValidator(None))
         if self.registry:
             self.validators.append(RegistryValidator(self.registry))
@@ -136,7 +134,7 @@ class AbstractStrategyField(models.Field):
         return value in self.registry
 
     def deconstruct(self):
-        name, path, args, kwargs = super(AbstractStrategyField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         del kwargs["max_length"]
         if "registry" in kwargs:
             del kwargs["registry"]
@@ -210,7 +208,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
 
     def get_db_prep_save(self, value, connection):
         value = list(filter(lambda x: x, value)) if value is not None else None
-        return super(MultipleStrategyClassField, self).get_db_prep_save(value, connection)
+        return super().get_db_prep_save(value, connection)
 
     def get_prep_value(self, value):
         if value is None:
@@ -233,7 +231,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
     def get_lookup(self, lookup_name):
         if lookup_name == 'in':
             raise TypeError('Lookup type %r not supported.' % lookup_name)
-        return super(MultipleStrategyClassField, self).get_lookup(lookup_name)
+        return super().get_lookup(lookup_name)
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
                     limit_choices_to=None, **kwargs):
@@ -273,7 +271,7 @@ class StrategyField(StrategyClassField):
 
     def __init__(self, *args, **kwargs):
         self.factory = kwargs.pop('factory', lambda klass, obj: klass(obj))
-        super(StrategyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def pre_save(self, model_instance, add):
         value = getattr(model_instance, self.attname)
@@ -315,17 +313,17 @@ class MultipleStrategyField(MultipleStrategyClassField):
 
     def __init__(self, *args, **kwargs):
         self.factory = kwargs.pop('factory', lambda klass, obj: klass(obj))
-        super(MultipleStrategyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_lookup(self, lookup_name):
         if lookup_name == 'in':
             raise TypeError('Lookup type %r not supported.' % lookup_name)
-        return super(MultipleStrategyField, self).get_lookup(lookup_name)
+        return super().get_lookup(lookup_name)
 
 
 class StrategyFieldLookupMixin(object):
     def get_prep_lookup(self):
-        value = super(StrategyFieldLookupMixin, self).get_prep_lookup()
+        value = super().get_prep_lookup()
         if value is None:
             return None
         if isinstance(value, str):

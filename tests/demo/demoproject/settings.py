@@ -1,8 +1,6 @@
 # Django settings for demoproject project.
 import os
 
-import django
-
 here = os.path.dirname(__file__)
 
 DEBUG = True

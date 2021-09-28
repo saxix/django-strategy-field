@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # flake8: noqa
 import pytest
 from django.forms.models import modelform_factory

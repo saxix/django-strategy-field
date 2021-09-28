@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from demoproject.demoapp.models import (DemoModel, DemoModelNone, Strategy,

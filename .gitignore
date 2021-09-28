@@ -11,3 +11,5 @@
 /*.log
 codecov.yml
 /poetry.lock
+.venv/
+~build/
