@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-import logging
 import six
 
+import logging
 from django.core.mail.backends.base import BaseEmailBackend
 from django.db import models
 
@@ -42,7 +41,7 @@ registry.register(Sender2)
 class AbstractStrategy(object):
     def __init__(self, context, label=''):
         if not context:
-            raise ValueError("Invalid context for strategy ('')".format(context))
+            raise ValueError("Invalid context for strategy ({})".format(context))
         self.context = context
         self.label = label
 

@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import logging
-
 import pytest
 from django_dynamic_fixture import G
 from rest_framework.reverse import reverse

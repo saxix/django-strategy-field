@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # !qa: E501
 import pytest
 from django.forms.models import modelform_factory

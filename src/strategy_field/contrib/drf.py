@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
 import logging
-
 from django.core.validators import BaseValidator
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -27,11 +24,11 @@ class DrfStrategyField(serializers.ChoiceField):
 
     def __init__(self, registry, **kwargs):
         choices = registry.as_choices()
-        super(DrfStrategyField, self).__init__(choices, **kwargs)
+        super().__init__(choices, **kwargs)
         self.registry = registry
 
     def get_validators(self):
-        ret = super(DrfStrategyField, self).get_validators()
+        ret = super().get_validators()
         ret.append(RegistryValidator(self.registry))
         return ret
 
@@ -48,10 +45,10 @@ class DrfMultipleStrategyField(serializers.MultipleChoiceField):
     def __init__(self, registry, **kwargs):
         choices = registry.as_choices()
         self.registry = registry
-        super(DrfMultipleStrategyField, self).__init__(choices, **kwargs)
+        super().__init__(choices, **kwargs)
 
     def get_validators(self):
-        ret = super(DrfMultipleStrategyField, self).get_validators()
+        ret = super().get_validators()
         ret.append(RegistryValidator(self.registry))
         return ret
 
@@ -62,4 +59,4 @@ class DrfMultipleStrategyField(serializers.MultipleChoiceField):
         return [import_by_name(i) for i in data]
 
     def run_validators(self, value):
-        return super(DrfMultipleStrategyField, self).run_validators(value)
+        return super().run_validators(value)
