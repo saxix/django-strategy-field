@@ -1,5 +1,11 @@
 Release 2.1
 ===========
+* add support python 3.9, 3.10
+* add support django 4.0
+
+
+Release 2.1
+===========
 * add support python 3.8
 * move to pyproject.toml and poetry
 
