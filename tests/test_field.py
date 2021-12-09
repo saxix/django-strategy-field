@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals, print_function
 import logging
-
 import pytest
-from django.core.exceptions import ValidationError
 from django.core.mail.backends.filebased import EmailBackend
 
 from demoproject.demoapp.models import DemoModelNoRegistry

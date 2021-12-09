@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-import logging
-
 import six
-from django.core.mail.backends.base import BaseEmailBackend
 
+import logging
+from django.core.mail.backends.base import BaseEmailBackend
 from django.db import models
-from django.utils.deconstruct import deconstructible
 
 from strategy_field.fields import (MultipleStrategyClassField,
                                    MultipleStrategyField, StrategyClassField,
-                                   StrategyField)
+                                   StrategyField,)
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn, import_by_name
 
@@ -44,18 +41,18 @@ registry.register(Sender2)
 class AbstractStrategy(object):
     def __init__(self, context, label=''):
         if not context:
-            raise ValueError("Invalid context for strategy ('')".format(context))
+            raise ValueError("Invalid context for strategy ({})".format(context))
         self.context = context
         self.label = label
 
 
 class Strategy(AbstractStrategy):
     label = 'strategy'
-    
+    none = None
+
     @classmethod
     def verbose_name(self):
         return "Verbose Name"
-    
 
 
 class Strategy1(AbstractStrategy):

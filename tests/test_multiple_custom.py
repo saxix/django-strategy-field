@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 # flake8: noqa
 # noqa
 import pytest
 from django.forms.models import modelform_factory
-from demoproject.compat import reverse
+from django.urls import reverse
+
 from demoproject.demoapp.models import (DemoMultipleCustomModel, Strategy,
                                         Strategy1,)
 from strategy_field.utils import fqn
@@ -88,7 +88,7 @@ def test_form_save(demo_multiplecustom_model):
                       instance=demo_multiplecustom_model)
     form.is_valid()
     instance = form.save()
-    assert instance.sender == demo_multiplecustom_model.sender
+    assert fqn(instance.sender[0]) == fqn(demo_multiplecustom_model.sender[0])
 
 
 @pytest.mark.django_db

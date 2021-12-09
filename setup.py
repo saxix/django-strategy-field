@@ -2,60 +2,90 @@
 import ast
 import os
 import re
-import codecs
 
 from setuptools import find_packages, setup
+from setuptools.command.test import test as TestCommand
 
 ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__)))
-init = os.path.join(ROOT, "src", "strategy_field", "__init__.py")
-
+init = os.path.join(ROOT, 'src', 'strategy_field', '__init__.py')
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 _name_re = re.compile(r'NAME\s+=\s+(.*)')
 
 with open(init, 'rb') as f:
     content = f.read().decode('utf-8')
-    version = str(ast.literal_eval(_version_re.search(content).group(1)))
-    name = str(ast.literal_eval(_name_re.search(content).group(1)))
+    VERSION = str(ast.literal_eval(_version_re.search(content).group(1)))
+    NAME = str(ast.literal_eval(_name_re.search(content).group(1)))
+
+base_url = 'https://github.com/saxix/django-strategy-field/'
 
 
-def fread(*parts):
-    return [l[:-1] for l in codecs.open(os.path.join(ROOT, *parts), encoding="utf-8").readlines() if l[0] != '#']
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = ['tests']
+        self.test_suite = True
 
-install_requires = fread('src/requirements', 'install.any.pip')
-tests_require = fread('src/requirements', 'testing.pip')
-dev_require = fread('src/requirements', 'develop.pip')
+    def run_tests(self):
+        # import here, cause outside the eggs aren't loaded
+        import pytest
+        import sys
+
+        sys.path.insert(0, os.path.join(ROOT, 'tests', 'demoapp'))
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
+
 
 setup(
-    name=name,
-    version=version,
+    name=NAME,
+    version=VERSION,
     url='https://github.com/saxix/django-strategy-field',
-    description="Django custom field to implement the strategy pattern",
-    long_description=open("README.rst").read(),
-    author='sax',
-    author_email='sax@os4d.org',
-    license='BSD',
+    author='Stefano Apostolico',
+    author_email='s.apostolico@gmail.com',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     include_package_data=True,
-    install_requires=install_requires,
-    zip_safe=False,
+    long_description=open('README.rst').read(),
+    license='MIT License',
+    setup_requires=['pytest-runner', ],
+    install_requires=(
+        'django-rest-framework',
+        'pytz',
+    ),
     extras_require={
-        'tests': tests_require,
-        'dev': dev_require + tests_require,
+        'test': (
+            'coverage',
+            'django_dynamic_fixture',
+            'django-webtest',
+            'factory-boy',
+            'faker',
+            'flake8',
+            'isort',
+            'pytest',
+            'pytest-cov',
+            'pytest-django',
+            'pytest-echo',
+            'pytest-pythonpath',
+            'twine',
+            'webtest',
+          ),
     },
-    platforms=['linux'],
     classifiers=[
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
-        'Framework :: Django',
-        'Framework :: Django :: 2.0',
-        'Framework :: Django :: 2.1',
-        'Framework :: Django :: 2.2',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Framework :: Django :: 2.2',
+        'Framework :: Django :: 3.1',
+        'Framework :: Django :: 3.2',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Intended Audience :: Developers'
-    ]
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
+    # platforms=['any']
 )

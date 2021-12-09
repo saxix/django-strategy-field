@@ -1,57 +1,22 @@
-# -*- coding: utf-8 -*-
 import logging
-from operator import itemgetter
-
-from inspect import isclass
-
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.validators import BaseValidator
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH, NOT_PROVIDED
 from django.db.models.lookups import Contains, IContains, In
-from django.utils.deconstruct import deconstructible
 from django.utils.text import capfirst
-from django.utils.translation import ugettext_lazy as _
+from inspect import isclass
+from operator import itemgetter
 
+from strategy_field.exceptions import StrategyNameError
 from strategy_field.forms import (StrategyFormField,
-                                  StrategyMultipleChoiceFormField, )
-from strategy_field.utils import (fqn, get_display_string, import_by_name,
-                                  stringify, get_class)
+                                  StrategyMultipleChoiceFormField,)
+from strategy_field.utils import fqn, get_class, get_display_string, stringify
+from strategy_field.validators import ClassnameValidator, RegistryValidator
 
 NOCONTEXT = object()
 
 logger = logging.getLogger(__name__)
-
-
-@deconstructible
-class ClassnameValidator(BaseValidator):
-    message = _('Ensure this value is valid class name (it is %(show_value)s).')
-    code = 'classname'
-
-    def compare(self, a, b):
-        try:
-            get_class(a)
-        except (ImportError, TypeError):
-            return True
-        return False
-
-
-@deconstructible
-class RegistryValidator(ClassnameValidator):
-    message = _('Ensure this value is registered (it is %(show_value)s).')
-    code = 'registry'
-
-    def compare(self, value, registry):
-        if value is None:
-            return False
-        elif isinstance(value, (list, tuple)):
-            for c in value:
-                if not issubclass(get_class(value), registry.klass):
-                    return False
-        else:
-            value = get_class(value)
-        return not issubclass(value, registry.klass)
 
 
 class StrategyClassFieldDescriptor(object):
@@ -65,18 +30,14 @@ class StrategyClassFieldDescriptor(object):
         value = obj.__dict__.get(self.field.name)
         try:
             return get_class(value)
-        except (AttributeError, ModuleNotFoundError, ImportError) as e:
+        except (AttributeError, ModuleNotFoundError, ImportError, StrategyNameError) as e:
             if callable(self.field.import_error):
-                self.field.import_error(value, e)
+                return self.field.import_error(value, e)
             else:
                 return self.field.import_error
-        except Exception as e:
+        except Exception as e:  # pragma: no-cover
             logger.exception(e)
             raise ValidationError(value)
-            # if isclass(value):
-            #     return value
-            # elif isinstance(value, six.string_types):
-            #     return import_by_name(value)
 
     def __set__(self, obj, value):
         obj.__dict__[self.field.name] = value
@@ -90,18 +51,26 @@ class MultipleStrategyClassFieldDescriptor(object):
         if obj is None:
             return None
         value = obj.__dict__.get(self.field.name)
-
+        if value is None:
+            return None
         if isinstance(value, str):
             value = value.split(',')
         if not isinstance(value, (list, tuple)):
             value = [value] if value is not None else None
-        if isinstance(value, (list, tuple)):
-            ret = []
-            for v in value:
-                if isinstance(v, str) and v:
-                    v = import_by_name(v)
-                ret.append(v)
-            return ret
+        # if isinstance(value, (list, tuple)):
+        ret = []
+        for v in value:
+            if v:
+                try:
+                    v = get_class(v)
+                    ret.append(v)
+                except StrategyNameError as e:
+                    if callable(self.field.import_error):
+                        return self.field.import_error(value, e)
+                    else:
+                        return self.field.import_error
+
+        return ret
 
     def __set__(self, obj, value):
         obj.__dict__[self.field.name] = value
@@ -117,7 +86,7 @@ class AbstractStrategyField(models.Field):
         kwargs['max_length'] = 200
 
         self.registry = kwargs.pop("registry", None)
-        super(AbstractStrategyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.validators.append(ClassnameValidator(None))
         if self.registry:
             self.validators.append(RegistryValidator(self.registry))
@@ -154,7 +123,8 @@ class AbstractStrategyField(models.Field):
 
     choices = property(_get_choices, _set_choices)
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
+                    limit_choices_to=None, **kwargs):
         first_choice = blank_choice if include_blank else []
 
         return first_choice + [(fqn(klass), l)
@@ -164,7 +134,7 @@ class AbstractStrategyField(models.Field):
         return value in self.registry
 
     def deconstruct(self):
-        name, path, args, kwargs = super(AbstractStrategyField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         del kwargs["max_length"]
         if "registry" in kwargs:
             del kwargs["registry"]
@@ -238,7 +208,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
 
     def get_db_prep_save(self, value, connection):
         value = list(filter(lambda x: x, value)) if value is not None else None
-        return super(MultipleStrategyClassField, self).get_db_prep_save(value, connection)
+        return super().get_db_prep_save(value, connection)
 
     def get_prep_value(self, value):
         if value is None:
@@ -261,9 +231,10 @@ class MultipleStrategyClassField(AbstractStrategyField):
     def get_lookup(self, lookup_name):
         if lookup_name == 'in':
             raise TypeError('Lookup type %r not supported.' % lookup_name)
-        return super(MultipleStrategyClassField, self).get_lookup(lookup_name)
+        return super().get_lookup(lookup_name)
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
+                    limit_choices_to=None, **kwargs):
         return AbstractStrategyField.get_choices(self, False, blank_choice)
 
 
@@ -280,12 +251,12 @@ class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
         else:
             try:
                 value = get_class(value)
-            except (AttributeError, ModuleNotFoundError, ImportError) as e:
+            except (AttributeError, ModuleNotFoundError, ImportError, StrategyNameError) as e:
                 if callable(self.field.import_error):
                     value = self.field.import_error(value, e)
                 else:
                     value = self.field.import_error
-            except Exception as e:
+            except Exception as e:  # pragma: no-cover
                 logger.exception(e)
                 raise ValidationError(value)
 
@@ -300,7 +271,7 @@ class StrategyField(StrategyClassField):
 
     def __init__(self, *args, **kwargs):
         self.factory = kwargs.pop('factory', lambda klass, obj: klass(obj))
-        super(StrategyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def pre_save(self, model_instance, add):
         value = getattr(model_instance, self.attname)
@@ -319,13 +290,17 @@ class MultipleStrategyFieldDescriptor(MultipleStrategyClassFieldDescriptor):
             if isinstance(value, str):
                 value = value.split(',')
             for v in value:
-                if isinstance(v, str):
-                    v = import_by_name(v)
-
-                if isclass(v):
-                    ret.append(self.field.factory(v, obj))
-                else:
-                    ret.append(v)
+                try:
+                    cleaned = get_class(v)
+                    ret.append(self.field.factory(cleaned, obj))
+                except (AttributeError, ModuleNotFoundError, ImportError, StrategyNameError) as e:
+                    if callable(self.field.import_error):
+                        value = self.field.import_error(value, e)
+                    else:
+                        value = self.field.import_error
+                except Exception as e:  # pragma: no-cover
+                    logger.exception(e)
+                    raise ValidationError(value)
 
             return ret
 
@@ -338,17 +313,17 @@ class MultipleStrategyField(MultipleStrategyClassField):
 
     def __init__(self, *args, **kwargs):
         self.factory = kwargs.pop('factory', lambda klass, obj: klass(obj))
-        super(MultipleStrategyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_lookup(self, lookup_name):
         if lookup_name == 'in':
             raise TypeError('Lookup type %r not supported.' % lookup_name)
-        return super(MultipleStrategyField, self).get_lookup(lookup_name)
+        return super().get_lookup(lookup_name)
 
 
 class StrategyFieldLookupMixin(object):
     def get_prep_lookup(self):
-        value = super(StrategyFieldLookupMixin, self).get_prep_lookup()
+        value = super().get_prep_lookup()
         if value is None:
             return None
         if isinstance(value, str):
