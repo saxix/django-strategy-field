@@ -1,5 +1,11 @@
+Release 2.1
+===========
+* add support python 3.8, 3.9, 3.10
+* add support django 4.0
+
+
 Release 2.0
-=============
+===========
 * dropped support django<2.0
 * dropped support python<3.6
 * updates `fqn()` to handle functions

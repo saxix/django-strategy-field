@@ -1,8 +1,10 @@
-# -*- coding: utf-8 -*-
 import importlib
 import logging
-from inspect import isclass
 import types
+from inspect import isclass
+
+from strategy_field.exceptions import (StrategyAttributeError,
+                                       StrategyClassError, StrategyNameError,)
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +12,7 @@ logger = logging.getLogger(__name__)
 class ModulesCache(dict):
     def __missing__(self, name):
         if '.' not in name:
-            raise ValueError("Cannot import '{}'".format(name))
+            raise StrategyNameError(name)
 
         module_path, class_str = name.rsplit(".", 1)
         module = importlib.import_module(module_path)
@@ -19,10 +21,7 @@ class ModulesCache(dict):
             self[name] = handler
             return handler
         except AttributeError:
-            raise AttributeError('Unable to import {}. '
-                                 '{} does not have {} attribute'.format(name,
-                                                                        module,
-                                                                        class_str))
+            raise StrategyAttributeError(name, module, class_str)
 
 
 _cache = ModulesCache()
@@ -73,7 +72,7 @@ def fqn(o):
     if isinstance(o, str):
         return o
     if not hasattr(o, '__module__'):
-        raise ValueError('Invalid argument `%s`' % o)
+        raise StrategyClassError(o)
     parts.append(o.__module__)
     if isclass(o):
         parts.append(o.__name__)

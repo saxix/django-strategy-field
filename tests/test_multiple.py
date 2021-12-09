@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 import pytest
 from django.forms.models import modelform_factory
-from demoproject.compat import reverse
+from django.urls import reverse
+
 from demoproject.demoapp.models import DemoMultipleModel, Sender1, Sender2
 from strategy_field.utils import fqn
 

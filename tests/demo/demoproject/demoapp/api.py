@@ -1,15 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import logging
-
-import six
 from rest_framework import serializers
 from rest_framework.viewsets import ModelViewSet
 
-from demoproject.demoapp.models import DemoMultipleModel, DemoModel, DemoModelNone, registry
-from strategy_field.contrib.drf import DrfStrategyField, DrfMultipleStrategyField
-from strategy_field.utils import fqn, stringify
+from demoproject.demoapp.models import (DemoModelNone, DemoMultipleModel,
+                                        registry,)
+from strategy_field.contrib.drf import (DrfMultipleStrategyField,
+                                        DrfStrategyField,)
 
 logger = logging.getLogger(__name__)
 

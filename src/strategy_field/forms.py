@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from django.core.exceptions import ValidationError
 from django.forms.fields import ChoiceField, TypedMultipleChoiceField
 
@@ -11,7 +9,7 @@ class StrategyFormField(ChoiceField):
         self.display_attribute = kwargs.pop('display_attribute', None)
         self.registry = kwargs.pop('registry')
         self.empty_value = kwargs.pop('empty_value', '')
-        super(StrategyFormField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def prepare_value(self, value):
         if isinstance(value, str):
@@ -44,7 +42,7 @@ class StrategyFormField(ChoiceField):
             )
 
     def clean(self, value):
-        value = super(StrategyFormField, self).clean(value)
+        value = super().clean(value)
         return self._coerce(value)
 
 
@@ -53,7 +51,7 @@ class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
         self.registry = kwargs.pop('registry')
         self.display_attribute = kwargs.pop('display_attribute', None)
 
-        super(StrategyMultipleChoiceFormField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def prepare_value(self, value):
         ret = value

@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 import logging
+from django.utils.functional import cached_property
 from inspect import isclass
 
-from django.utils.functional import cached_property
-
-from .utils import fqn, get_attr, import_by_name, get_display_string  # noqa
+from .utils import fqn, get_attr, get_display_string, import_by_name  # noqa
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +57,7 @@ class Registry(list):
         if cls in self:
             return
 
-        super(Registry, self).append(cls)
+        super().append(cls)
         self._choices = None
         return class_or_fqn
 
@@ -71,4 +69,4 @@ class Registry(list):
                 y = import_by_name(y)
             except (ImportError, ValueError):
                 return False
-        return super(Registry, self).__contains__(y)
+        return super().__contains__(y)
