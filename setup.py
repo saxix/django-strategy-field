@@ -50,6 +50,7 @@ setup(
     setup_requires=['pytest-runner', ],
     install_requires=(
         'django-rest-framework',
+        'pytz',
     ),
     extras_require={
         'test': (
