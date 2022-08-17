@@ -18,7 +18,7 @@ TEMPLATES = [
         },
     },
 ]
-
+# STRATEGY_CLASSLOADER = "demoproject.classloader.custom_classloader"
 DATABASES = {
     'default': {
         # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
