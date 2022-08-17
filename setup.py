@@ -49,10 +49,12 @@ setup(
     license='MIT License',
     setup_requires=['pytest-runner', ],
     install_requires=(
-        'django-rest-framework',
         'pytz',
     ),
     extras_require={
+        'drf': (
+            'django-rest-framework',
+        ),
         'test': (
             'coverage',
             'django_dynamic_fixture',
@@ -61,14 +63,15 @@ setup(
             'faker',
             'flake8',
             'isort',
-            'pytest',
-            'pytest-cov',
+            'pytest<7',
+            'pytest-coverage',
             'pytest-django',
             'pytest-echo',
-            'pytest-pythonpath',
+            'pytest-pythonpath>=0.7.4',
             'twine',
+            'tox',
             'webtest',
-          ),
+        ),
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',

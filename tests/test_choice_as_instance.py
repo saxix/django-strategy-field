@@ -111,8 +111,10 @@ def test_form_default(democustommodel):
 @pytest.mark.django_db
 def test_admin_demomodel_add(webapp, admin_user):
     res = webapp.get('/demoapp/democustommodel/add/', user=admin_user)
-    res.form['sender'] = 'demoproject.demoapp.models.Strategy'
-    res.form.submit().follow()
+    form = res.forms[1]
+
+    form['sender'] = 'demoproject.demoapp.models.Strategy'
+    form.submit().follow()
     assert DemoCustomModel.objects.filter(
         sender='demoproject.demoapp.models.Strategy').count() == 1
 
@@ -122,8 +124,10 @@ def test_admin_demomodel_edit(webapp, admin_user, democustommodel):
     url = reverse('admin:demoapp_democustommodel_change',
                   args=[democustommodel.pk])
     res = webapp.get(url, user=admin_user)
-    res.form['sender'] = 'demoproject.demoapp.models.Strategy'
-    res.form.submit().follow()
+    form = res.forms[1]
+
+    form['sender'] = 'demoproject.demoapp.models.Strategy'
+    form.submit().follow()
     assert DemoCustomModel.objects.filter(
         sender='demoproject.demoapp.models.Strategy').count() == 1
 
