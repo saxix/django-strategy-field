@@ -3,8 +3,12 @@ import logging
 import types
 from inspect import isclass
 
-from strategy_field.exceptions import (StrategyAttributeError,
-                                       StrategyClassError, StrategyNameError,)
+from django.utils.functional import lazy
+from django.utils.module_loading import import_string
+
+from . import config
+from .exceptions import (StrategyAttributeError,
+                         StrategyClassError, StrategyNameError, )
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +31,7 @@ class ModulesCache(dict):
 _cache = ModulesCache()
 
 
-def get_class(value):
+def default_classloader(value):
     if not value:
         return value
     elif isinstance(value, str):
@@ -36,6 +40,16 @@ def get_class(value):
         return value
     else:
         return type(value)
+
+
+importer = None
+
+
+def get_class(value):
+    global importer
+    if importer is None:
+        importer = import_string(config.CLASSLOADER)
+    return importer(value)
 
 
 def get_display_string(klass, display_attribute=None):
