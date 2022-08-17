@@ -45,7 +45,7 @@ class DrfMultipleStrategyField(serializers.MultipleChoiceField):
     def __init__(self, registry, **kwargs):
         choices = registry.as_choices()
         self.registry = registry
-        super().__init__(choices, **kwargs)
+        super().__init__(choices=choices, **kwargs)
 
     def get_validators(self):
         ret = super().get_validators()

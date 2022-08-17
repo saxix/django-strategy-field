@@ -1,6 +1,7 @@
 Release 2.2
 ===========
 * add ability to customise classloader
+* drop support Django 2.x
 
 
 Release 2.1

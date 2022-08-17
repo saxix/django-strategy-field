@@ -134,10 +134,11 @@ def test_form_default(demomodel):
 @pytest.mark.django_db
 def test_admin_demomodel_add(webapp, admin_user):
     res = webapp.get('/demoapp/demomodel/add/', user=admin_user)
-    res.form['sender'] = 'demoproject.demoapp.models.Sender1'
+    form = res.forms[1]
+    form['sender'] = 'demoproject.demoapp.models.Sender1'
     # import pdb; pdb.set_trace()
 
-    res.form.submit().follow()
+    form.submit().follow()
     assert DemoModel.objects.filter(
         sender='demoproject.demoapp.models.Sender1').count() == 1
 
@@ -146,8 +147,9 @@ def test_admin_demomodel_add(webapp, admin_user):
 def test_admin_demomodel_edit(webapp, admin_user, demomodel):
     url = reverse('admin:demoapp_demomodel_change', args=[demomodel.pk])
     res = webapp.get(url, user=admin_user)
-    res.form['sender'] = 'demoproject.demoapp.models.Sender2'
-    res.form.submit().follow()
+    form = res.forms[1]
+    form['sender'] = 'demoproject.demoapp.models.Sender2'
+    form.submit().follow()
     assert DemoModel.objects.filter(
         sender='demoproject.demoapp.models.Sender2').count() == 1
 
@@ -156,8 +158,9 @@ def test_admin_demomodel_edit(webapp, admin_user, demomodel):
 def test_admin_demomodel_validate(webapp, admin_user, demomodel):
     url = reverse('admin:demoapp_demomodel_change', args=[demomodel.pk])
     res = webapp.get(url, user=admin_user)
-    res.form['sender'].force_value('invalid_strategy_classname')
-    res = res.form.submit()
+    form = res.forms[1]
+    form['sender'].force_value('invalid_strategy_classname')
+    res = form.submit()
     assert 'Select a valid choice' in res.context[
         'adminform'].form.errors['sender'][0]
 
