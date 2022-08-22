@@ -1,4 +1,4 @@
-from demoproject.demoapp.models import DemoModel, DemoCustomModel, Strategy1
+from demoproject.demoapp.models import DemoCustomModel, DemoModel, Strategy1
 
 
 def test_class_set_value():
@@ -24,11 +24,11 @@ def test_instance_create(db):
 
 
 def test_class_filter(db):
-    d = DemoModel.objects.create(sender=Strategy1)
+    DemoModel.objects.create(sender=Strategy1)
     assert DemoModel.objects.get(sender="demoproject.demoapp.models.Strategy1")
     assert DemoModel.objects.get(sender=Strategy1)
 
 
 def test_instance_filter(db):
-    d = DemoCustomModel.objects.create(sender=Strategy1)
+    DemoCustomModel.objects.create(sender=Strategy1)
     assert DemoCustomModel.objects.get(sender=Strategy1)

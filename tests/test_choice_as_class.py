@@ -1,9 +1,9 @@
 # flake8: noqa
 import pytest
+from demoproject.compat import get_edit_form
 from django.forms.models import modelform_factory
 from django.urls import reverse
 
-from demoproject.compat import get_edit_form
 from demoproject.demoapp.models import (DemoModel, DemoModelCallableDefault,
                                         DemoModelDefault, DemoModelNone,
                                         Sender1, Sender2, SenderNotRegistered,)

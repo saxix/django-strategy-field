@@ -8,7 +8,7 @@ from django.utils.text import capfirst
 from inspect import isclass
 from operator import itemgetter
 
-from strategy_field.exceptions import StrategyNameError, StrategyClassError
+from strategy_field.exceptions import StrategyClassError, StrategyNameError
 from strategy_field.forms import (StrategyFormField,
                                   StrategyMultipleChoiceFormField,)
 from strategy_field.utils import fqn, get_class, get_display_string, stringify
