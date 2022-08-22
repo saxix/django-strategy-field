@@ -1,3 +1,4 @@
+from demoproject.demoapp.models import Strategy1
 from strategy_field.fields import (MultipleStrategyClassFieldDescriptor,
                                    MultipleStrategyFieldDescriptor,
                                    StrategyClassFieldDescriptor,
@@ -6,7 +7,7 @@ from strategy_field.utils import fqn
 
 
 class MockField:
-    value = 11
+    value = fqn(StrategyFieldDescriptor)
     import_error = None
     factory = lambda x, s: x(s)
 
@@ -33,18 +34,18 @@ def test_strategyclassfielddescriptor():
     desc1 = StrategyClassFieldDescriptor(type("Field", (MockField,), {'name': 'strategy'}))
     desc2 = StrategyClassFieldDescriptor(type("Field", (MockField,), {'name': 'errored'}))
     desc3 = StrategyClassFieldDescriptor(type("Field", (MockField,), {'name': 'errored',
-                                                                      'import_error': lambda *a: 22}))
+                                                                      'import_error': lambda *a: Strategy1}))
 
     # strategy
     obj = MockModel()
     assert desc1.__get__(None) is None
-    assert desc1.__get__(obj).value == 11
+    assert desc1.__get__(obj) == 'test_descriptors.MockField'
 
-    assert desc2.__get__(obj) is None
-    assert desc3.__get__(obj) == 22
+    # assert desc2.__get__(obj) is None
+    assert desc3.__set__(obj, 22) is None
 
     desc1.__set__(obj, fqn(StrategyClassFieldDescriptor))
-    assert obj.strategy == 'strategy_field.fields.StrategyClassFieldDescriptor'
+    assert obj.strategy == StrategyClassFieldDescriptor
 
 
 def test_multiplestrategyclassfielddescriptor():

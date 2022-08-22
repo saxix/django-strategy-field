@@ -2,6 +2,7 @@ import pytest
 from django.forms.models import modelform_factory
 from django.urls import reverse
 
+from demoproject.compat import get_edit_form
 from demoproject.demoapp.models import DemoMultipleModel, Sender1, Sender2
 from strategy_field.utils import fqn
 
@@ -149,7 +150,7 @@ def test_form_default(demo_multiple_model):
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_add(webapp, admin_user):
     res = webapp.get('/demoapp/demomultiplemodel/add/', user=admin_user)
-    form = res.forms[1]
+    form = get_edit_form(res)
     form['sender'] = ['demoproject.demoapp.models.Sender1']
     form.submit().follow()
     assert DemoMultipleModel.objects.filter(sender='demoproject.demoapp.models.Sender1').count() == 1
@@ -159,7 +160,7 @@ def test_admin_demo_multiple_model_add(webapp, admin_user):
 def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiple_model):
     url = reverse('admin:demoapp_demomultiplemodel_change', args=[demo_multiple_model.pk])
     res = webapp.get(url, user=admin_user)
-    form = res.forms[1]
+    form = get_edit_form(res)
     form['sender'] = ['demoproject.demoapp.models.Sender2']
     form.submit().follow()
     assert DemoMultipleModel.objects.filter(sender='demoproject.demoapp.models.Sender2').count() == 1

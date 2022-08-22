@@ -3,6 +3,7 @@ import pytest
 from django.forms.models import modelform_factory
 from django.urls import reverse
 
+from demoproject.compat import get_edit_form
 from demoproject.demoapp.models import DemoCustomModel, Strategy, Strategy1
 from strategy_field.utils import fqn
 
@@ -111,7 +112,7 @@ def test_form_default(democustommodel):
 @pytest.mark.django_db
 def test_admin_demomodel_add(webapp, admin_user):
     res = webapp.get('/demoapp/democustommodel/add/', user=admin_user)
-    form = res.forms[1]
+    form = get_edit_form(res)
 
     form['sender'] = 'demoproject.demoapp.models.Strategy'
     form.submit().follow()
@@ -124,7 +125,7 @@ def test_admin_demomodel_edit(webapp, admin_user, democustommodel):
     url = reverse('admin:demoapp_democustommodel_change',
                   args=[democustommodel.pk])
     res = webapp.get(url, user=admin_user)
-    form = res.forms[1]
+    form = get_edit_form(res)
 
     form['sender'] = 'demoproject.demoapp.models.Strategy'
     form.submit().follow()

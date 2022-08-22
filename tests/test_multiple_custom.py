@@ -4,6 +4,7 @@ import pytest
 from django.forms.models import modelform_factory
 from django.urls import reverse
 
+from demoproject.compat import get_edit_form
 from demoproject.demoapp.models import (DemoMultipleCustomModel, Strategy,
                                         Strategy1,)
 from strategy_field.utils import fqn
@@ -119,7 +120,7 @@ def test_form_default(demo_multiplecustom_model):
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_add(webapp, admin_user):
     res = webapp.get('/demoapp/demomultiplecustommodel/add/', user=admin_user)
-    form = res.forms[1]
+    form = get_edit_form(res)
     form['sender'].force_value(['demoproject.demoapp.models.Strategy'])
     form.submit().follow()
     assert DemoMultipleCustomModel.objects.filter(
@@ -137,7 +138,7 @@ def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiplecustom_
                                              ('demoproject.demoapp.models.Strategy1',
                                               'demoproject.demoapp.models.Strategy1')]
 
-    form = res.forms[1]
+    form = get_edit_form(res)
     form['sender'] = ['demoproject.demoapp.models.Strategy',
                           'demoproject.demoapp.models.Strategy1']
     form.submit().follow()
