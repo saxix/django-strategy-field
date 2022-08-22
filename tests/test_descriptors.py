@@ -32,7 +32,6 @@ class MultipleMockModel:
 
 def test_strategyclassfielddescriptor():
     desc1 = StrategyClassFieldDescriptor(type("Field", (MockField,), {'name': 'strategy'}))
-    desc2 = StrategyClassFieldDescriptor(type("Field", (MockField,), {'name': 'errored'}))
     desc3 = StrategyClassFieldDescriptor(type("Field", (MockField,), {'name': 'errored',
                                                                       'import_error': lambda *a: Strategy1}))
 
@@ -41,7 +40,6 @@ def test_strategyclassfielddescriptor():
     assert desc1.__get__(None) is None
     assert desc1.__get__(obj) == 'test_descriptors.MockField'
 
-    # assert desc2.__get__(obj) is None
     assert desc3.__set__(obj, 22) is None
 
     desc1.__set__(obj, fqn(StrategyClassFieldDescriptor))

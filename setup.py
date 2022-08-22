@@ -63,6 +63,7 @@ setup(
             'faker',
             'flake8',
             'isort',
+            'pycodestyle>2.4',
             'pytest<7',
             'pytest-coverage',
             'pytest-django',
