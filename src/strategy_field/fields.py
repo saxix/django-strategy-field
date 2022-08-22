@@ -8,7 +8,7 @@ from django.utils.text import capfirst
 from inspect import isclass
 from operator import itemgetter
 
-from strategy_field.exceptions import StrategyNameError
+from strategy_field.exceptions import StrategyNameError, StrategyClassError
 from strategy_field.forms import (StrategyFormField,
                                   StrategyMultipleChoiceFormField,)
 from strategy_field.utils import fqn, get_class, get_display_string, stringify
@@ -19,28 +19,58 @@ NOCONTEXT = object()
 logger = logging.getLogger(__name__)
 
 
-class StrategyClassFieldDescriptor(object):
+class StrategyClassFieldDescriptor:
     def __init__(self, field):
         self.field = field
 
-    def __get__(self, obj, type=None):
+    # def __get__(self, obj, type=None):
+    #     if obj is None:
+    #         return None
+    #
+    #     value = obj.__dict__.get(self.field.name)
+    #     try:
+    #         return get_class(value)
+    #     except (AttributeError, ModuleNotFoundError, ImportError, StrategyNameError) as e:
+    #         if callable(self.field.import_error):
+    #             return self.field.import_error(value, e)
+    #         else:
+    #             return self.field.import_error
+    #     except Exception as e:  # pragma: no-cover
+    #         logger.exception(e)
+    #         raise ValidationError(value)
+    #
+    # def __set__(self, obj, value):
+    #     obj.__dict__[self.field.name] = value
+    #     obj.__dict__[f"_strategy_fqn_{self.field.name}"] = value
+    def __get__(self, obj, value=None):
         if obj is None:
             return None
+        return obj.__dict__.get(self.field.name)
 
-        value = obj.__dict__.get(self.field.name)
-        try:
-            return get_class(value)
-        except (AttributeError, ModuleNotFoundError, ImportError, StrategyNameError) as e:
-            if callable(self.field.import_error):
-                return self.field.import_error(value, e)
-            else:
-                return self.field.import_error
-        except Exception as e:  # pragma: no-cover
-            logger.exception(e)
-            raise ValidationError(value)
+    def __set__(self, obj, original):
+        if not original:
+            value = None
+        else:
+            try:
+                value = get_class(original)
+            except (AttributeError, ModuleNotFoundError, ImportError, StrategyNameError) as e:
+                if callable(self.field.import_error):
+                    value = self.field.import_error(original, e)
+                else:
+                    value = self.field.import_error
+            except Exception as e:  # pragma: no-cover
+                logger.exception(e)
+                raise ValidationError(original)
 
-    def __set__(self, obj, value):
+        # if isclass(value):
+        #     value = self.field.factory(value, obj)
+
         obj.__dict__[self.field.name] = value
+        try:
+            raw_value = fqn(original or "")
+        except StrategyClassError:
+            raw_value = None
+        obj.__dict__[f"_strategy_fqn_{self.field.name}"] = raw_value
 
 
 class MultipleStrategyClassFieldDescriptor(object):
@@ -180,10 +210,6 @@ class StrategyClassField(AbstractStrategyField):
     def get_prep_value(self, value):
         if value is None:
             return None
-        # if isinstance(value, six.string_types):
-        #     return value
-        # if isclass(value) or isinstance(value, object):
-        #     return fqn(value)
         return fqn(value)
 
     # def get_prep_lookup(self, lookup_type, value):
@@ -245,25 +271,30 @@ class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
             return None
         return obj.__dict__.get(self.field.name)
 
-    def __set__(self, obj, value):
-        if not value:
+    def __set__(self, obj, original):
+        if not original:
             value = None
         else:
             try:
-                value = get_class(value)
+                value = get_class(original)
             except (AttributeError, ModuleNotFoundError, ImportError, StrategyNameError) as e:
                 if callable(self.field.import_error):
-                    value = self.field.import_error(value, e)
+                    value = self.field.import_error(original, e)
                 else:
                     value = self.field.import_error
             except Exception as e:  # pragma: no-cover
                 logger.exception(e)
-                raise ValidationError(value)
+                raise ValidationError(original)
 
         if isclass(value):
             value = self.field.factory(value, obj)
 
         obj.__dict__[self.field.name] = value
+        try:
+            raw_value = fqn(original or "")
+        except StrategyClassError:
+            raw_value = None
+        obj.__dict__[f"_strategy_fqn_{self.field.name}"] = raw_value
 
 
 class StrategyField(StrategyClassField):

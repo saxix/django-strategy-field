@@ -3,6 +3,7 @@ import pytest
 from django.forms.models import modelform_factory
 from django.urls import reverse
 
+from demoproject.compat import get_edit_form
 from demoproject.demoapp.models import (DemoModel, DemoModelCallableDefault,
                                         DemoModelDefault, DemoModelNone,
                                         Sender1, Sender2, SenderNotRegistered,)
@@ -134,7 +135,7 @@ def test_form_default(demomodel):
 @pytest.mark.django_db
 def test_admin_demomodel_add(webapp, admin_user):
     res = webapp.get('/demoapp/demomodel/add/', user=admin_user)
-    form = res.forms[1]
+    form = get_edit_form(res)
     form['sender'] = 'demoproject.demoapp.models.Sender1'
     # import pdb; pdb.set_trace()
 
@@ -147,7 +148,7 @@ def test_admin_demomodel_add(webapp, admin_user):
 def test_admin_demomodel_edit(webapp, admin_user, demomodel):
     url = reverse('admin:demoapp_demomodel_change', args=[demomodel.pk])
     res = webapp.get(url, user=admin_user)
-    form = res.forms[1]
+    form = get_edit_form(res)
     form['sender'] = 'demoproject.demoapp.models.Sender2'
     form.submit().follow()
     assert DemoModel.objects.filter(
@@ -158,7 +159,7 @@ def test_admin_demomodel_edit(webapp, admin_user, demomodel):
 def test_admin_demomodel_validate(webapp, admin_user, demomodel):
     url = reverse('admin:demoapp_demomodel_change', args=[demomodel.pk])
     res = webapp.get(url, user=admin_user)
-    form = res.forms[1]
+    form = get_edit_form(res)
     form['sender'].force_value('invalid_strategy_classname')
     res = form.submit()
     assert 'Select a valid choice' in res.context[

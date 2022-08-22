@@ -1,3 +1,9 @@
+Release 3.0
+===========
+* WARNING: some internal api changed. Possible backward incompatibility if some "internals" have been used
+* add `_strategy_fqn_<field_name_attribute>` to retrieve fqn strategy name
+
+
 Release 2.2
 ===========
 * add ability to customise classloader
