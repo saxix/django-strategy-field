@@ -1,2 +1,2 @@
 NAME = 'django-strategy-field'
-VERSION = __version__ = "2.2.0"
+VERSION = __version__ = "3.0.0"
