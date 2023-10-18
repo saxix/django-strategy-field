@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH, NOT_PROVIDED
 from django.db.models.lookups import Contains, IContains, In
+from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 from inspect import isclass
 from operator import itemgetter
@@ -106,12 +107,10 @@ class MultipleStrategyClassFieldDescriptor(object):
         obj.__dict__[self.field.name] = value
 
 
-# @deconstructible
 class AbstractStrategyField(models.Field):
     registry = None
 
     def __init__(self, *args, **kwargs):
-        self.display_attribute = kwargs.pop('display_attribute', None)
         self.import_error = kwargs.pop('import_error', None)
         kwargs['max_length'] = 200
 
@@ -133,6 +132,22 @@ class AbstractStrategyField(models.Field):
     #     if isinstance(other, Field):
     #         return self.creation_counter == other.creation_counter
     #     return self.registry == other.registry
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        del kwargs["max_length"]
+        if "registry" in kwargs:
+            del kwargs["registry"]
+        if "choices" in kwargs:
+            del kwargs["choices"]
+        return name, path, args, kwargs
+
+    def get_prep_value(self, value):
+        if value is None:
+            return None
+        return fqn(value)
+    def value_to_string(self, obj):
+        value = self.value_from_object(obj)
+        return fqn(value)
 
     def get_internal_type(self):
         return 'CharField'
@@ -142,10 +157,7 @@ class AbstractStrategyField(models.Field):
 
     def _get_choices(self):
         if self.registry:
-            return sorted([(klass, get_display_string(klass, self.display_attribute))
-                    for klass in self.registry], key=itemgetter(1))
-            # return [(klass, get_display_string(klass, self.display_attribute))
-            #         for klass in self.registry]
+            return self.registry.as_choices()
         return []
 
     def _set_choices(self, value):
@@ -157,25 +169,14 @@ class AbstractStrategyField(models.Field):
                     limit_choices_to=None, **kwargs):
         first_choice = blank_choice if include_blank else []
 
-        return first_choice + [(fqn(klass), l)
-                               for klass, l in self.choices]
+        return first_choice + self.choices
 
     def validate(self, value, model_instance):
         return value in self.registry
 
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        del kwargs["max_length"]
-        if "registry" in kwargs:
-            del kwargs["registry"]
-        if "choices" in kwargs:
-            del kwargs["choices"]
-        return name, path, args, kwargs
-
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
         defaults = {'required': not self.blank,
                     'label': capfirst(self.verbose_name),
-                    'display_attribute': self.display_attribute,
                     'help_text': self.help_text,
                     'registry': self.registry}
         if self.has_default():
@@ -191,7 +192,7 @@ class AbstractStrategyField(models.Field):
         form_class = choices_form_class or self.form_class
         for k in list(kwargs):
             if k not in ('empty_value', 'required', 'choices',
-                         'registry', 'display_attribute',
+                         'registry',
                          'widget', 'label', 'initial', 'help_text',
                          'error_messages', 'show_hidden_initial'):
                 del kwargs[k]
@@ -207,10 +208,6 @@ class StrategyClassField(AbstractStrategyField):
     form_class = StrategyFormField
     descriptor = StrategyClassFieldDescriptor
 
-    def get_prep_value(self, value):
-        if value is None:
-            return None
-        return fqn(value)
 
     # def get_prep_lookup(self, lookup_type, value):
     #     if lookup_type == 'exact':

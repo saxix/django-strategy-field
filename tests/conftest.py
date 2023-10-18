@@ -6,7 +6,7 @@ def registry():
     from demoproject.demoapp.models import AbstractSender, Sender1, Sender2
     from strategy_field.registry import Registry
 
-    r = Registry(AbstractSender)
+    r = Registry(AbstractSender, label_attribute="label")
     r.register(Sender1)
     r.register(Sender2)
     return r

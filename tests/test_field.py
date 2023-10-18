@@ -34,7 +34,7 @@ def test_no_registry_assign_instance():
 
 @pytest.mark.django_db
 def test_no_registry_assign_string():
-    d = DemoModelNoRegistry(instance='django.core.mail.backends.filebased.EmailBackend')
+    d = DemoModelNoRegistry(instance="django.core.mail.backends.filebased.EmailBackend")
     d.save()
     assert isinstance(d.instance, EmailBackend)
     assert d.instance.open()

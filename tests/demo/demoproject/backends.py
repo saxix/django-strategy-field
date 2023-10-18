@@ -8,14 +8,20 @@ class AnyUserBackend(ModelBackend):
 
     def get_all_permissions(self, user_obj, obj=None):
         # if settings.DEBUG:
-        return Permission.objects.all().values_list('content_type__app_label',
-                                                    'codename').order_by()
+        return (
+            Permission.objects.all()
+            .values_list("content_type__app_label", "codename")
+            .order_by()
+        )
         # return super().get_all_permissions(user_obj, obj)
 
     def get_group_permissions(self, user_obj, obj=None):
         # if settings.DEBUG:
-        return Permission.objects.all().values_list('content_type__app_label',
-                                                    'codename').order_by()
+        return (
+            Permission.objects.all()
+            .values_list("content_type__app_label", "codename")
+            .order_by()
+        )
         # return super().get_group_permissions(user_obj,
         # obj)
 

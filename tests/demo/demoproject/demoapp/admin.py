@@ -1,16 +1,23 @@
 from django.contrib import admin
 from django.forms import ModelForm, TextInput
 
-from .models import (DemoAllModel, DemoCustomModel, DemoModel,
-                     DemoModelCallableDefault, DemoModelDefault, DemoModelProxy,
-                     DemoMultipleCustomModel, DemoMultipleModel,)
+from .models import (
+    DemoAllModel,
+    DemoCustomModel,
+    DemoModel,
+    DemoModelCallableDefault,
+    DemoModelDefault,
+    DemoModelProxy,
+    DemoMultipleCustomModel,
+    DemoMultipleModel,
+)
 
 
 class DemoModelForm(ModelForm):
     class Meta:
         model = DemoModelProxy
-        widgets = {'sender': TextInput}
-        fields = '__all__'
+        widgets = {"sender": TextInput}
+        fields = "__all__"
 
 
 class DemoModelProxyAdmin(admin.ModelAdmin):

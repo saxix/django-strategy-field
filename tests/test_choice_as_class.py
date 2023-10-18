@@ -1,6 +1,5 @@
 # flake8: noqa
 import pytest
-from demoproject.compat import get_edit_form
 from django.forms.models import modelform_factory
 from django.urls import reverse
 
@@ -135,7 +134,7 @@ def test_form_default(demomodel):
 @pytest.mark.django_db
 def test_admin_demomodel_add(webapp, admin_user):
     res = webapp.get('/demoapp/demomodel/add/', user=admin_user)
-    form = get_edit_form(res)
+    form = res.forms["demomodel_form"]
     form['sender'] = 'demoproject.demoapp.models.Sender1'
     # import pdb; pdb.set_trace()
 
@@ -148,7 +147,7 @@ def test_admin_demomodel_add(webapp, admin_user):
 def test_admin_demomodel_edit(webapp, admin_user, demomodel):
     url = reverse('admin:demoapp_demomodel_change', args=[demomodel.pk])
     res = webapp.get(url, user=admin_user)
-    form = get_edit_form(res)
+    form = res.forms["demomodel_form"]
     form['sender'] = 'demoproject.demoapp.models.Sender2'
     form.submit().follow()
     assert DemoModel.objects.filter(
@@ -159,7 +158,7 @@ def test_admin_demomodel_edit(webapp, admin_user, demomodel):
 def test_admin_demomodel_validate(webapp, admin_user, demomodel):
     url = reverse('admin:demoapp_demomodel_change', args=[demomodel.pk])
     res = webapp.get(url, user=admin_user)
-    form = get_edit_form(res)
+    form = res.forms["demomodel_form"]
     form['sender'].force_value('invalid_strategy_classname')
     res = form.submit()
     assert 'Select a valid choice' in res.context[
@@ -187,11 +186,17 @@ def test_display_attribute(demomodel, registry, monkeypatch):
     monkeypatch.setattr(SenderNotRegistered, 'label',
                         classmethod(lambda s: fqn(s).split('.')[-1]),
                         raising=False)
-
-    DemoModel._meta.get_field('sender').display_attribute = 'label'
+    # DemoModel._meta.get_field('sender').display_attribute = 'label'
     DemoModel._meta.get_field('sender').registry = registry
     registry.register(SenderNotRegistered)
+    assert registry.as_choices() == [
+        ("demoproject.demoapp.models.Sender1", "demoproject.demoapp.models.Sender1"),
+        ("demoproject.demoapp.models.Sender2", "demoproject.demoapp.models.Sender2"),
+        ("demoproject.demoapp.models.SenderNotRegistered", "SenderNotRegistered"),
+    ]
 
     form_class = modelform_factory(DemoModel, exclude=[])
     form = form_class(instance=demomodel)
-    assert form.fields['sender'].choices[1][1] == 'SenderNotRegistered'
+    assert form.fields['sender'].choices == registry.as_choices()
+
+    assert form.fields['sender'].choices[2][1] == 'SenderNotRegistered'

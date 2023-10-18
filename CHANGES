@@ -1,3 +1,10 @@
+Release 3.1
+===========
+* removes `display_attribute` from the Field, use Registry(label_attribute=...)
+* add support for Django 4.2
+* drop support python <3.8
+
+
 Release 3.0
 ===========
 * WARNING: some internal api changed. Possible backward incompatibility if some "internals" have been used

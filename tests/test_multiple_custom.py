@@ -1,7 +1,6 @@
 # flake8: noqa
 # noqa
 import pytest
-from demoproject.compat import get_edit_form
 from django.forms.models import modelform_factory
 from django.urls import reverse
 
@@ -120,7 +119,7 @@ def test_form_default(demo_multiplecustom_model):
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_add(webapp, admin_user):
     res = webapp.get('/demoapp/demomultiplecustommodel/add/', user=admin_user)
-    form = get_edit_form(res)
+    form = res.forms["demomultiplecustommodel_form"]
     form['sender'].force_value(['demoproject.demoapp.models.Strategy'])
     form.submit().follow()
     assert DemoMultipleCustomModel.objects.filter(
@@ -138,7 +137,7 @@ def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiplecustom_
                                              ('demoproject.demoapp.models.Strategy1',
                                               'demoproject.demoapp.models.Strategy1')]
 
-    form = get_edit_form(res)
+    form = res.forms["demomultiplecustommodel_form"]
     form['sender'] = ['demoproject.demoapp.models.Strategy',
                           'demoproject.demoapp.models.Strategy1']
     form.submit().follow()
