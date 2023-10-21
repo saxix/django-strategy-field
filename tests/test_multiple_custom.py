@@ -1,38 +1,31 @@
 # flake8: noqa
 # noqa
 import pytest
+from demoproject.demoapp.models import DemoMultipleCustomModel, Strategy, Strategy1
 from django.forms.models import modelform_factory
 from django.urls import reverse
-
-from demoproject.demoapp.models import (DemoMultipleCustomModel, Strategy,
-                                        Strategy1,)
 from strategy_field.utils import fqn
 
 
 def pytest_generate_tests(metafunc):
     func_name = metafunc.function.__name__
     values = ids = []
-    if 'target' in metafunc.fixturenames:
-        if func_name.endswith('_lookup_in'):
-            values = [lambda o: [fqn(o.sender[0])],
-                      lambda o: o.sender,
-                      lambda o: [fqn(Strategy), fqn(Strategy1)],
-                      lambda o: [Strategy, Strategy1]]
-            ids = ['fqn(target.sender)',
-                   'target.sender',
-                   'fqn(Strategy)',
-                   'Strategy']
+    if "target" in metafunc.fixturenames:
+        if func_name.endswith("_lookup_in"):
+            values = [
+                lambda o: [fqn(o.sender[0])],
+                lambda o: o.sender,
+                lambda o: [fqn(Strategy), fqn(Strategy1)],
+                lambda o: [Strategy, Strategy1],
+            ]
+            ids = ["fqn(target.sender)", "target.sender", "fqn(Strategy)", "Strategy"]
         else:
-            values = [lambda o: [fqn(Strategy)],
-                      lambda o: [Strategy]]
-            ids = ['fqn(Strategy)',
-                   'Strategy']
+            values = [lambda o: [fqn(Strategy)], lambda o: [Strategy]]
+            ids = ["fqn(Strategy)", "Strategy"]
 
-            if 'demo_multiplecustom_model' in metafunc.fixturenames:
-                values.extend([lambda o: [fqn(o.sender[0])],
-                               lambda o: o.sender])
-                ids.extend(['fqn(target.sender)',
-                            'target.sender'])
+            if "demo_multiplecustom_model" in metafunc.fixturenames:
+                values.extend([lambda o: [fqn(o.sender[0])], lambda o: o.sender])
+                ids.extend(["fqn(target.sender)", "target.sender"])
 
         metafunc.parametrize("target", values, ids=ids)
 
@@ -75,17 +68,22 @@ def test_form_load():
     d = DemoMultipleCustomModel(sender=[Strategy, Strategy1])
     form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
     form = form_class(instance=d)
-    assert form.fields['sender'].choices == [('demoproject.demoapp.models.Strategy',
-                                              'demoproject.demoapp.models.Strategy'),
-                                             ('demoproject.demoapp.models.Strategy1',
-                                              'demoproject.demoapp.models.Strategy1')]
+    assert form.fields["sender"].choices == [
+        ("demoproject.demoapp.models.Strategy", "demoproject.demoapp.models.Strategy"),
+        (
+            "demoproject.demoapp.models.Strategy1",
+            "demoproject.demoapp.models.Strategy1",
+        ),
+    ]
 
 
 @pytest.mark.django_db
 def test_form_save(demo_multiplecustom_model):
     form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
-    form = form_class({'sender': [fqn(demo_multiplecustom_model.sender[0])]},
-                      instance=demo_multiplecustom_model)
+    form = form_class(
+        {"sender": [fqn(demo_multiplecustom_model.sender[0])]},
+        instance=demo_multiplecustom_model,
+    )
     form.is_valid()
     instance = form.save()
     assert fqn(instance.sender[0]) == fqn(demo_multiplecustom_model.sender[0])
@@ -95,21 +93,27 @@ def test_form_save(demo_multiplecustom_model):
 def test_form_not_valid(demo_multiplecustom_model):
     form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
     form = form_class(
-        {'sender': [fqn(DemoMultipleCustomModel)]}, instance=demo_multiplecustom_model)
+        {"sender": [fqn(DemoMultipleCustomModel)]}, instance=demo_multiplecustom_model
+    )
     assert not form.is_valid()
-    assert form.errors['sender'] == ['Select a valid choice. '
-                                     'demoproject.demoapp.models.DemoMultipleCustomModel '
-                                     'is not one of the available choices.']
+    assert form.errors["sender"] == [
+        "Select a valid choice. "
+        "demoproject.demoapp.models.DemoMultipleCustomModel "
+        "is not one of the available choices."
+    ]
 
 
 @pytest.mark.django_db
 def test_form_default(demo_multiplecustom_model):
     form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
     form = form_class(instance=demo_multiplecustom_model)
-    assert form.fields['sender'].choices == [('demoproject.demoapp.models.Strategy',
-                                              'demoproject.demoapp.models.Strategy'),
-                                             ('demoproject.demoapp.models.Strategy1',
-                                              'demoproject.demoapp.models.Strategy1')]
+    assert form.fields["sender"].choices == [
+        ("demoproject.demoapp.models.Strategy", "demoproject.demoapp.models.Strategy"),
+        (
+            "demoproject.demoapp.models.Strategy1",
+            "demoproject.demoapp.models.Strategy1",
+        ),
+    ]
     # assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
     #                           u'<td><select multiple="multiple" id="id_sender" name="sender">\n' \
     #                           u'<option value="demoproject.demoapp.models.Strategy" selected="selected">demoproject.demoapp.models.Strategy</option>\n' \
@@ -118,34 +122,49 @@ def test_form_default(demo_multiplecustom_model):
 
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_add(webapp, admin_user):
-    res = webapp.get('/demoapp/demomultiplecustommodel/add/', user=admin_user)
+    res = webapp.get("/demoapp/demomultiplecustommodel/add/", user=admin_user)
     form = res.forms["demomultiplecustommodel_form"]
-    form['sender'].force_value(['demoproject.demoapp.models.Strategy'])
+    form["sender"].force_value(["demoproject.demoapp.models.Strategy"])
     form.submit().follow()
-    assert DemoMultipleCustomModel.objects.filter(
-        sender='demoproject.demoapp.models.Strategy').count() == 1
+    assert (
+        DemoMultipleCustomModel.objects.filter(
+            sender="demoproject.demoapp.models.Strategy"
+        ).count()
+        == 1
+    )
 
 
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiplecustom_model):
     demo_multiplecustom_model.sender = [Strategy, Strategy1]
     demo_multiplecustom_model.save()
-    url = reverse('admin:demoapp_demomultiplecustommodel_change', args=[demo_multiplecustom_model.pk])
+    url = reverse(
+        "admin:demoapp_demomultiplecustommodel_change",
+        args=[demo_multiplecustom_model.pk],
+    )
     res = webapp.get(url, user=admin_user)
-    assert res.context['adminform'].form.fields['sender'].choices == [('demoproject.demoapp.models.Strategy',
-                                              'demoproject.demoapp.models.Strategy'),
-                                             ('demoproject.demoapp.models.Strategy1',
-                                              'demoproject.demoapp.models.Strategy1')]
+    assert res.context["adminform"].form.fields["sender"].choices == [
+        ("demoproject.demoapp.models.Strategy", "demoproject.demoapp.models.Strategy"),
+        (
+            "demoproject.demoapp.models.Strategy1",
+            "demoproject.demoapp.models.Strategy1",
+        ),
+    ]
 
     form = res.forms["demomultiplecustommodel_form"]
-    form['sender'] = ['demoproject.demoapp.models.Strategy',
-                          'demoproject.demoapp.models.Strategy1']
+    form["sender"] = [
+        "demoproject.demoapp.models.Strategy",
+        "demoproject.demoapp.models.Strategy1",
+    ]
     form.submit().follow()
     res = webapp.get(url, user=admin_user)
-    assert res.context['adminform'].form.fields['sender'].choices == [('demoproject.demoapp.models.Strategy',
-                                                                       'demoproject.demoapp.models.Strategy'),
-                                                                      ('demoproject.demoapp.models.Strategy1',
-                                                                       'demoproject.demoapp.models.Strategy1')]
+    assert res.context["adminform"].form.fields["sender"].choices == [
+        ("demoproject.demoapp.models.Strategy", "demoproject.demoapp.models.Strategy"),
+        (
+            "demoproject.demoapp.models.Strategy1",
+            "demoproject.demoapp.models.Strategy1",
+        ),
+    ]
 
     # assert res.context['adminform'].form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
     #                                                    u'<td><select multiple="multiple" id="id_sender" name="sender">\n' \
@@ -164,18 +183,28 @@ def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiplecustom_
 
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_equal(demo_multiplecustom_model, target):
-    assert DemoMultipleCustomModel.objects.get(sender=target(
-        demo_multiplecustom_model)) == demo_multiplecustom_model
+    assert (
+        DemoMultipleCustomModel.objects.get(sender=target(demo_multiplecustom_model))
+        == demo_multiplecustom_model
+    )
 
 
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_contains(demo_multiplecustom_model, target):
-    assert DemoMultipleCustomModel.objects.get(
-        sender__contains=target(demo_multiplecustom_model)) == demo_multiplecustom_model
+    assert (
+        DemoMultipleCustomModel.objects.get(
+            sender__contains=target(demo_multiplecustom_model)
+        )
+        == demo_multiplecustom_model
+    )
 
 
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_in(demo_multiplecustom_model, target):
     with pytest.raises(TypeError):
-        assert DemoMultipleCustomModel.objects.get(
-            sender__in=target(demo_multiplecustom_model)) == demo_multiplecustom_model
+        assert (
+            DemoMultipleCustomModel.objects.get(
+                sender__in=target(demo_multiplecustom_model)
+            )
+            == demo_multiplecustom_model
+        )

@@ -1,11 +1,9 @@
 import logging
+
+from demoproject.demoapp.models import DemoModelNone, DemoMultipleModel, registry
 from rest_framework import serializers
 from rest_framework.viewsets import ModelViewSet
-
-from demoproject.demoapp.models import (DemoModelNone, DemoMultipleModel,
-                                        registry,)
-from strategy_field.contrib.drf import (DrfMultipleStrategyField,
-                                        DrfStrategyField,)
+from strategy_field.contrib.drf import DrfMultipleStrategyField, DrfStrategyField
 
 logger = logging.getLogger(__name__)
 

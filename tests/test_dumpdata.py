@@ -1,9 +1,8 @@
 import io
 import json
 
+from demoproject.demoapp.models import DemoModel, Strategy1
 from django.core.management import call_command
-
-from demoproject.demoapp.models import DemoCustomModel, Strategy1, DemoModel
 
 
 def test_dumpdata(db):

@@ -1,17 +1,17 @@
 import logging
+from inspect import isclass
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH, NOT_PROVIDED
 from django.db.models.lookups import Contains, IContains, In
 from django.utils.text import capfirst
-from inspect import isclass
 
-from strategy_field.exceptions import StrategyClassError, StrategyNameError
-from strategy_field.forms import (StrategyFormField,
-                                  StrategyMultipleChoiceFormField,)
-from strategy_field.utils import fqn, get_class, stringify
-from strategy_field.validators import ClassnameValidator, RegistryValidator
+from .exceptions import StrategyClassError, StrategyNameError
+from .forms import StrategyFormField, StrategyMultipleChoiceFormField
+from .utils import fqn, get_class, stringify
+from .validators import ClassnameValidator, RegistryValidator
 
 NOCONTEXT = object()
 
@@ -122,12 +122,6 @@ class AbstractStrategyField(models.Field):
         self.validators.append(ClassnameValidator(None))
         if self.registry:
             self.validators.append(RegistryValidator(self.registry))
-
-    def __str__(self):
-        return "-oooooo"
-
-    def __repr__(self):
-        return "-oooooo"
 
     def contribute_to_class(
         self, cls, name, private_only=False, virtual_only=NOT_PROVIDED

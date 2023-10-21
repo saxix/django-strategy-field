@@ -1,6 +1,6 @@
-from demoproject.classloader import custom_classloader
 from unittest.mock import patch
 
+from demoproject.classloader import custom_classloader
 from demoproject.demoapp.models import Sender1
 from strategy_field.utils import fqn, get_class
 

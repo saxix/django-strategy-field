@@ -1,12 +1,14 @@
-import six
-
 import logging
+
+import six
 from django.core.mail.backends.base import BaseEmailBackend
 from django.db import models
-
-from strategy_field.fields import (MultipleStrategyClassField,
-                                   MultipleStrategyField, StrategyClassField,
-                                   StrategyField, )
+from strategy_field.fields import (
+    MultipleStrategyClassField,
+    MultipleStrategyField,
+    StrategyClassField,
+    StrategyField,
+)
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn, import_by_name
 
@@ -42,7 +44,7 @@ registry.register(Sender2)
 
 
 class AbstractStrategy:
-    def __init__(self, context, label=''):
+    def __init__(self, context, label=""):
         if not context:
             raise ValueError("Invalid context for strategy ({})".format(context))
         self.context = context
@@ -51,8 +53,9 @@ class AbstractStrategy:
     def __str__(self):
         return "oooooo"
 
+
 class Strategy(AbstractStrategy):
-    label = 'strategy'
+    label = "strategy"
     none = None
 
     @classmethod
@@ -68,7 +71,7 @@ class StrategyRegistry(Registry):
     def deserialize(self, value, obj=None):
         ret = []
         if isinstance(value, six.string_types):
-            value = value.split(',')
+            value = value.split(",")
         for v in value:
             if isinstance(v, six.string_types):
                 v = import_by_name(v)
@@ -110,19 +113,17 @@ class DemoModelNone(models.Model):
 
 
 class DemoModelDefault(models.Model):
-    sender = StrategyClassField(null=True,
-                                registry=registry,
-                                default='demoproject.demoapp.models.Sender1')
+    sender = StrategyClassField(
+        null=True, registry=registry, default="demoproject.demoapp.models.Sender1"
+    )
 
 
 def cc():
-    return 'demoproject.demoapp.models.Sender1'
+    return "demoproject.demoapp.models.Sender1"
 
 
 class DemoModelCallableDefault(models.Model):
-    sender = StrategyClassField(registry=registry, null=True,
-                                default=cc
-                                )
+    sender = StrategyClassField(registry=registry, null=True, default=cc)
 
 
 class DemoModelProxy(DemoModel):
@@ -149,7 +150,7 @@ class DemoModelContext(models.Model):
 # funny code. just for tests
 def factory(klass, context):
     if issubclass(klass, BaseEmailBackend):
-        return klass(file_path='')
+        return klass(file_path="")
     return klass()
 
 

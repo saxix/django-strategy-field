@@ -1,6 +1,7 @@
 import logging
-from django.utils.functional import cached_property
 from inspect import isclass
+
+from django.utils.functional import cached_property
 
 from .utils import fqn, get_attr, get_display_string, import_by_name  # noqa
 
@@ -71,12 +72,12 @@ class Registry(list):
                 return False
         return super().__contains__(y)
 
-    def get_class(self, value):
-        if not value:
-            return value
-        elif isinstance(value, str):
-            return import_by_name(value)
-        elif isclass(value):
-            return value
-        else:
-            return type(value)
+    # def get_class(self, value):
+    #     if not value:
+    #         return value
+    #     elif isinstance(value, str):
+    #         return import_by_name(value)
+    #     elif isclass(value):
+    #         return value
+    #     else:
+    #         return type(value)

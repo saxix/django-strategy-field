@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.forms.fields import ChoiceField, TypedMultipleChoiceField
 
-from strategy_field.utils import fqn, stringify
+from .utils import fqn, stringify
 
 
 class StrategyFormField(ChoiceField):

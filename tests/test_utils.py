@@ -1,11 +1,5 @@
 import pytest
-
-from demoproject.demoapp.models import (
-    DemoModel,
-    DemoModelNone,
-    Strategy,
-    Strategy1,
-)
+from demoproject.demoapp.models import DemoModel, DemoModelNone, Strategy, Strategy1
 from strategy_field.utils import (
     fqn,
     get_attr,

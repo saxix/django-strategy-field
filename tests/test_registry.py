@@ -1,11 +1,5 @@
 import pytest
-
-from demoproject.demoapp.models import (
-    AbstractSender,
-    DemoModel,
-    Sender1,
-    Sender2,
-)
+from demoproject.demoapp.models import AbstractSender, DemoModel, Sender1, Sender2
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn
 
@@ -72,13 +66,11 @@ def test_registry_as_choices(monkeypatch):
     r.register(Sender1)
     r.register(Sender2)
     r.register(fqn(Sender1))
-    monkeypatch.setattr(Sender1, 'label',
-                        classmethod(lambda s: "LABEL"),
-                        raising=False)
+    monkeypatch.setattr(Sender1, "label", classmethod(lambda s: "LABEL"), raising=False)
 
     assert r.as_choices() == [
         ("demoproject.demoapp.models.Sender1", "LABEL"),
-        ("demoproject.demoapp.models.Sender2", "demoproject.demoapp.models.Sender2")
+        ("demoproject.demoapp.models.Sender2", "demoproject.demoapp.models.Sender2"),
     ]
 
 

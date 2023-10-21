@@ -1,12 +1,12 @@
 import importlib
 import logging
 import types
-from django.utils.module_loading import import_string
 from inspect import isclass
 
+from django.utils.module_loading import import_string
+
 from . import config
-from .exceptions import (StrategyAttributeError, StrategyClassError,
-                         StrategyNameError,)
+from .exceptions import StrategyAttributeError, StrategyClassError, StrategyNameError
 
 logger = logging.getLogger(__name__)
 

@@ -3,8 +3,8 @@ from django.core.validators import BaseValidator
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
 
-from strategy_field.exceptions import StrategyNameError
-from strategy_field.utils import get_class
+from .exceptions import StrategyNameError
+from .utils import get_class
 
 
 @deconstructible

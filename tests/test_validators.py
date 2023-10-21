@@ -1,6 +1,5 @@
 import pytest
 from django.core.exceptions import ValidationError
-
 from strategy_field.validators import ClassnameValidator, RegistryValidator
 
 

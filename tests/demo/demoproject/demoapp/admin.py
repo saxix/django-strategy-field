@@ -1,17 +1,17 @@
 from django.contrib import admin
 from django.forms import ModelForm, TextInput
-
 from strategy_field.utils import fqn
+
 from .models import (
     DemoAllModel,
     DemoCustomModel,
     DemoModel,
     DemoModelCallableDefault,
     DemoModelDefault,
+    DemoModelNone,
     DemoModelProxy,
     DemoMultipleCustomModel,
     DemoMultipleModel,
-    DemoModelNone,
 )
 
 
