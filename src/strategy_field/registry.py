@@ -8,10 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 class Registry(list):
-
     def __init__(self, base_class, *args, **kwargs):
         self._klass = base_class
-        self._label_attribute = kwargs.get('label_attribute', None)
+        self._label_attribute = kwargs.get("label_attribute", None)
         self._choices = None
         list.__init__(self, *args[:])
 
@@ -32,8 +31,9 @@ class Registry(list):
                 return False
 
         if self.klass:
-            return (isclass(value) and issubclass(value, self.klass)) or \
-                   (isinstance(value, self.klass))
+            return (isclass(value) and issubclass(value, self.klass)) or (
+                isinstance(value, self.klass)
+            )
 
         return True
 

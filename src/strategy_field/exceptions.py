@@ -25,7 +25,9 @@ class StrategyImportError(ImportError):
 
 
 class StrategyAttributeError(AttributeError):
-    default_message = 'Unable to import %(name)s. %(module)s does not have %(class_str)s attribute'
+    default_message = (
+        "Unable to import %(name)s. %(module)s does not have %(class_str)s attribute"
+    )
 
     def __init__(self, name, module, class_str, message=None):
         self.name = str(name)

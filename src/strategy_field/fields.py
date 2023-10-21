@@ -4,17 +4,13 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH, NOT_PROVIDED
 from django.db.models.lookups import Contains, IContains, In
-from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 from inspect import isclass
-from operator import itemgetter
 
 from strategy_field.exceptions import StrategyClassError, StrategyNameError
-from strategy_field.forms import (
-    StrategyFormField,
-    StrategyMultipleChoiceFormField,
-)
-from strategy_field.utils import fqn, get_class, get_display_string, stringify
+from strategy_field.forms import (StrategyFormField,
+                                  StrategyMultipleChoiceFormField,)
+from strategy_field.utils import fqn, get_class, stringify
 from strategy_field.validators import ClassnameValidator, RegistryValidator
 
 NOCONTEXT = object()

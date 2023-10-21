@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class RegistryValidator(BaseValidator):
-
     def __call__(self, value):
         if not isinstance(value, (list, tuple)):
             value = [value]

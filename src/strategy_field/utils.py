@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class ModulesCache(dict):
     def __missing__(self, name):
-        if '.' not in name:
+        if "." not in name:
             raise StrategyNameError(name)
 
         module_path, class_str = name.rsplit(".", 1)
@@ -64,14 +64,12 @@ def get_display_string(klass, display_attribute=None):
 
 
 def get_attr(obj, attr, default=None):
-    """Recursive get object's attribute. May use dot notation.
-
-    """
-    if '.' not in attr:
+    """Recursive get object's attribute. May use dot notation."""
+    if "." not in attr:
         return getattr(obj, attr, default)
     else:
-        L = attr.split('.')
-        return get_attr(getattr(obj, L[0], default), '.'.join(L[1:]), default)
+        L = attr.split(".")
+        return get_attr(getattr(obj, L[0], default), ".".join(L[1:]), default)
 
 
 def fqn(o):
@@ -83,7 +81,7 @@ def fqn(o):
     parts = []
     if isinstance(o, str):
         return o
-    if not hasattr(o, '__module__'):
+    if not hasattr(o, "__module__"):
         raise StrategyClassError(o)
     parts.append(o.__module__)
     if isclass(o):
