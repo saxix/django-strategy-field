@@ -64,3 +64,5 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'demoproject.demoapp.apps.DemoConfig')
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

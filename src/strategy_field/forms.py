@@ -8,7 +8,7 @@ class StrategyFormField(ChoiceField):
     def __init__(self, *args, **kwargs):
         self.registry = kwargs.pop('registry')
         self.empty_value = kwargs.pop('empty_value', '')
-        kwargs["choices"] = self.registry.as_choices()
+        # kwargs["choices"] = self.registry.as_choices()
         super().__init__(*args, **kwargs)
 
     def prepare_value(self, value):

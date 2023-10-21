@@ -6,15 +6,18 @@ from django.db import models
 
 from strategy_field.fields import (MultipleStrategyClassField,
                                    MultipleStrategyField, StrategyClassField,
-                                   StrategyField,)
+                                   StrategyField, )
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn, import_by_name
 
 logger = logging.getLogger(__name__)
 
 
-class AbstractSender(object):
+class AbstractSender:
     pass
+
+    def __str__(self):
+        return "oooooo"
 
 
 class Sender1(AbstractSender):
@@ -29,7 +32,7 @@ class SenderNotRegistered(AbstractSender):
     pass
 
 
-class SenderWrong(object):
+class SenderWrong:
     pass
 
 
@@ -38,13 +41,15 @@ registry.register(Sender1)
 registry.register(Sender2)
 
 
-class AbstractStrategy(object):
+class AbstractStrategy:
     def __init__(self, context, label=''):
         if not context:
             raise ValueError("Invalid context for strategy ({})".format(context))
         self.context = context
         self.label = label
 
+    def __str__(self):
+        return "oooooo"
 
 class Strategy(AbstractStrategy):
     label = 'strategy'
