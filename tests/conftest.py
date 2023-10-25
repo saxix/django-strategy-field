@@ -6,7 +6,7 @@ def registry():
     from demoproject.demoapp.models import AbstractSender, Sender1, Sender2
     from strategy_field.registry import Registry
 
-    r = Registry(AbstractSender)
+    r = Registry(AbstractSender, label_attribute="label")
     r.register(Sender1)
     r.register(Sender2)
     return r
@@ -41,6 +41,7 @@ def democustommodel():
 def demo_multiplecustom_model():
     from demoproject.demoapp.models import DemoMultipleCustomModel, Strategy
     from strategy_field.utils import fqn
+
     return DemoMultipleCustomModel.objects.get_or_create(sender=[fqn(Strategy)])[0]
 
 
@@ -51,7 +52,7 @@ def demo_multiple_model():
     return DemoMultipleModel.objects.get_or_create(sender=[Sender1])[0]
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def webapp(django_app):
     return django_app
     # import django_webtest
@@ -60,4 +61,6 @@ def webapp(django_app):
     # wtm.csrf_checks = False
     # wtm._patch_settings()
     # request.addfinalizer(wtm._unpatch_settings)
+
+
 #     return django_webtest.DjangoTestApp()

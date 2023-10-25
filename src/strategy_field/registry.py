@@ -1,6 +1,7 @@
 import logging
-from django.utils.functional import cached_property
 from inspect import isclass
+
+from django.utils.functional import cached_property
 
 from .utils import fqn, get_attr, get_display_string, import_by_name  # noqa
 
@@ -8,10 +9,9 @@ logger = logging.getLogger(__name__)
 
 
 class Registry(list):
-
     def __init__(self, base_class, *args, **kwargs):
         self._klass = base_class
-        self._label_attribute = kwargs.get('label_attribute', None)
+        self._label_attribute = kwargs.get("label_attribute", None)
         self._choices = None
         list.__init__(self, *args[:])
 
@@ -32,8 +32,9 @@ class Registry(list):
                 return False
 
         if self.klass:
-            return (isclass(value) and issubclass(value, self.klass)) or \
-                   (isinstance(value, self.klass))
+            return (isclass(value) and issubclass(value, self.klass)) or (
+                isinstance(value, self.klass)
+            )
 
         return True
 
@@ -71,12 +72,12 @@ class Registry(list):
                 return False
         return super().__contains__(y)
 
-    def get_class(self, value):
-        if not value:
-            return value
-        elif isinstance(value, str):
-            return import_by_name(value)
-        elif isclass(value):
-            return value
-        else:
-            return type(value)
+    # def get_class(self, value):
+    #     if not value:
+    #         return value
+    #     elif isinstance(value, str):
+    #         return import_by_name(value)
+    #     elif isclass(value):
+    #         return value
+    #     else:
+    #         return type(value)

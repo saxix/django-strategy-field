@@ -1,16 +1,16 @@
 import logging
+
 from django.core.validators import BaseValidator
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from strategy_field.fields import ClassnameValidator
-from strategy_field.utils import fqn, import_by_name
+from ..fields import ClassnameValidator
+from ..utils import fqn, import_by_name
 
 logger = logging.getLogger(__name__)
 
 
 class RegistryValidator(BaseValidator):
-
     def __call__(self, value):
         if not isinstance(value, (list, tuple)):
             value = [value]

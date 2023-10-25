@@ -30,5 +30,6 @@ endif
 
 
 demo:
-	cd tests/demo && ./manage.py syncdb
+	cd tests/demo && ./manage.py makemigrations
+	cd tests/demo && ./manage.py migrate
 	cd tests/demo && ./manage.py runserver

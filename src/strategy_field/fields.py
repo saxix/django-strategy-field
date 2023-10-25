@@ -1,18 +1,17 @@
 import logging
+from inspect import isclass
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH, NOT_PROVIDED
 from django.db.models.lookups import Contains, IContains, In
 from django.utils.text import capfirst
-from inspect import isclass
-from operator import itemgetter
 
-from strategy_field.exceptions import StrategyClassError, StrategyNameError
-from strategy_field.forms import (StrategyFormField,
-                                  StrategyMultipleChoiceFormField,)
-from strategy_field.utils import fqn, get_class, get_display_string, stringify
-from strategy_field.validators import ClassnameValidator, RegistryValidator
+from .exceptions import StrategyClassError, StrategyNameError
+from .forms import StrategyFormField, StrategyMultipleChoiceFormField
+from .utils import fqn, get_class, stringify
+from .validators import ClassnameValidator, RegistryValidator
 
 NOCONTEXT = object()
 
@@ -53,7 +52,12 @@ class StrategyClassFieldDescriptor:
         else:
             try:
                 value = get_class(original)
-            except (AttributeError, ModuleNotFoundError, ImportError, StrategyNameError) as e:
+            except (
+                AttributeError,
+                ModuleNotFoundError,
+                ImportError,
+                StrategyNameError,
+            ) as e:
                 if callable(self.field.import_error):
                     value = self.field.import_error(original, e)
                 else:
@@ -84,7 +88,7 @@ class MultipleStrategyClassFieldDescriptor(object):
         if value is None:
             return None
         if isinstance(value, str):
-            value = value.split(',')
+            value = value.split(",")
         if not isinstance(value, (list, tuple)):
             value = [value] if value is not None else None
         # if isinstance(value, (list, tuple)):
@@ -106,14 +110,12 @@ class MultipleStrategyClassFieldDescriptor(object):
         obj.__dict__[self.field.name] = value
 
 
-# @deconstructible
 class AbstractStrategyField(models.Field):
     registry = None
 
     def __init__(self, *args, **kwargs):
-        self.display_attribute = kwargs.pop('display_attribute', None)
-        self.import_error = kwargs.pop('import_error', None)
-        kwargs['max_length'] = 200
+        self.import_error = kwargs.pop("import_error", None)
+        kwargs["max_length"] = 200
 
         self.registry = kwargs.pop("registry", None)
         super().__init__(*args, **kwargs)
@@ -121,7 +123,9 @@ class AbstractStrategyField(models.Field):
         if self.registry:
             self.validators.append(RegistryValidator(self.registry))
 
-    def contribute_to_class(self, cls, name, private_only=False, virtual_only=NOT_PROVIDED):
+    def contribute_to_class(
+        self, cls, name, private_only=False, virtual_only=NOT_PROVIDED
+    ):
         self.set_attributes_from_name(name)
         self.model = cls
         if callable(self.registry):
@@ -133,36 +137,6 @@ class AbstractStrategyField(models.Field):
     #     if isinstance(other, Field):
     #         return self.creation_counter == other.creation_counter
     #     return self.registry == other.registry
-
-    def get_internal_type(self):
-        return 'CharField'
-
-    def _check_choices(self):
-        return []
-
-    def _get_choices(self):
-        if self.registry:
-            return sorted([(klass, get_display_string(klass, self.display_attribute))
-                    for klass in self.registry], key=itemgetter(1))
-            # return [(klass, get_display_string(klass, self.display_attribute))
-            #         for klass in self.registry]
-        return []
-
-    def _set_choices(self, value):
-        pass
-
-    choices = property(_get_choices, _set_choices)
-
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
-                    limit_choices_to=None, **kwargs):
-        first_choice = blank_choice if include_blank else []
-
-        return first_choice + [(fqn(klass), l)
-                               for klass, l in self.choices]
-
-    def validate(self, value, model_instance):
-        return value in self.registry
-
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         del kwargs["max_length"]
@@ -172,28 +146,76 @@ class AbstractStrategyField(models.Field):
             del kwargs["choices"]
         return name, path, args, kwargs
 
+    def get_prep_value(self, value):
+        if value is None:
+            return None
+        return fqn(value)
+
+    def value_to_string(self, obj):
+        value = self.value_from_object(obj)
+        return fqn(value)
+
+    def get_internal_type(self):
+        return "CharField"
+
+    def _check_choices(self):
+        return []
+
+    def _get_choices(self):
+        if self.registry:
+            return self.registry.as_choices()
+        return []
+
+    def _set_choices(self, value):
+        pass
+
+    choices = property(_get_choices, _set_choices)
+
+    def get_choices(
+        self,
+        include_blank=True,
+        blank_choice=BLANK_CHOICE_DASH,
+        limit_choices_to=None,
+        **kwargs,
+    ):
+        first_choice = blank_choice if include_blank else []
+
+        return first_choice + self.choices
+
+    def validate(self, value, model_instance):
+        return value in self.registry
+
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
-        defaults = {'required': not self.blank,
-                    'label': capfirst(self.verbose_name),
-                    'display_attribute': self.display_attribute,
-                    'help_text': self.help_text,
-                    'registry': self.registry}
+        defaults = {
+            "required": not self.blank,
+            "label": capfirst(self.verbose_name),
+            "help_text": self.help_text,
+            "registry": self.registry,
+        }
         if self.has_default():
             if callable(self.default):
-                defaults['initial'] = self.default
-                defaults['show_hidden_initial'] = True
+                defaults["initial"] = self.default
+                defaults["show_hidden_initial"] = True
             else:
-                defaults['initial'] = self.get_default()
-        include_blank = (self.blank or not (self.has_default() or 'initial' in kwargs))
-        defaults['choices'] = self.get_choices(include_blank=include_blank)
+                defaults["initial"] = self.get_default()
+        include_blank = self.blank or not (self.has_default() or "initial" in kwargs)
+        defaults["choices"] = self.get_choices(include_blank=include_blank)
         if self.null:
-            defaults['empty_value'] = None
+            defaults["empty_value"] = None
         form_class = choices_form_class or self.form_class
         for k in list(kwargs):
-            if k not in ('empty_value', 'required', 'choices',
-                         'registry', 'display_attribute',
-                         'widget', 'label', 'initial', 'help_text',
-                         'error_messages', 'show_hidden_initial'):
+            if k not in (
+                "empty_value",
+                "required",
+                "choices",
+                "registry",
+                "widget",
+                "label",
+                "initial",
+                "help_text",
+                "error_messages",
+                "show_hidden_initial",
+            ):
                 del kwargs[k]
         defaults.update(kwargs)
         return form_class(**defaults)
@@ -206,23 +228,6 @@ class RegexFormField(forms.CharField):
 class StrategyClassField(AbstractStrategyField):
     form_class = StrategyFormField
     descriptor = StrategyClassFieldDescriptor
-
-    def get_prep_value(self, value):
-        if value is None:
-            return None
-        return fqn(value)
-
-    # def get_prep_lookup(self, lookup_type, value):
-    #     if lookup_type == 'exact':
-    #         return self.get_prep_value(value)
-    #     elif lookup_type == 'in':
-    #         return [self.get_prep_value(v) for v in value]
-    #     elif lookup_type == 'contains':
-    #         return self.get_prep_value(value)
-    #     elif lookup_type == 'icontains':
-    #         return self.get_prep_value(value)
-    #     else:
-    #         raise TypeError('Lookup type %r not supported.' % lookup_type)
 
 
 class MultipleStrategyClassField(AbstractStrategyField):
@@ -255,17 +260,21 @@ class MultipleStrategyClassField(AbstractStrategyField):
     #         return self.get_prep_value(value)
 
     def get_lookup(self, lookup_name):
-        if lookup_name == 'in':
-            raise TypeError('Lookup type %r not supported.' % lookup_name)
+        if lookup_name == "in":
+            raise TypeError("Lookup type %r not supported." % lookup_name)
         return super().get_lookup(lookup_name)
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
-                    limit_choices_to=None, **kwargs):
+    def get_choices(
+        self,
+        include_blank=True,
+        blank_choice=BLANK_CHOICE_DASH,
+        limit_choices_to=None,
+        **kwargs,
+    ):
         return AbstractStrategyField.get_choices(self, False, blank_choice)
 
 
 class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
-
     def __get__(self, obj, value=None):
         if obj is None:
             return None
@@ -277,7 +286,12 @@ class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
         else:
             try:
                 value = get_class(original)
-            except (AttributeError, ModuleNotFoundError, ImportError, StrategyNameError) as e:
+            except (
+                AttributeError,
+                ModuleNotFoundError,
+                ImportError,
+                StrategyNameError,
+            ) as e:
                 if callable(self.field.import_error):
                     value = self.field.import_error(original, e)
                 else:
@@ -301,7 +315,7 @@ class StrategyField(StrategyClassField):
     descriptor = StrategyFieldDescriptor
 
     def __init__(self, *args, **kwargs):
-        self.factory = kwargs.pop('factory', lambda klass, obj: klass(obj))
+        self.factory = kwargs.pop("factory", lambda klass, obj: klass(obj))
         super().__init__(*args, **kwargs)
 
     def pre_save(self, model_instance, add):
@@ -319,12 +333,17 @@ class MultipleStrategyFieldDescriptor(MultipleStrategyClassFieldDescriptor):
         if value and isinstance(value, str) or isinstance(value, (list, tuple)):
             ret = []
             if isinstance(value, str):
-                value = value.split(',')
+                value = value.split(",")
             for v in value:
                 try:
                     cleaned = get_class(v)
                     ret.append(self.field.factory(cleaned, obj))
-                except (AttributeError, ModuleNotFoundError, ImportError, StrategyNameError) as e:
+                except (
+                    AttributeError,
+                    ModuleNotFoundError,
+                    ImportError,
+                    StrategyNameError,
+                ) as e:
                     if callable(self.field.import_error):
                         value = self.field.import_error(value, e)
                     else:
@@ -343,12 +362,12 @@ class MultipleStrategyField(MultipleStrategyClassField):
     descriptor = MultipleStrategyFieldDescriptor
 
     def __init__(self, *args, **kwargs):
-        self.factory = kwargs.pop('factory', lambda klass, obj: klass(obj))
+        self.factory = kwargs.pop("factory", lambda klass, obj: klass(obj))
         super().__init__(*args, **kwargs)
 
     def get_lookup(self, lookup_name):
-        if lookup_name == 'in':
-            raise TypeError('Lookup type %r not supported.' % lookup_name)
+        if lookup_name == "in":
+            raise TypeError("Lookup type %r not supported." % lookup_name)
         return super().get_lookup(lookup_name)
 
 

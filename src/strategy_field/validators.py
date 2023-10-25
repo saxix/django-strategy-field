@@ -3,18 +3,18 @@ from django.core.validators import BaseValidator
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
 
-from strategy_field.exceptions import StrategyNameError
-from strategy_field.utils import get_class
+from .exceptions import StrategyNameError
+from .utils import get_class
 
 
 @deconstructible
 class ClassnameValidator(BaseValidator):
-    message = _('Ensure this value is valid class name (it is %(show_value)s).')
-    code = 'classname'
+    message = _("Ensure this value is valid class name (it is %(show_value)s).")
+    code = "classname"
 
     def __call__(self, value):
         cleaned = self.clean(value)
-        params = {'show_value': cleaned, 'value': value}
+        params = {"show_value": cleaned, "value": value}
         try:
             get_class(cleaned)
         except (ImportError, TypeError, StrategyNameError):
@@ -24,8 +24,8 @@ class ClassnameValidator(BaseValidator):
 
 @deconstructible
 class RegistryValidator(ClassnameValidator):
-    message = _('Invalid entry `%(show_value)s`')
-    code = 'registry'
+    message = _("Invalid entry `%(show_value)s`")
+    code = "registry"
 
     def __init__(self, registry, message=None):
         super().__init__(registry, message)
@@ -33,7 +33,7 @@ class RegistryValidator(ClassnameValidator):
 
     def __call__(self, value):
         cleaned = self.clean(value)
-        params = {'show_value': cleaned, 'value': value}
+        params = {"show_value": cleaned, "value": value}
         try:
             if isinstance(value, (list, tuple)):
                 for c in cleaned:

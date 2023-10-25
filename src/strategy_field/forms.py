@@ -1,14 +1,14 @@
 from django.core.exceptions import ValidationError
 from django.forms.fields import ChoiceField, TypedMultipleChoiceField
 
-from strategy_field.utils import fqn, stringify
+from .utils import fqn, stringify
 
 
 class StrategyFormField(ChoiceField):
     def __init__(self, *args, **kwargs):
-        self.display_attribute = kwargs.pop('display_attribute', None)
-        self.registry = kwargs.pop('registry')
-        self.empty_value = kwargs.pop('empty_value', '')
+        self.registry = kwargs.pop("registry")
+        self.empty_value = kwargs.pop("empty_value", "")
+        # kwargs["choices"] = self.registry.as_choices()
         super().__init__(*args, **kwargs)
 
     def prepare_value(self, value):
@@ -36,9 +36,9 @@ class StrategyFormField(ChoiceField):
                 raise ValidationError
         except (ValueError, TypeError, ValidationError):
             raise ValidationError(
-                self.error_messages['invalid_choice'],
-                code='invalid_choice',
-                params={'value': value},
+                self.error_messages["invalid_choice"],
+                code="invalid_choice",
+                params={"value": value},
             )
 
     def clean(self, value):
@@ -48,8 +48,7 @@ class StrategyFormField(ChoiceField):
 
 class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
     def __init__(self, *args, **kwargs):
-        self.registry = kwargs.pop('registry')
-        self.display_attribute = kwargs.pop('display_attribute', None)
+        self.registry = kwargs.pop("registry")
 
         super().__init__(*args, **kwargs)
 
@@ -60,7 +59,7 @@ class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
         if isinstance(value, (list, tuple)):
             ret = stringify(value)
         if ret:
-            return ret.split(',')
+            return ret.split(",")
 
     def valid_value(self, value):
         return value in self.registry
