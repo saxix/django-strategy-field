@@ -1,6 +1,7 @@
 from collections.abc import Hashable
 
 import pytest
+
 from strategy_field.fields import (
     MultipleStrategyClassField,
     MultipleStrategyField,

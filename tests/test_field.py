@@ -1,17 +1,6 @@
-import logging
-
 import pytest
 from demo.models import DemoModelNoRegistry
-from django.core.mail.backends.filebased import EmailBackend
-
-logger = logging.getLogger(__name__)
-
-
-# @pytest.mark.django_db
-# def test_valid_class():
-#     d = DemoModelNoRegistry(klass='a.b.c')
-#     with pytest.raises(ValidationError):
-#         d.clean_fields()
+from django.core.mail.backends.dummy import EmailBackend
 
 
 class Dummy:
@@ -34,7 +23,20 @@ def test_no_registry_assign_instance():
 
 @pytest.mark.django_db
 def test_no_registry_assign_string():
-    d = DemoModelNoRegistry(instance="django.core.mail.backends.filebased.EmailBackend")
+    d = DemoModelNoRegistry(instance="django.core.mail.backends.dummy.EmailBackend")
     d.save()
     assert isinstance(d.instance, EmailBackend)
-    assert d.instance.open()
+
+
+@pytest.mark.django_db
+def test_wrong_strategy():
+    d = DemoModelNoRegistry(instance="wrong.strategy")
+    d.save()
+    assert d.instance is None
+
+
+@pytest.mark.django_db
+def test_wrong_type():
+    d = DemoModelNoRegistry(instance=1)
+    d.save()
+    assert d.instance is None

@@ -123,6 +123,12 @@ class AbstractStrategyField(models.Field):
             del kwargs["choices"]
         return name, path, args, kwargs
 
+    def get_db_prep_value(self, value, connection, prepared=False):
+        return super().get_db_prep_value(value, connection, prepared)
+
+    def get_db_prep_save(self, value, connection):
+        return super().get_db_prep_value(value, connection)
+
     def get_prep_value(self, value):
         if value is None:
             return None

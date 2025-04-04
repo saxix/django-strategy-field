@@ -1,5 +1,6 @@
 import pytest
 from demo.models import AbstractSender, DemoModel, Sender1, Sender2
+
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn
 

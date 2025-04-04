@@ -8,9 +8,10 @@ from demo.models import (
     Sender2,
     Strategy,
 )
-from rest_framework.reverse import reverse
-from strategy_field.utils import fqn
 from factory.django import DjangoModelFactory
+from rest_framework.reverse import reverse
+
+from strategy_field.utils import fqn
 
 logger = logging.getLogger(__name__)
 
@@ -80,8 +81,6 @@ def test_post_multiple(webapp):
     assert res.json["sender"] == [fqn(Sender1), fqn(Sender2)]
     assert DemoMultipleModel.objects.get(pk=res.json["id"]).sender == [Sender1, Sender2]
 
-    res = webapp.post(
-        url, expect_errors=True, params={"sender": [fqn(Sender1), fqn(DemoModelNone)]}
-    )
+    res = webapp.post(url, expect_errors=True, params={"sender": [fqn(Sender1), fqn(DemoModelNone)]})
     assert res.status_code == 400
     assert res.json["sender"] == ["Invalid entry `%s`" % fqn(DemoModelNone)]

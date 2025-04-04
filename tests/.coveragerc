@@ -2,8 +2,9 @@
 branch = True
 source = strategy_field
 include =
+    src/
 
-omit =  strategy_field/__init__.py
+omit =
 
 [report]
 # Regexes for lines to exclude from consideration

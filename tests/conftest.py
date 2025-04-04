@@ -4,6 +4,7 @@ import pytest
 @pytest.fixture
 def registry():
     from demo.models import AbstractSender, Sender1, Sender2
+
     from strategy_field.registry import Registry
 
     r = Registry(AbstractSender, label_attribute="label")
@@ -15,6 +16,7 @@ def registry():
 @pytest.fixture
 def custom_registry():
     from demo.models import Strategy
+
     from strategy_field.registry import Registry
 
     r = Registry(Strategy)
@@ -32,6 +34,7 @@ def demomodel():
 @pytest.fixture
 def democustommodel():
     from demo.models import DemoCustomModel, Strategy
+
     from strategy_field.utils import fqn
 
     return DemoCustomModel.objects.get_or_create(sender=fqn(Strategy))[0]
@@ -40,6 +43,7 @@ def democustommodel():
 @pytest.fixture
 def demo_multiplecustom_model():
     from demo.models import DemoMultipleCustomModel, Strategy
+
     from strategy_field.utils import fqn
 
     return DemoMultipleCustomModel.objects.get_or_create(sender=[fqn(Strategy)])[0]
@@ -55,12 +59,3 @@ def demo_multiple_model():
 @pytest.fixture(scope="function")
 def webapp(django_app):
     return django_app
-    # import django_webtest
-    #
-    # wtm = django_webtest.WebTestMixin()
-    # wtm.csrf_checks = False
-    # wtm._patch_settings()
-    # request.addfinalizer(wtm._unpatch_settings)
-
-
-#     return django_webtest.DjangoTestApp()

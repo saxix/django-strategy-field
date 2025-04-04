@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from django.core.exceptions import ValidationError
 from django.forms.fields import ChoiceField, TypedMultipleChoiceField
 
 from .utils import fqn, stringify
+
+if TYPE_CHECKING:
+    from .registry import Registry
 
 
 class StrategyFormField(ChoiceField):
@@ -38,7 +43,7 @@ class StrategyFormField(ChoiceField):
             raise ValidationError(
                 self.error_messages["invalid_choice"],
                 code="invalid_choice",
-                params={"value": value},
+                params={"value": f"'{value}'"},
             ) from None
 
     def clean(self, value):
@@ -48,8 +53,8 @@ class StrategyFormField(ChoiceField):
 
 class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
     def __init__(self, *args, **kwargs):
-        self.registry = kwargs.pop("registry")
-
+        self.registry: Registry = kwargs.pop("registry")
+        kwargs["coerce"] = self.coerce
         super().__init__(*args, **kwargs)
 
     def prepare_value(self, value):
@@ -60,6 +65,18 @@ class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
             ret = stringify(value)
         if ret:
             return ret.split(",")
+
+    def coerce(self, value):
+        try:
+            if value in self.registry:
+                return self.registry.get_by_name(value)
+            raise ValidationError
+        except (ValueError, TypeError, ValidationError):
+            raise ValidationError(
+                self.error_messages["invalid_choice"],
+                code="invalid_choice",
+                params={"value": f"'{value}'"},
+            ) from None
 
     def valid_value(self, value):
         return value in self.registry

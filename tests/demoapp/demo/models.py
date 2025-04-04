@@ -2,6 +2,7 @@ import logging
 
 from django.core.mail.backends.base import BaseEmailBackend
 from django.db import models
+
 from strategy_field.fields import (
     MultipleStrategyClassField,
     MultipleStrategyField,
@@ -15,8 +16,6 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractSender:
-    pass
-
     def __str__(self):
         return "oooooo"
 
@@ -58,7 +57,7 @@ class Strategy(AbstractStrategy):
     none = None
 
     @classmethod
-    def verbose_name(self):
+    def verbose_name(cls):
         return "Verbose Name"
 
 
@@ -112,9 +111,7 @@ class DemoModelNone(models.Model):
 
 
 class DemoModelDefault(models.Model):
-    sender = StrategyClassField(
-        null=True, registry=registry, default="demo.models.Sender1"
-    )
+    sender = StrategyClassField(null=True, registry=registry, default="demo.models.Sender1")
 
 
 def cc():

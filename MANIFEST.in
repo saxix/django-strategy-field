@@ -1,7 +1,9 @@
 include README.md
 include CHANGES
 include MANIFEST.in
+
 recursive-exclude src *.pyc
+
 recursive-include docs *
 recursive-include src *
 recursive-include tests *.coveragerc

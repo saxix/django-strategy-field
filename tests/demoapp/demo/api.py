@@ -1,21 +1,12 @@
 import logging
 
-from demo.models import DemoModelNone, DemoMultipleModel, registry
 from rest_framework import serializers
 from rest_framework.viewsets import ModelViewSet
+
+from demo.models import DemoModelNone, DemoMultipleModel, registry
 from strategy_field.contrib.drf import DrfMultipleStrategyField, DrfStrategyField
 
 logger = logging.getLogger(__name__)
-
-
-# class StrategyClassFieldDrf(serializers.CharField):
-#     def to_representation(self, value):
-#         return fqn(value)
-
-
-# class MultipleStrategyClassFieldDrf(serializers.CharField):
-#     def to_representation(self, value):
-#         return stringify(value)
 
 
 class DemoModelSerializer(serializers.ModelSerializer):

@@ -5,7 +5,7 @@ from inspect import isclass
 
 from django.utils.functional import cached_property
 
-from .utils import fqn, get_attr, get_display_string, import_by_name  # noqa
+from .utils import fqn, get_attr, get_class, get_display_string, import_by_name, importer  # noqa
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +25,9 @@ class Registry(list):
 
     def get_name(self, entry):
         return get_display_string(entry, self._label_attribute)
+
+    def get_by_name(self, entry):
+        return get_class(entry)
 
     def is_valid(self, value):
         if value and isinstance(value, str):

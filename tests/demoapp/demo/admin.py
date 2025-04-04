@@ -1,5 +1,7 @@
 from django.contrib import admin
+from django.contrib.admin.views.main import ChangeList
 from django.forms import ModelForm, TextInput
+
 from strategy_field.utils import fqn
 
 from .models import (
@@ -26,16 +28,12 @@ class DemoModelProxyAdmin(admin.ModelAdmin):
     form = DemoModelForm
 
 
-from django.contrib.admin.views.main import ChangeList
-
-
 class MyChangeList(ChangeList):
     pass
 
 
 class DemoModelNoneAdmin(admin.ModelAdmin):
     list_display = ("pk", "sender", "strategy")
-
 
     def get_changelist(self, request, **kwargs):
         return MyChangeList

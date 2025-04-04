@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib
 import logging
 import types
@@ -29,14 +31,18 @@ class ModulesCache(dict):
 _cache = ModulesCache()
 
 
-def default_classloader(value):
+def default_classloader(value) -> type | None:
     if not value:
         return value
     if isinstance(value, str):
         return import_by_name(value)
     if isclass(value):
         return value
-    return type(value)
+
+    t = type(value)
+    if t.__module__ in ("builtins", "__builtin__"):
+        return None
+    return t
 
 
 importer = None

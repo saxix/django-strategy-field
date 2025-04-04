@@ -1,5 +1,6 @@
 import pytest
 from demo.models import DemoModel, DemoModelNone, Strategy, Strategy1
+
 from strategy_field.utils import (
     fqn,
     get_attr,
@@ -18,21 +19,19 @@ def test_get_class():
     assert get_class(DemoModel()) == DemoModel
     with pytest.raises(ValueError):
         assert get_class("x")
-    assert get_class(2) == int
+    assert get_class(2) is None
 
 
 def test_get_display_string():
     assert get_display_string(DemoModel) == "demo.models.DemoModel"
     assert get_display_string(Strategy, "label") == "strategy"
-    assert (
-        get_display_string(Strategy1, "label") == "demo.models.Strategy1"
-    )
+    assert get_display_string(Strategy1, "label") == "demo.models.Strategy1"
     assert get_display_string(Strategy, "verbose_name") == "Verbose Name"
     assert get_display_string(Strategy, "none") == "demo.models.Strategy"
 
 
 def test_get_attr():
-    class C(object):
+    class C:
         def __repr__(self):
             return "c"
 
@@ -53,23 +52,13 @@ def test_import_by_name():
 
 
 def test_stringify():
-    assert (
-        stringify([DemoModel, DemoModelNone]) == "demo.models.DemoModel,"
-        "demo.models.DemoModelNone"
-    )
-    assert (
-        stringify(["demo.models.DemoModel", DemoModelNone])
-        == "demo.models.DemoModel,"
-        "demo.models.DemoModelNone"
-    )
+    assert stringify([DemoModel, DemoModelNone]) == "demo.models.DemoModel,demo.models.DemoModelNone"
+    assert stringify(["demo.models.DemoModel", DemoModelNone]) == "demo.models.DemoModel,demo.models.DemoModelNone"
 
 
 def test_fqn():
     assert fqn(DemoModel) == "demo.models.DemoModel"
-    assert (
-        fqn("demo.models.DemoModel")
-        == "demo.models.DemoModel"
-    )
+    assert fqn("demo.models.DemoModel") == "demo.models.DemoModel"
     assert fqn(fqn) == "strategy_field.utils.fqn"
     with pytest.raises(ValueError):
         assert fqn(2)

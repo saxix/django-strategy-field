@@ -3,6 +3,7 @@ import pytest
 from demo.models import DemoCustomModel, Strategy, Strategy1
 from django.forms.models import modelform_factory
 from django.urls import reverse
+
 from strategy_field.utils import fqn
 
 
@@ -69,14 +70,6 @@ def test_model_load(democustommodel):
     assert isinstance(d.sender, Strategy)
 
 
-# @pytest.mark.django_db
-# def test_form(democustommodel, registry):
-#     democustommodel._meta.get_field_by_name('sender')[0].registry = registry
-#     form_class = modelform_factory(DemoCustomModel)
-#     form = form_class(instance=democustommodel)
-#     assert form.fields['sender'].choices[1:] == registry.as_choices()
-
-
 @pytest.mark.django_db
 def test_form_save(democustommodel):
     form_class = modelform_factory(DemoCustomModel, exclude=[])
@@ -92,9 +85,7 @@ def test_form_not_valid(democustommodel):
     form = form_class({"sender": fqn(DemoCustomModel)}, instance=democustommodel)
     assert not form.is_valid()
     assert form.errors["sender"] == [
-        "Select a valid choice. "
-        "demo.models.DemoCustomModel "
-        "is not one of the available choices."
+        "Select a valid choice. demo.models.DemoCustomModel is not one of the available choices."
     ]
 
 
@@ -119,12 +110,7 @@ def test_admin_demomodel_add(webapp, admin_user):
 
     form["sender"] = "demo.models.Strategy"
     form.submit().follow()
-    assert (
-        DemoCustomModel.objects.filter(
-            sender="demo.models.Strategy"
-        ).count()
-        == 1
-    )
+    assert DemoCustomModel.objects.filter(sender="demo.models.Strategy").count() == 1
 
 
 @pytest.mark.django_db
@@ -135,33 +121,19 @@ def test_admin_demomodel_edit(webapp, admin_user, democustommodel):
 
     form["sender"] = "demo.models.Strategy"
     form.submit().follow()
-    assert (
-        DemoCustomModel.objects.filter(
-            sender="demo.models.Strategy"
-        ).count()
-        == 1
-    )
+    assert DemoCustomModel.objects.filter(sender="demo.models.Strategy").count() == 1
 
 
 @pytest.mark.django_db
 def test_demomodel_lookup_equal(democustommodel, target_factory):
-    assert (
-        DemoCustomModel.objects.get(sender=target_factory(democustommodel))
-        == democustommodel
-    )
+    assert DemoCustomModel.objects.get(sender=target_factory(democustommodel)) == democustommodel
 
 
 @pytest.mark.django_db
 def test_demomodel_lookup_contains(democustommodel, target_factory):
-    assert (
-        DemoCustomModel.objects.get(sender__contains=target_factory(democustommodel))
-        == democustommodel
-    )
+    assert DemoCustomModel.objects.get(sender__contains=target_factory(democustommodel)) == democustommodel
 
 
 @pytest.mark.django_db
 def test_demomodel_lookup_in(democustommodel, target_factory):
-    assert (
-        DemoCustomModel.objects.get(sender__in=target_factory(democustommodel))
-        == democustommodel
-    )
+    assert DemoCustomModel.objects.get(sender__in=target_factory(democustommodel)) == democustommodel

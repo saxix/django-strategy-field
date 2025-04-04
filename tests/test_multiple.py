@@ -2,6 +2,7 @@ import pytest
 from demo.models import DemoMultipleModel, Sender1, Sender2
 from django.forms.models import modelform_factory
 from django.urls import reverse
+
 from strategy_field.utils import fqn
 
 
@@ -104,7 +105,6 @@ def test_model_load(demo_multiple_model):
 
 @pytest.mark.django_db
 def test_form(demo_multiple_model, registry):
-    # demo_multiple_model._meta.get_field_by_name('sender')[0].registry = registry
     demo_multiple_model._meta.get_field("sender").registry = registry
     form_class = modelform_factory(DemoMultipleModel, exclude=[])
     form = form_class(instance=demo_multiple_model)
@@ -114,10 +114,9 @@ def test_form(demo_multiple_model, registry):
 @pytest.mark.django_db
 def test_form_save(demo_multiple_model):
     form_class = modelform_factory(DemoMultipleModel, exclude=[])
-    form = form_class(
-        {"sender": [fqn(demo_multiple_model.sender[0])]}, instance=demo_multiple_model
-    )
-    form.is_valid()
+
+    form = form_class({"sender": [fqn(demo_multiple_model.sender[0])]}, instance=demo_multiple_model)
+    assert form.is_valid(), form.errors
     instance = form.save()
     assert instance.sender == demo_multiple_model.sender
 
@@ -125,14 +124,10 @@ def test_form_save(demo_multiple_model):
 @pytest.mark.django_db
 def test_form_not_valid(demo_multiple_model):
     form_class = modelform_factory(DemoMultipleModel, exclude=[])
-    form = form_class(
-        {"sender": [fqn(DemoMultipleModel)]}, instance=demo_multiple_model
-    )
+    form = form_class({"sender": [fqn(DemoMultipleModel)]}, instance=demo_multiple_model)
     assert not form.is_valid()
     assert form.errors["sender"] == [
-        "Select a valid choice. "
-        "demo.models.DemoMultipleModel "
-        "is not one of the available choices."
+        "Select a valid choice. demo.models.DemoMultipleModel is not one of the available choices."
     ]
 
 
@@ -153,52 +148,31 @@ def test_admin_demo_multiple_model_add(webapp, admin_user):
 
     form["sender"] = ["demo.models.Sender1"]
     form.submit().follow()
-    assert (
-        DemoMultipleModel.objects.filter(
-            sender="demo.models.Sender1"
-        ).count()
-        == 1
-    )
+    assert DemoMultipleModel.objects.filter(sender="demo.models.Sender1").count() == 1
 
 
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiple_model):
-    url = reverse(
-        "admin:demo_demomultiplemodel_change", args=[demo_multiple_model.pk]
-    )
+    url = reverse("admin:demo_demomultiplemodel_change", args=[demo_multiple_model.pk])
     res = webapp.get(url, user=admin_user)
     form = res.forms["demomultiplemodel_form"]
 
     form["sender"] = ["demo.models.Sender2"]
     form.submit().follow()
-    assert (
-        DemoMultipleModel.objects.filter(
-            sender="demo.models.Sender2"
-        ).count()
-        == 1
-    )
+    assert DemoMultipleModel.objects.filter(sender="demo.models.Sender2").count() == 1
 
 
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_equal(demo_multiple_model, target):
-    assert (
-        DemoMultipleModel.objects.get(sender=target(demo_multiple_model))
-        == demo_multiple_model
-    )
+    assert DemoMultipleModel.objects.get(sender=target(demo_multiple_model)) == demo_multiple_model
 
 
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_contains(demo_multiple_model, target):
-    assert (
-        DemoMultipleModel.objects.get(sender__contains=target(demo_multiple_model))
-        == demo_multiple_model
-    )
+    assert DemoMultipleModel.objects.get(sender__contains=target(demo_multiple_model)) == demo_multiple_model
 
 
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_in(demo_multiple_model, target):
     with pytest.raises(TypeError):
-        assert (
-            DemoMultipleModel.objects.get(sender__in=[target(demo_multiple_model)])
-            == demo_multiple_model
-        )
+        assert DemoMultipleModel.objects.get(sender__in=[target(demo_multiple_model)]) == demo_multiple_model

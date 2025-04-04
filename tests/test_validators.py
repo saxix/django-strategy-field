@@ -1,5 +1,6 @@
 import pytest
 from django.core.exceptions import ValidationError
+
 from strategy_field.validators import ClassnameValidator, RegistryValidator
 
 
@@ -10,7 +11,7 @@ def test_classnamevalidator():
         v("error")
 
 
-def test_RegistryValidator(registry):
+def test_registryvalidator(registry):
     v = RegistryValidator(registry)
     assert v("demo.models.Sender1")
 

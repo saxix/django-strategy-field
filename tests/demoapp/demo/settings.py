@@ -19,7 +19,28 @@ TEMPLATES = [
         },
     },
 ]
-# STRATEGY_CLASSLOADER = "demoproject.classloader.custom_classloader"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "null": {
+            "class": "logging.NullHandler",
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "CRITICAL",
+    },
+    "strategy_field": {
+        "handlers": ["null"],
+        "level": "DEBUG",
+    },
+}
+
 DATABASES = {
     "default": {
         # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.

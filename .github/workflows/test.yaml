@@ -57,7 +57,7 @@ jobs:
           cache-dependency-glob: |
             pyproject.toml
             uv.lock
-          cache-suffix: ${{ matrix.python }}-${{ matrix.django }}
+          cache-suffix: ${{ matrix.cfg }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           python-version: ${{ matrix.python }}
 
@@ -73,13 +73,12 @@ jobs:
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-results-${{ matrix.python }}-${{matrix.django}}
-          path: junit-${{ matrix.python }}-${{matrix.django}}.xml
+          name: pytest-results-${{ matrix.cfg }}
+          path: junit-${{ matrix.cfg }}.xml
         if: ${{ always() }}
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        if: matrix.python == 3.12
+        uses: codecov/codecov-action@v5
         continue-on-error: true
         with:
           env_vars: OS,PYTHON

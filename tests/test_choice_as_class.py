@@ -110,9 +110,7 @@ def test_form_not_valid(demomodel):
     form = form_class({"sender": fqn(DemoModel)}, instance=demomodel)
     assert not form.is_valid()
     assert form.errors["sender"] == [
-        "Select a valid choice. "
-        "demo.models.DemoModel "
-        "is not one of the available choices."
+        "Select a valid choice. demo.models.DemoModel is not one of the available choices."
     ]
 
 
@@ -141,10 +139,7 @@ def test_admin_demomodel_add(webapp, admin_user):
     # import pdb; pdb.set_trace()
 
     form.submit().follow()
-    assert (
-        DemoModel.objects.filter(sender="demo.models.Sender1").count()
-        == 1
-    )
+    assert DemoModel.objects.filter(sender="demo.models.Sender1").count() == 1
 
 
 @pytest.mark.django_db
@@ -154,10 +149,7 @@ def test_admin_demomodel_edit(webapp, admin_user, demomodel):
     form = res.forms["demomodel_form"]
     form["sender"] = "demo.models.Sender2"
     form.submit().follow()
-    assert (
-        DemoModel.objects.filter(sender="demo.models.Sender2").count()
-        == 1
-    )
+    assert DemoModel.objects.filter(sender="demo.models.Sender2").count() == 1
 
 
 @pytest.mark.django_db

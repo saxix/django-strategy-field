@@ -125,35 +125,23 @@ lint.ignore = [
 lint.per-file-ignores."src/strategy_field/version.py" = [
   "ALL",
 ]
+lint.per-file-ignores."tests/**/*.py" = [
+  "ARG",
+  "DJ",
+  "E",
+  "PLR2004",
+  "PLW",
+  "S",
+  "S101",
+  "UP",
+]
 
 [tool.check-manifest]
 ignore = """
-.travis.yml
 Makefile
 *.sqlite
-.tox/*"""
-
-[tool.pytest.ini_options]
-django_find_project = false
-pythonpath = [ "./tests/demoapp/", "./src" ]
-DJANGO_SETTINGS_MODULE = "demo.settings"
-norecursedirs = [ "demo", ".tox" ]
-addopts = [
-  "--tb=short",
-  "--capture=no",
-  "--echo-version=django",
-  "--echo-attr=django.conf.settings.DATABASES.default.ENGINE",
-  "--cov=strategy_field",
-  "--cov-report=html",
-  "--cov-report=xml",
-  "--cov-config=tests/.coveragerc",
-]
-python_files = "tests/test_*.py tests/**/test_*.py src/*.py"
-markers = [
-  "functional: mark a test as functional",
-  "selenium: selenium test",
-  "skip: skip test",
-]
+.tox/*
+"""
 
 [tool.mypy]
 plugins = "mypy_django_plugin.main"

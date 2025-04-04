@@ -92,14 +92,10 @@ def test_form_save(demo_multiplecustom_model):
 @pytest.mark.django_db
 def test_form_not_valid(demo_multiplecustom_model):
     form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
-    form = form_class(
-        {"sender": [fqn(DemoMultipleCustomModel)]}, instance=demo_multiplecustom_model
-    )
+    form = form_class({"sender": [fqn(DemoMultipleCustomModel)]}, instance=demo_multiplecustom_model)
     assert not form.is_valid()
     assert form.errors["sender"] == [
-        "Select a valid choice. "
-        "demo.models.DemoMultipleCustomModel "
-        "is not one of the available choices."
+        "Select a valid choice. demo.models.DemoMultipleCustomModel is not one of the available choices."
     ]
 
 
@@ -126,12 +122,7 @@ def test_admin_demo_multiple_model_add(webapp, admin_user):
     form = res.forms["demomultiplecustommodel_form"]
     form["sender"].force_value(["demo.models.Strategy"])
     form.submit().follow()
-    assert (
-        DemoMultipleCustomModel.objects.filter(
-            sender="demo.models.Strategy"
-        ).count()
-        == 1
-    )
+    assert DemoMultipleCustomModel.objects.filter(sender="demo.models.Strategy").count() == 1
 
 
 @pytest.mark.django_db
@@ -183,18 +174,13 @@ def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiplecustom_
 
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_equal(demo_multiplecustom_model, target):
-    assert (
-        DemoMultipleCustomModel.objects.get(sender=target(demo_multiplecustom_model))
-        == demo_multiplecustom_model
-    )
+    assert DemoMultipleCustomModel.objects.get(sender=target(demo_multiplecustom_model)) == demo_multiplecustom_model
 
 
 @pytest.mark.django_db
 def test_demo_multiple_model_lookup_contains(demo_multiplecustom_model, target):
     assert (
-        DemoMultipleCustomModel.objects.get(
-            sender__contains=target(demo_multiplecustom_model)
-        )
+        DemoMultipleCustomModel.objects.get(sender__contains=target(demo_multiplecustom_model))
         == demo_multiplecustom_model
     )
 
@@ -203,8 +189,6 @@ def test_demo_multiple_model_lookup_contains(demo_multiplecustom_model, target):
 def test_demo_multiple_model_lookup_in(demo_multiplecustom_model, target):
     with pytest.raises(TypeError):
         assert (
-            DemoMultipleCustomModel.objects.get(
-                sender__in=target(demo_multiplecustom_model)
-            )
+            DemoMultipleCustomModel.objects.get(sender__in=target(demo_multiplecustom_model))
             == demo_multiplecustom_model
         )
