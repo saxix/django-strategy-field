@@ -23,7 +23,7 @@ class ModulesCache(dict):
             self[name] = handler
             return handler
         except AttributeError:
-            raise StrategyAttributeError(name, module, class_str)
+            raise StrategyAttributeError(name, module, class_str) from None
 
 
 _cache = ModulesCache()
@@ -32,19 +32,18 @@ _cache = ModulesCache()
 def default_classloader(value):
     if not value:
         return value
-    elif isinstance(value, str):
+    if isinstance(value, str):
         return import_by_name(value)
-    elif isclass(value):
+    if isclass(value):
         return value
-    else:
-        return type(value)
+    return type(value)
 
 
 importer = None
 
 
 def get_class(value):
-    global importer
+    global importer  # noqa PLW0603
     if importer is None:
         importer = import_string(config.CLASSLOADER)
     return importer(value)
@@ -55,10 +54,9 @@ def get_display_string(klass, display_attribute=None):
         attr = getattr(klass, display_attribute)
         if attr is None:
             return fqn(klass)
-        elif callable(attr):
+        if callable(attr):
             return attr()
-        else:
-            return attr
+        return attr
 
     return fqn(klass)
 
@@ -67,9 +65,8 @@ def get_attr(obj, attr, default=None):
     """Recursive get object's attribute. May use dot notation."""
     if "." not in attr:
         return getattr(obj, attr, default)
-    else:
-        L = attr.split(".")
-        return get_attr(getattr(obj, L[0], default), ".".join(L[1:]), default)
+    parts = attr.split(".")
+    return get_attr(getattr(obj, parts[0], default), ".".join(parts[1:]), default)
 
 
 def fqn(o):
@@ -106,25 +103,9 @@ def import_by_name(name):
     """
     return _cache[name]
 
-    # if '.' not in name:
-    #     raise ValueError("Cannot import '{}'".format(name))
-    # class_data = name.split(".")
-    # module_path = ".".join(class_data[:-1])
-    # class_str = class_data[-1]
-    # module = importlib.import_module(module_path)
-    # try:
-    #     return getattr(module, class_str)
-    # except AttributeError:
-    #     raise AttributeError('Unable to import {}. '
-    #                          '{} does not have {} attribute'.format(name,
-    #                                                                 module,
-    #                                                                 class_str))
-
 
 def stringify(value):
     ret = []
-    # if isinstance(value, six.string_types):
-    #     value = value.split(',')
     for v in value:
         if isinstance(v, str) and v:
             ret.append(v)

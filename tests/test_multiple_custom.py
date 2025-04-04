@@ -1,7 +1,7 @@
 # flake8: noqa
 # noqa
 import pytest
-from demoproject.demoapp.models import DemoMultipleCustomModel, Strategy, Strategy1
+from demo.models import DemoMultipleCustomModel, Strategy, Strategy1
 from django.forms.models import modelform_factory
 from django.urls import reverse
 from strategy_field.utils import fqn
@@ -69,10 +69,10 @@ def test_form_load():
     form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
     form = form_class(instance=d)
     assert form.fields["sender"].choices == [
-        ("demoproject.demoapp.models.Strategy", "demoproject.demoapp.models.Strategy"),
+        ("demo.models.Strategy", "demo.models.Strategy"),
         (
-            "demoproject.demoapp.models.Strategy1",
-            "demoproject.demoapp.models.Strategy1",
+            "demo.models.Strategy1",
+            "demo.models.Strategy1",
         ),
     ]
 
@@ -98,7 +98,7 @@ def test_form_not_valid(demo_multiplecustom_model):
     assert not form.is_valid()
     assert form.errors["sender"] == [
         "Select a valid choice. "
-        "demoproject.demoapp.models.DemoMultipleCustomModel "
+        "demo.models.DemoMultipleCustomModel "
         "is not one of the available choices."
     ]
 
@@ -108,27 +108,27 @@ def test_form_default(demo_multiplecustom_model):
     form_class = modelform_factory(DemoMultipleCustomModel, exclude=[])
     form = form_class(instance=demo_multiplecustom_model)
     assert form.fields["sender"].choices == [
-        ("demoproject.demoapp.models.Strategy", "demoproject.demoapp.models.Strategy"),
+        ("demo.models.Strategy", "demo.models.Strategy"),
         (
-            "demoproject.demoapp.models.Strategy1",
-            "demoproject.demoapp.models.Strategy1",
+            "demo.models.Strategy1",
+            "demo.models.Strategy1",
         ),
     ]
     # assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
     #                           u'<td><select multiple="multiple" id="id_sender" name="sender">\n' \
-    #                           u'<option value="demoproject.demoapp.models.Strategy" selected="selected">demoproject.demoapp.models.Strategy</option>\n' \
-    #                           u'<option value="demoproject.demoapp.models.Strategy1">demoproject.demoapp.models.Strategy1</option>\n</select></td></tr>'
+    #                           u'<option value="demo.models.Strategy" selected="selected">demo.models.Strategy</option>\n' \
+    #                           u'<option value="demo.models.Strategy1">demo.models.Strategy1</option>\n</select></td></tr>'
 
 
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_add(webapp, admin_user):
-    res = webapp.get("/demoapp/demomultiplecustommodel/add/", user=admin_user)
+    res = webapp.get("/demo/demomultiplecustommodel/add/", user=admin_user)
     form = res.forms["demomultiplecustommodel_form"]
-    form["sender"].force_value(["demoproject.demoapp.models.Strategy"])
+    form["sender"].force_value(["demo.models.Strategy"])
     form.submit().follow()
     assert (
         DemoMultipleCustomModel.objects.filter(
-            sender="demoproject.demoapp.models.Strategy"
+            sender="demo.models.Strategy"
         ).count()
         == 1
     )
@@ -139,37 +139,37 @@ def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiplecustom_
     demo_multiplecustom_model.sender = [Strategy, Strategy1]
     demo_multiplecustom_model.save()
     url = reverse(
-        "admin:demoapp_demomultiplecustommodel_change",
+        "admin:demo_demomultiplecustommodel_change",
         args=[demo_multiplecustom_model.pk],
     )
     res = webapp.get(url, user=admin_user)
     assert res.context["adminform"].form.fields["sender"].choices == [
-        ("demoproject.demoapp.models.Strategy", "demoproject.demoapp.models.Strategy"),
+        ("demo.models.Strategy", "demo.models.Strategy"),
         (
-            "demoproject.demoapp.models.Strategy1",
-            "demoproject.demoapp.models.Strategy1",
+            "demo.models.Strategy1",
+            "demo.models.Strategy1",
         ),
     ]
 
     form = res.forms["demomultiplecustommodel_form"]
     form["sender"] = [
-        "demoproject.demoapp.models.Strategy",
-        "demoproject.demoapp.models.Strategy1",
+        "demo.models.Strategy",
+        "demo.models.Strategy1",
     ]
     form.submit().follow()
     res = webapp.get(url, user=admin_user)
     assert res.context["adminform"].form.fields["sender"].choices == [
-        ("demoproject.demoapp.models.Strategy", "demoproject.demoapp.models.Strategy"),
+        ("demo.models.Strategy", "demo.models.Strategy"),
         (
-            "demoproject.demoapp.models.Strategy1",
-            "demoproject.demoapp.models.Strategy1",
+            "demo.models.Strategy1",
+            "demo.models.Strategy1",
         ),
     ]
 
     # assert res.context['adminform'].form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
     #                                                    u'<td><select multiple="multiple" id="id_sender" name="sender">\n' \
-    #                                                    u'<option value="demoproject.demoapp.models.Strategy" selected="selected">demoproject.demoapp.models.Strategy</option>\n' \
-    #                                                    u'<option value="demoproject.demoapp.models.Strategy1" selected="selected">demoproject.demoapp.models.Strategy1</option>\n' \
+    #                                                    u'<option value="demo.models.Strategy" selected="selected">demo.models.Strategy</option>\n' \
+    #                                                    u'<option value="demo.models.Strategy1" selected="selected">demo.models.Strategy1</option>\n' \
     #                                                    u'</select></td></tr>'
 
 

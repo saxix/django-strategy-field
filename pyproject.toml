@@ -1,0 +1,169 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+  "hatch-vcs>=0.4",
+  "hatchling>=1.25",
+]
+
+[project]
+name = "django-strategy-field"
+description = "custom fields useful to implement the Strategy Pattern with Django models."
+readme = "README.md"
+license.file = "LICENSE"
+authors = [
+  { name = "sax", email = "s.apostolico@gmail.com" },
+]
+requires-python = ">=3.8"
+
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Web Environment",
+  "Framework :: Django :: 3.2",
+  "Framework :: Django :: 4.2",
+  "Framework :: Django :: 5.2",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dynamic = [ "version" ]
+urls.downloads = "https://github.com/saxix/django-strategy-field"
+urls.homepage = "https://github.com/saxix/django-strategy-field"
+
+[dependency-groups]
+dev = [
+  "django-stubs>=5.1.3",
+  "django-webtest>=1.9.13",
+  "djangorestframework",
+  "factory-boy>=3.3.3",
+  "mypy>=1.14.1",
+  "pdbpp>=0.10.3",
+  "pre-commit",
+  "pyquery>=2.0.1",
+  "pytest>=8.3.5",
+  "pytest-coverage>=0",
+  "pytest-django>=4.11.1",
+  "pytest-echo>=2",
+  "ruff>=0.11.3",
+]
+
+[tool.distutils.bdist_wheel]
+universal = 1
+
+[tool.distutils.egg_info]
+tag-build = ""
+tag-date = 0
+tag-svn-revision = 0
+
+[tool.hatch]
+build.hooks.vcs.version-file = "src/strategy_field/version.py"
+version.source = "vcs"
+raw-options = { root = "../.." }
+
+[tool.hatch.build.targets.sdist]
+ignore-vcs = true
+include = [
+  "src/strategy_field/**/*.*",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = [ "src/strategy_field" ]
+
+[tool.ruff]
+target-version = "py38"
+line-length = 120
+exclude = [
+  "docs",
+  "manage.py",
+  "tests",
+]
+format.preview = true
+format.docstring-code-line-length = 120
+format.docstring-code-format = true
+lint.select = [
+  "A",
+  "ARG",
+  "B",
+  "C90",
+  "COM",
+  "DJ",
+  "E",
+  "ERA",
+  "F",
+  "I",
+  "ICN",
+  "ISC",
+  "N",
+  "PIE",
+  "PL",
+  "PLE",
+  "PLR",
+  "PLW",
+  "PYI",
+  "Q",
+  "RET",
+  "S",
+  "T10",
+  "UP",
+  "W",
+]
+lint.ignore = [
+  "ARG002",
+  "COM812",
+  "RET503",
+]
+lint.per-file-ignores."src/strategy_field/version.py" = [
+  "ALL",
+]
+
+[tool.check-manifest]
+ignore = """
+.travis.yml
+Makefile
+*.sqlite
+.tox/*"""
+
+[tool.pytest.ini_options]
+django_find_project = false
+pythonpath = [ "./tests/demoapp/", "./src" ]
+DJANGO_SETTINGS_MODULE = "demo.settings"
+norecursedirs = [ "demo", ".tox" ]
+addopts = [
+  "--tb=short",
+  "--capture=no",
+  "--echo-version=django",
+  "--echo-attr=django.conf.settings.DATABASES.default.ENGINE",
+  "--cov=strategy_field",
+  "--cov-report=html",
+  "--cov-report=xml",
+  "--cov-config=tests/.coveragerc",
+]
+python_files = "tests/test_*.py tests/**/test_*.py src/*.py"
+markers = [
+  "functional: mark a test as functional",
+  "selenium: selenium test",
+  "skip: skip test",
+]
+
+[tool.mypy]
+plugins = "mypy_django_plugin.main"
+mypy_path = "tests/demoapp"
+[[tool.mypy.overrides]]
+module = "environ.*"
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "demo.settings"
+
+[tool.uv]
+package = true

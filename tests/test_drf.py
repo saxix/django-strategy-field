@@ -1,27 +1,42 @@
 import logging
 
 import pytest
-from demoproject.demoapp.models import (
+from demo.models import (
     DemoModelNone,
     DemoMultipleModel,
     Sender1,
     Sender2,
     Strategy,
 )
-from django_dynamic_fixture import G
 from rest_framework.reverse import reverse
 from strategy_field.utils import fqn
+from factory.django import DjangoModelFactory
 
 logger = logging.getLogger(__name__)
 
 
+class DemoModelNoneFactory(DjangoModelFactory):
+    class Meta:
+        model = DemoModelNone
+
+
+class DemoMultipleModelFactory(DjangoModelFactory):
+    class Meta:
+        model = DemoMultipleModel
+
+
+@pytest.fixture
+def record():
+    return DemoModelNoneFactory()
+
+
 @pytest.mark.django_db
-def test_get_single(webapp):
-    x = G(DemoModelNone, sender=Strategy)
+def test_get_single(webapp, record):
+    x = DemoModelNoneFactory(sender=Strategy)
     res = webapp.get("/api/s/" + str(x.id) + "/")
     assert res.json["sender"] == fqn(x.sender)
 
-    x = G(DemoModelNone, sender=None)
+    x = DemoModelNoneFactory(sender=None)
     res = webapp.get("/api/s/" + str(x.id) + "/")
     assert res.json["sender"] is None
 
@@ -44,15 +59,15 @@ def test_post_single(webapp):
 
 @pytest.mark.django_db
 def test_get_multiple(webapp):
-    x = G(DemoMultipleModel, sender=[Sender1, Sender2])
+    x = DemoMultipleModelFactory(sender=[Sender1, Sender2])
     res = webapp.get("/api/m/" + str(x.id) + "/")
     assert res.json["sender"] == sorted(map(fqn, x.sender))
 
-    x = G(DemoMultipleModel, sender=[])
+    x = DemoMultipleModelFactory(sender=[])
     res = webapp.get("/api/m/" + str(x.id) + "/")
     assert res.json["sender"] == []
 
-    x = G(DemoMultipleModel, sender=None)
+    x = DemoMultipleModelFactory(sender=None)
     res = webapp.get("/api/m/" + str(x.id) + "/")
     assert res.json["sender"] is None
 

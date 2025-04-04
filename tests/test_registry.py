@@ -1,5 +1,5 @@
 import pytest
-from demoproject.demoapp.models import AbstractSender, DemoModel, Sender1, Sender2
+from demo.models import AbstractSender, DemoModel, Sender1, Sender2
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn
 
@@ -31,7 +31,7 @@ def test_registry_bypass_class_check():
 
 
 def test_registry_string():
-    r = Registry("demoproject.demoapp.models.AbstractSender")
+    r = Registry("demo.models.AbstractSender")
     r.register(Sender1)
 
     assert Sender1 in r
@@ -40,7 +40,7 @@ def test_registry_string():
 
 
 def test_registry_is_valid():
-    r = Registry("demoproject.demoapp.models.AbstractSender")
+    r = Registry("demo.models.AbstractSender")
 
     assert r.is_valid(Sender1)
     assert r.is_valid(fqn(Sender1))
@@ -49,19 +49,19 @@ def test_registry_is_valid():
     r = Registry(None)
     assert r.is_valid(Sender1)
     assert r.is_valid(DemoModel)
-    assert not r.is_valid("demoproject.demoapp.models.Wrong")
+    assert not r.is_valid("demo.models.Wrong")
 
 
 def test_registry_append():
-    r = Registry("demoproject.demoapp.models.AbstractSender")
+    r = Registry("demo.models.AbstractSender")
 
     assert r.register(Sender1)
     assert r.register(fqn(Sender2))
-    assert not r.register("demoproject.demoapp.models.AbstractSender")
+    assert not r.register("demo.models.AbstractSender")
 
 
 def test_registry_as_choices(monkeypatch):
-    r = Registry("demoproject.demoapp.models.AbstractSender", label_attribute="label")
+    r = Registry("demo.models.AbstractSender", label_attribute="label")
 
     r.register(Sender1)
     r.register(Sender2)
@@ -69,13 +69,13 @@ def test_registry_as_choices(monkeypatch):
     monkeypatch.setattr(Sender1, "label", classmethod(lambda s: "LABEL"), raising=False)
 
     assert r.as_choices() == [
-        ("demoproject.demoapp.models.Sender1", "LABEL"),
-        ("demoproject.demoapp.models.Sender2", "demoproject.demoapp.models.Sender2"),
+        ("demo.models.Sender1", "LABEL"),
+        ("demo.models.Sender2", "demo.models.Sender2"),
     ]
 
 
 def test_registry_contains():
-    r = Registry("demoproject.demoapp.models.AbstractSender")
+    r = Registry("demo.models.AbstractSender")
 
     r.register(Sender1)
     r.register(fqn(Sender2))

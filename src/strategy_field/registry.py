@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from inspect import isclass
 
@@ -32,9 +34,7 @@ class Registry(list):
                 return False
 
         if self.klass:
-            return (isclass(value) and issubclass(value, self.klass)) or (
-                isinstance(value, self.klass)
-            )
+            return (isclass(value) and issubclass(value, self.klass)) or (isinstance(value, self.klass))
 
         return True
 
@@ -43,20 +43,20 @@ class Registry(list):
             self._choices = sorted((fqn(klass), self.get_name(klass)) for klass in self)
         return self._choices
 
-    def append(self, class_or_fqn):
+    def append(self, class_or_fqn) -> str | type | None:
         if isinstance(class_or_fqn, str):
             cls = import_by_name(class_or_fqn)
         else:
             cls = class_or_fqn
 
         if cls == self.klass:
-            return
+            return None
 
         if self.klass and not issubclass(cls, self.klass):
-            raise ValueError("'%s' is not a subtype of %s" % (class_or_fqn, self.klass))
+            raise ValueError(f"'{class_or_fqn}' is not a subtype of {self.klass}")
 
         if cls in self:
-            return
+            return None
 
         super().append(cls)
         self._choices = None
@@ -71,13 +71,3 @@ class Registry(list):
             except (ImportError, ValueError):
                 return False
         return super().__contains__(y)
-
-    # def get_class(self, value):
-    #     if not value:
-    #         return value
-    #     elif isinstance(value, str):
-    #         return import_by_name(value)
-    #     elif isclass(value):
-    #         return value
-    #     else:
-    #         return type(value)

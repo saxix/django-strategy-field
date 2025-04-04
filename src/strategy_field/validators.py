@@ -18,7 +18,7 @@ class ClassnameValidator(BaseValidator):
         try:
             get_class(cleaned)
         except (ImportError, TypeError, StrategyNameError):
-            raise ValidationError(self.message, code=self.code, params=params)
+            raise ValidationError(self.message, code=self.code, params=params) from None
         return True
 
 
@@ -40,11 +40,10 @@ class RegistryValidator(ClassnameValidator):
                     if not issubclass(get_class(c), self.registry.klass):
                         return False
                 return True
-            else:
-                value = get_class(cleaned)
+            value = get_class(cleaned)
         except (ImportError, TypeError, StrategyNameError):
-            raise ValidationError(self.message, code=self.code, params=params)
+            raise ValidationError(self.message, code=self.code, params=params) from None
 
         if not issubclass(value, self.registry.klass):
-            raise ValidationError(self.message, code=self.code, params=params)
+            raise ValidationError(self.message, code=self.code, params=params) from None
         return True

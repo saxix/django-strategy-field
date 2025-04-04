@@ -1,4 +1,4 @@
-# Django settings for demoproject project.
+# Django settings for demo project.
 import os
 
 here = os.path.dirname(__file__)
@@ -51,10 +51,10 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 )
 
-ROOT_URLCONF = "demoproject.urls"
-WSGI_APPLICATION = "demoproject.wsgi.application"
+ROOT_URLCONF = "demo.urls"
+WSGI_APPLICATION = "demo.wsgi.application"
 
-AUTHENTICATION_BACKENDS = ("demoproject.backends.AnyUserBackend",)
+AUTHENTICATION_BACKENDS = ("demo.backends.AnyUserBackend",)
 
 INSTALLED_APPS = (
     "django.contrib.auth",
@@ -64,7 +64,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.admin",
-    "demoproject.demoapp.apps.DemoConfig",
+    "demo.apps.DemoConfig",
 )
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

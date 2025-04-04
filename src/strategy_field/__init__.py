@@ -1,2 +1,1 @@
-NAME = "django-strategy-field"
-VERSION = __version__ = "3.1.0"
+from .version import version  # noqa F401

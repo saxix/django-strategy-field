@@ -12,15 +12,15 @@ def test_classnamevalidator():
 
 def test_RegistryValidator(registry):
     v = RegistryValidator(registry)
-    assert v("demoproject.demoapp.models.Sender1")
+    assert v("demo.models.Sender1")
 
     with pytest.raises(ValidationError):
-        v("demoproject.demoapp.models.Strategy1")
+        v("demo.models.Strategy1")
 
     with pytest.raises(ValidationError):
         v("error")
 
-    v(["demoproject.demoapp.models.Strategy1"])
+    v(["demo.models.Strategy1"])
 
     with pytest.raises(ValidationError):
         v(["error"])

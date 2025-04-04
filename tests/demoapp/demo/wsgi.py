@@ -13,6 +13,7 @@ middleware here, or combine a Django application with an application of another
 framework.
 
 """
+
 import os
 
 # This application object is used by any WSGI server configured to use this
@@ -20,7 +21,7 @@ import os
 # setting points here.
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "demoproject.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "demo.settings")
 
 application = get_wsgi_application()
 

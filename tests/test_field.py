@@ -1,7 +1,7 @@
 import logging
 
 import pytest
-from demoproject.demoapp.models import DemoModelNoRegistry
+from demo.models import DemoModelNoRegistry
 from django.core.mail.backends.filebased import EmailBackend
 
 logger = logging.getLogger(__name__)

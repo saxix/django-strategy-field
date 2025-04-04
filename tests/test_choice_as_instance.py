@@ -1,6 +1,6 @@
 # !qa: E501
 import pytest
-from demoproject.demoapp.models import DemoCustomModel, Strategy, Strategy1
+from demo.models import DemoCustomModel, Strategy, Strategy1
 from django.forms.models import modelform_factory
 from django.urls import reverse
 from strategy_field.utils import fqn
@@ -93,7 +93,7 @@ def test_form_not_valid(democustommodel):
     assert not form.is_valid()
     assert form.errors["sender"] == [
         "Select a valid choice. "
-        "demoproject.demoapp.models.DemoCustomModel "
+        "demo.models.DemoCustomModel "
         "is not one of the available choices."
     ]
 
@@ -104,24 +104,24 @@ def test_form_default(democustommodel):
     form = form_class(instance=democustommodel)
     assert form.fields["sender"].choices == [
         ("", "---------"),
-        ("demoproject.demoapp.models.Strategy", "demoproject.demoapp.models.Strategy"),
+        ("demo.models.Strategy", "demo.models.Strategy"),
         (
-            "demoproject.demoapp.models.Strategy1",
-            "demoproject.demoapp.models.Strategy1",
+            "demo.models.Strategy1",
+            "demo.models.Strategy1",
         ),
     ]
 
 
 @pytest.mark.django_db
 def test_admin_demomodel_add(webapp, admin_user):
-    res = webapp.get("/demoapp/democustommodel/add/", user=admin_user)
+    res = webapp.get("/demo/democustommodel/add/", user=admin_user)
     form = res.forms["democustommodel_form"]
 
-    form["sender"] = "demoproject.demoapp.models.Strategy"
+    form["sender"] = "demo.models.Strategy"
     form.submit().follow()
     assert (
         DemoCustomModel.objects.filter(
-            sender="demoproject.demoapp.models.Strategy"
+            sender="demo.models.Strategy"
         ).count()
         == 1
     )
@@ -129,15 +129,15 @@ def test_admin_demomodel_add(webapp, admin_user):
 
 @pytest.mark.django_db
 def test_admin_demomodel_edit(webapp, admin_user, democustommodel):
-    url = reverse("admin:demoapp_democustommodel_change", args=[democustommodel.pk])
+    url = reverse("admin:demo_democustommodel_change", args=[democustommodel.pk])
     res = webapp.get(url, user=admin_user)
     form = res.forms["democustommodel_form"]
 
-    form["sender"] = "demoproject.demoapp.models.Strategy"
+    form["sender"] = "demo.models.Strategy"
     form.submit().follow()
     assert (
         DemoCustomModel.objects.filter(
-            sender="demoproject.demoapp.models.Strategy"
+            sender="demo.models.Strategy"
         ).count()
         == 1
     )

@@ -1,5 +1,5 @@
 import pytest
-from demoproject.demoapp.models import DemoModel, DemoModelNone, Strategy, Strategy1
+from demo.models import DemoModel, DemoModelNone, Strategy, Strategy1
 from strategy_field.utils import (
     fqn,
     get_attr,
@@ -22,13 +22,13 @@ def test_get_class():
 
 
 def test_get_display_string():
-    assert get_display_string(DemoModel) == "demoproject.demoapp.models.DemoModel"
+    assert get_display_string(DemoModel) == "demo.models.DemoModel"
     assert get_display_string(Strategy, "label") == "strategy"
     assert (
-        get_display_string(Strategy1, "label") == "demoproject.demoapp.models.Strategy1"
+        get_display_string(Strategy1, "label") == "demo.models.Strategy1"
     )
     assert get_display_string(Strategy, "verbose_name") == "Verbose Name"
-    assert get_display_string(Strategy, "none") == "demoproject.demoapp.models.Strategy"
+    assert get_display_string(Strategy, "none") == "demo.models.Strategy"
 
 
 def test_get_attr():
@@ -47,28 +47,28 @@ def test_get_attr():
 
 
 def test_import_by_name():
-    assert import_by_name("demoproject.demoapp.models.DemoModel") == DemoModel
+    assert import_by_name("demo.models.DemoModel") == DemoModel
     with pytest.raises(AttributeError):
-        import_by_name("demoproject.demoapp.models.Wrong")
+        import_by_name("demo.models.Wrong")
 
 
 def test_stringify():
     assert (
-        stringify([DemoModel, DemoModelNone]) == "demoproject.demoapp.models.DemoModel,"
-        "demoproject.demoapp.models.DemoModelNone"
+        stringify([DemoModel, DemoModelNone]) == "demo.models.DemoModel,"
+        "demo.models.DemoModelNone"
     )
     assert (
-        stringify(["demoproject.demoapp.models.DemoModel", DemoModelNone])
-        == "demoproject.demoapp.models.DemoModel,"
-        "demoproject.demoapp.models.DemoModelNone"
+        stringify(["demo.models.DemoModel", DemoModelNone])
+        == "demo.models.DemoModel,"
+        "demo.models.DemoModelNone"
     )
 
 
 def test_fqn():
-    assert fqn(DemoModel) == "demoproject.demoapp.models.DemoModel"
+    assert fqn(DemoModel) == "demo.models.DemoModel"
     assert (
-        fqn("demoproject.demoapp.models.DemoModel")
-        == "demoproject.demoapp.models.DemoModel"
+        fqn("demo.models.DemoModel")
+        == "demo.models.DemoModel"
     )
     assert fqn(fqn) == "strategy_field.utils.fqn"
     with pytest.raises(ValueError):

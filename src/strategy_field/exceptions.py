@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class StrategyNameError(ValueError):
     default_message = "Invalid value '%s': must be a valid python dotted name."
 
@@ -12,7 +15,7 @@ class StrategyNameError(ValueError):
 class StrategyClassError(ValueError):
     default_message = "Invalid argument: '%s' is a invalid python name"
 
-    def __init__(self, name, message=None):
+    def __init__(self, name: str, message: str | None = None) -> None:
         self.name = str(name)
         self.message = message or self.default_message
 
@@ -25,9 +28,7 @@ class StrategyImportError(ImportError):
 
 
 class StrategyAttributeError(AttributeError):
-    default_message = (
-        "Unable to import %(name)s. %(module)s does not have %(class_str)s attribute"
-    )
+    default_message = "Unable to import %(name)s. %(module)s does not have %(class_str)s attribute"
 
     def __init__(self, name, module, class_str, message=None):
         self.name = str(name)

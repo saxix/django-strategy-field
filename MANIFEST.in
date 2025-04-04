@@ -1,9 +1,6 @@
-include README.rst
+include README.md
 include CHANGES
 include MANIFEST.in
-include setup.cfg
-include setup.py
-include tox.ini
 recursive-exclude src *.pyc
 recursive-include docs *
 recursive-include src *

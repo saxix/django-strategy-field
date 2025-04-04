@@ -1,6 +1,6 @@
 import logging
 
-from demoproject.demoapp.models import DemoModelNone, DemoMultipleModel, registry
+from demo.models import DemoModelNone, DemoMultipleModel, registry
 from rest_framework import serializers
 from rest_framework.viewsets import ModelViewSet
 from strategy_field.contrib.drf import DrfMultipleStrategyField, DrfStrategyField

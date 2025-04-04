@@ -1,4 +1,4 @@
-from demoproject.demoapp.models import Strategy1
+from demo.models import Strategy1
 from strategy_field.fields import (
     MultipleStrategyClassFieldDescriptor,
     MultipleStrategyFieldDescriptor,

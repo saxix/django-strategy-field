@@ -1,5 +1,5 @@
 import pytest
-from demoproject.demoapp.models import DemoMultipleModel, Sender1, Sender2
+from demo.models import DemoMultipleModel, Sender1, Sender2
 from django.forms.models import modelform_factory
 from django.urls import reverse
 from strategy_field.utils import fqn
@@ -131,7 +131,7 @@ def test_form_not_valid(demo_multiple_model):
     assert not form.is_valid()
     assert form.errors["sender"] == [
         "Select a valid choice. "
-        "demoproject.demoapp.models.DemoMultipleModel "
+        "demo.models.DemoMultipleModel "
         "is not one of the available choices."
     ]
 
@@ -141,21 +141,21 @@ def test_form_default(demo_multiple_model):
     form_class = modelform_factory(DemoMultipleModel, exclude=[])
     form = form_class(instance=demo_multiple_model)
     assert form.fields["sender"].choices == [
-        ("demoproject.demoapp.models.Sender1", "demoproject.demoapp.models.Sender1"),
-        ("demoproject.demoapp.models.Sender2", "demoproject.demoapp.models.Sender2"),
+        ("demo.models.Sender1", "demo.models.Sender1"),
+        ("demo.models.Sender2", "demo.models.Sender2"),
     ]
 
 
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_add(webapp, admin_user):
-    res = webapp.get("/demoapp/demomultiplemodel/add/", user=admin_user)
+    res = webapp.get("/demo/demomultiplemodel/add/", user=admin_user)
     form = res.forms["demomultiplemodel_form"]
 
-    form["sender"] = ["demoproject.demoapp.models.Sender1"]
+    form["sender"] = ["demo.models.Sender1"]
     form.submit().follow()
     assert (
         DemoMultipleModel.objects.filter(
-            sender="demoproject.demoapp.models.Sender1"
+            sender="demo.models.Sender1"
         ).count()
         == 1
     )
@@ -164,16 +164,16 @@ def test_admin_demo_multiple_model_add(webapp, admin_user):
 @pytest.mark.django_db
 def test_admin_demo_multiple_model_edit(webapp, admin_user, demo_multiple_model):
     url = reverse(
-        "admin:demoapp_demomultiplemodel_change", args=[demo_multiple_model.pk]
+        "admin:demo_demomultiplemodel_change", args=[demo_multiple_model.pk]
     )
     res = webapp.get(url, user=admin_user)
     form = res.forms["demomultiplemodel_form"]
 
-    form["sender"] = ["demoproject.demoapp.models.Sender2"]
+    form["sender"] = ["demo.models.Sender2"]
     form.submit().follow()
     assert (
         DemoMultipleModel.objects.filter(
-            sender="demoproject.demoapp.models.Sender2"
+            sender="demo.models.Sender2"
         ).count()
         == 1
     )

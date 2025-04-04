@@ -16,7 +16,7 @@ class RegistryValidator(BaseValidator):
             value = [value]
         for entry in value:
             if not self.limit_value.is_valid(entry):
-                raise ValidationError("Invalid entry `%s`" % fqn(entry))
+                raise ValidationError(f"Invalid entry `{fqn(entry)}`")
 
 
 class DrfStrategyField(serializers.ChoiceField):

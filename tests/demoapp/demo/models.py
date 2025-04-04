@@ -1,6 +1,5 @@
 import logging
 
-import six
 from django.core.mail.backends.base import BaseEmailBackend
 from django.db import models
 from strategy_field.fields import (
@@ -70,10 +69,10 @@ class Strategy1(AbstractStrategy):
 class StrategyRegistry(Registry):
     def deserialize(self, value, obj=None):
         ret = []
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = value.split(",")
         for v in value:
-            if isinstance(v, six.string_types):
+            if isinstance(v, str):
                 v = import_by_name(v)
             if not issubclass(v, self.klass):
                 raise ValueError(fqn(v))
@@ -114,12 +113,12 @@ class DemoModelNone(models.Model):
 
 class DemoModelDefault(models.Model):
     sender = StrategyClassField(
-        null=True, registry=registry, default="demoproject.demoapp.models.Sender1"
+        null=True, registry=registry, default="demo.models.Sender1"
     )
 
 
 def cc():
-    return "demoproject.demoapp.models.Sender1"
+    return "demo.models.Sender1"
 
 
 class DemoModelCallableDefault(models.Model):

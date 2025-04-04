@@ -1,6 +1,6 @@
 # flake8: noqa
 import pytest
-from demoproject.demoapp.models import (
+from demo.models import (
     DemoModel,
     DemoModelCallableDefault,
     DemoModelDefault,
@@ -111,7 +111,7 @@ def test_form_not_valid(demomodel):
     assert not form.is_valid()
     assert form.errors["sender"] == [
         "Select a valid choice. "
-        "demoproject.demoapp.models.DemoModel "
+        "demo.models.DemoModel "
         "is not one of the available choices."
     ]
 
@@ -122,47 +122,47 @@ def test_form_default(demomodel):
     form = form_class(instance=demomodel)
     assert form.fields["sender"].choices == [
         ("", "---------"),
-        ("demoproject.demoapp.models.Sender1", "demoproject.demoapp.models.Sender1"),
-        ("demoproject.demoapp.models.Sender2", "demoproject.demoapp.models.Sender2"),
+        ("demo.models.Sender1", "demo.models.Sender1"),
+        ("demo.models.Sender2", "demo.models.Sender2"),
     ]
 
     # assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
     #                           u'<td><select id="id_sender" name="sender" required>\n' \
     #                           u'<option value="">---------</option>\n' \
-    #                           u'<option value="demoproject.demoapp.models.Sender1" selected="selected">demoproject.demoapp.models.Sender1</option>\n' \
-    #                           u'<option value="demoproject.demoapp.models.Sender2">demoproject.demoapp.models.Sender2</option>\n</select></td></tr>'
+    #                           u'<option value="demo.models.Sender1" selected="selected">demo.models.Sender1</option>\n' \
+    #                           u'<option value="demo.models.Sender2">demo.models.Sender2</option>\n</select></td></tr>'
 
 
 @pytest.mark.django_db
 def test_admin_demomodel_add(webapp, admin_user):
-    res = webapp.get("/demoapp/demomodel/add/", user=admin_user)
+    res = webapp.get("/demo/demomodel/add/", user=admin_user)
     form = res.forms["demomodel_form"]
-    form["sender"] = "demoproject.demoapp.models.Sender1"
+    form["sender"] = "demo.models.Sender1"
     # import pdb; pdb.set_trace()
 
     form.submit().follow()
     assert (
-        DemoModel.objects.filter(sender="demoproject.demoapp.models.Sender1").count()
+        DemoModel.objects.filter(sender="demo.models.Sender1").count()
         == 1
     )
 
 
 @pytest.mark.django_db
 def test_admin_demomodel_edit(webapp, admin_user, demomodel):
-    url = reverse("admin:demoapp_demomodel_change", args=[demomodel.pk])
+    url = reverse("admin:demo_demomodel_change", args=[demomodel.pk])
     res = webapp.get(url, user=admin_user)
     form = res.forms["demomodel_form"]
-    form["sender"] = "demoproject.demoapp.models.Sender2"
+    form["sender"] = "demo.models.Sender2"
     form.submit().follow()
     assert (
-        DemoModel.objects.filter(sender="demoproject.demoapp.models.Sender2").count()
+        DemoModel.objects.filter(sender="demo.models.Sender2").count()
         == 1
     )
 
 
 @pytest.mark.django_db
 def test_admin_demomodel_validate(webapp, admin_user, demomodel):
-    url = reverse("admin:demoapp_demomodel_change", args=[demomodel.pk])
+    url = reverse("admin:demo_demomodel_change", args=[demomodel.pk])
     res = webapp.get(url, user=admin_user)
     form = res.forms["demomodel_form"]
     form["sender"].force_value("invalid_strategy_classname")
@@ -197,9 +197,9 @@ def test_display_attribute(demomodel, registry, monkeypatch):
     DemoModel._meta.get_field("sender").registry = registry
     registry.register(SenderNotRegistered)
     assert registry.as_choices() == [
-        ("demoproject.demoapp.models.Sender1", "demoproject.demoapp.models.Sender1"),
-        ("demoproject.demoapp.models.Sender2", "demoproject.demoapp.models.Sender2"),
-        ("demoproject.demoapp.models.SenderNotRegistered", "SenderNotRegistered"),
+        ("demo.models.Sender1", "demo.models.Sender1"),
+        ("demo.models.Sender2", "demo.models.Sender2"),
+        ("demo.models.SenderNotRegistered", "SenderNotRegistered"),
     ]
 
     form_class = modelform_factory(DemoModel, exclude=[])

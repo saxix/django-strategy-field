@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.core.exceptions import ValidationError
 from django.forms.fields import ChoiceField, TypedMultipleChoiceField
 
@@ -8,10 +10,9 @@ class StrategyFormField(ChoiceField):
     def __init__(self, *args, **kwargs):
         self.registry = kwargs.pop("registry")
         self.empty_value = kwargs.pop("empty_value", "")
-        # kwargs["choices"] = self.registry.as_choices()
         super().__init__(*args, **kwargs)
 
-    def prepare_value(self, value):
+    def prepare_value(self, value) -> str | None:
         if isinstance(value, str):
             return value
         if value:
@@ -32,14 +33,13 @@ class StrategyFormField(ChoiceField):
             v = self.to_python(value)
             if v in self.registry:
                 return v
-            else:
-                raise ValidationError
+            raise ValidationError
         except (ValueError, TypeError, ValidationError):
             raise ValidationError(
                 self.error_messages["invalid_choice"],
                 code="invalid_choice",
                 params={"value": value},
-            )
+            ) from None
 
     def clean(self, value):
         value = super().clean(value)

@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class DemoConfig(AppConfig):
-    name = "demoproject.demoapp"
+    name = "demo"
     # verbose_name = "demoapp"

@@ -20,10 +20,10 @@ def test_formfield_invalid_classname(registry):
 def test_formfield_valid(registry):
     f = StrategyFormField(registry=registry, choices=registry.as_choices())
     # assert f.clean(fqn(registry[0]))
-    assert f.clean("demoproject.demoapp.models.Sender1")
+    assert f.clean("demo.models.Sender1")
 
 
 def test_formfield_empty(registry):
     f = StrategyFormField(registry=registry, choices=registry.as_choices())
     # assert f.clean(fqn(registry[0]))
-    assert f.clean("demoproject.demoapp.models.Sender1")
+    assert f.clean("demo.models.Sender1")

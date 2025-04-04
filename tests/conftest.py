@@ -3,7 +3,7 @@ import pytest
 
 @pytest.fixture
 def registry():
-    from demoproject.demoapp.models import AbstractSender, Sender1, Sender2
+    from demo.models import AbstractSender, Sender1, Sender2
     from strategy_field.registry import Registry
 
     r = Registry(AbstractSender, label_attribute="label")
@@ -14,7 +14,7 @@ def registry():
 
 @pytest.fixture
 def custom_registry():
-    from demoproject.demoapp.models import Strategy
+    from demo.models import Strategy
     from strategy_field.registry import Registry
 
     r = Registry(Strategy)
@@ -24,14 +24,14 @@ def custom_registry():
 
 @pytest.fixture
 def demomodel():
-    from demoproject.demoapp.models import DemoModel, Sender1
+    from demo.models import DemoModel, Sender1
 
     return DemoModel.objects.get_or_create(sender=Sender1)[0]
 
 
 @pytest.fixture
 def democustommodel():
-    from demoproject.demoapp.models import DemoCustomModel, Strategy
+    from demo.models import DemoCustomModel, Strategy
     from strategy_field.utils import fqn
 
     return DemoCustomModel.objects.get_or_create(sender=fqn(Strategy))[0]
@@ -39,7 +39,7 @@ def democustommodel():
 
 @pytest.fixture
 def demo_multiplecustom_model():
-    from demoproject.demoapp.models import DemoMultipleCustomModel, Strategy
+    from demo.models import DemoMultipleCustomModel, Strategy
     from strategy_field.utils import fqn
 
     return DemoMultipleCustomModel.objects.get_or_create(sender=[fqn(Strategy)])[0]
@@ -47,7 +47,7 @@ def demo_multiplecustom_model():
 
 @pytest.fixture
 def demo_multiple_model():
-    from demoproject.demoapp.models import DemoMultipleModel, Sender1
+    from demo.models import DemoMultipleModel, Sender1
 
     return DemoMultipleModel.objects.get_or_create(sender=[Sender1])[0]
 

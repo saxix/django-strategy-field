@@ -26,8 +26,19 @@ class DemoModelProxyAdmin(admin.ModelAdmin):
     form = DemoModelForm
 
 
+from django.contrib.admin.views.main import ChangeList
+
+
+class MyChangeList(ChangeList):
+    pass
+
+
 class DemoModelNoneAdmin(admin.ModelAdmin):
-    list_display = ("sender", "strategy")
+    list_display = ("pk", "sender", "strategy")
+
+
+    def get_changelist(self, request, **kwargs):
+        return MyChangeList
 
     def strategy(self, obj):
         if obj.sender:

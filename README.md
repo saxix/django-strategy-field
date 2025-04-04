@@ -1,8 +1,6 @@
-=====================
-django-strategy-field
-=====================
+# django-strategy-field
 
-Set of custom fields useful to implement the `Strategy Pattern`_ with Django models.
+Set of custom fields useful to implement the [Strategy Pattern](http://www.oodesign.com/strategy-pattern.html) with Django models.
 
 The Strategies are displayed in SelectBoxes as standard choice field
 
@@ -16,10 +14,10 @@ This package provides the following custom fields:
 The StrategyField can be accessed as instance of the model with an attribute
 ``context`` that points to model that 'owns' the field (inverse relation). So:
 
-Example
-=======
+## Example
 
-.. code-block:: python
+
+```python
 
     from strategy_field.fields import StrategyField
     from django.core.mail.backends.filebased.EmailBackend
@@ -30,16 +28,17 @@ Example
 
     Event(sender='django.core.mail.backends.filebased.EmailBackend')
 
+```
 
-Use case
-========
+## Use case
+
 
 As example we can imagine an application that manages `Events` that need to be notified to users.
 Each `Occurrence` of `Event` can be notified using different transport, (email, sms,...).
 We want to be able to add/change the way we send notification, per event basis, simply using
 the Django admin panel.
 
-.. code-block:: python
+```python
 
     from strategy_field.fields import StrategyField
     from strategy_field.registry import Registry
@@ -74,14 +73,15 @@ the Django admin panel.
     e = Event.objects.get(sender=EmailStrategy)
     e.sender.send() # e.sender.context == e
 
+```
 
-More examples
--------------
+### More examples
 
-Use callable
-~~~~~~~~~~~~
 
-.. code-block:: python
+*Use callable*
+
+
+```python
 
     from strategy_field.fields import StrategyField
     from strategy_field.registry import Registry
@@ -104,33 +104,4 @@ Use callable
         class Meta:
             abstract = True
 
-
-Project links
-=============
-
-+--------------------+----------------+--------------+---------------------------+
-| Stable             | |master-build| | |master-cov| |                           |
-+--------------------+----------------+--------------+---------------------------+
-| Development        | |dev-build|    | |dev-cov|    |                           |
-+--------------------+----------------+--------------+---------------------------+
-| Project home page: |https://github.com/saxix/django-strategy-field             |
-+--------------------+---------------+-------------------------------------------+
-| Issue tracker:     |https://github.com/saxix/django-strategy-field/issues?sort |
-+--------------------+---------------+-------------------------------------------+
-| Download:          |http://pypi.python.org/pypi/django-strategy-field/         |
-+--------------------+---------------+-------------------------------------------+
-
-.. _Strategy Pattern: http://www.oodesign.com/strategy-pattern.html
-
-.. |master-build| image:: https://github.com/saxix/django-strategy-field/actions/workflows/test.yaml/badge.svg?branch=master
-    :target: https://github.com/saxix/django-strategy-field/actions/workflows/test.yaml
-
-.. |master-cov| image:: https://codecov.io/github/saxix/django-strategy-field/coverage.svg?branch=master
-    :target: https://codecov.io/github/saxix/django-strategy-field?branch=develop
-
-
-.. |dev-build| image:: https://github.com/saxix/django-strategy-field/actions/workflows/test.yaml/badge.svg?branch=develop
-    :target: https://github.com/saxix/django-strategy-field/actions/workflows/test.yaml
-
-.. |dev-cov| image:: https://codecov.io/github/saxix/django-strategy-field/coverage.svg?branch=develop
-    :target: https://codecov.io/github/saxix/django-strategy-field?branch=develop
+```

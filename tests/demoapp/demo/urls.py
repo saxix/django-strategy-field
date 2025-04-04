@@ -1,4 +1,4 @@
-from demoproject.demoapp.api import DemoModelView, DemoMultipleModelView
+from demo.api import DemoModelView, DemoMultipleModelView
 from django.contrib.admin.sites import site
 from django.urls import path, re_path
 
