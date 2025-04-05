@@ -4,6 +4,7 @@ import importlib
 import logging
 import types
 from inspect import isclass
+from typing import Any, Sequence
 
 from django.utils.module_loading import import_string
 
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class ModulesCache(dict):
-    def __missing__(self, name):
+    def __missing__(self, name: str) -> Any:
         if "." not in name:
             raise StrategyNameError(name)
 
@@ -25,13 +26,13 @@ class ModulesCache(dict):
             self[name] = handler
             return handler
         except AttributeError:
-            raise StrategyAttributeError(name, module, class_str) from None
+            raise StrategyAttributeError(name, module_path, class_str) from None
 
 
 _cache = ModulesCache()
 
 
-def default_classloader(value) -> type | None:
+def default_classloader(value: str | type | None) -> type | None:
     if not value:
         return value
     if isinstance(value, str):
@@ -48,14 +49,14 @@ def default_classloader(value) -> type | None:
 importer = None
 
 
-def get_class(value):
-    global importer  # noqa PLW0603
+def get_class(value: str) -> type:
+    global importer  # noqa: PLW0603
     if importer is None:
         importer = import_string(config.CLASSLOADER)
     return importer(value)
 
 
-def get_display_string(klass, display_attribute=None):
+def get_display_string(klass: type, display_attribute: str | None = None) -> str:
     if display_attribute and hasattr(klass, display_attribute):
         attr = getattr(klass, display_attribute)
         if attr is None:
@@ -67,7 +68,7 @@ def get_display_string(klass, display_attribute=None):
     return fqn(klass)
 
 
-def get_attr(obj, attr, default=None):
+def get_attr(obj: Any, attr: str, default: Any = None) -> Any:
     """Recursive get object's attribute. May use dot notation."""
     if "." not in attr:
         return getattr(obj, attr, default)
@@ -75,7 +76,7 @@ def get_attr(obj, attr, default=None):
     return get_attr(getattr(obj, parts[0], default), ".".join(parts[1:]), default)
 
 
-def fqn(o):
+def fqn(o: Any) -> str | None:
     """Returns the fully qualified class name of an object or a class
 
     :param o: object or class
@@ -87,16 +88,14 @@ def fqn(o):
     if not hasattr(o, "__module__"):
         raise StrategyClassError(o)
     parts.append(o.__module__)
-    if isclass(o):
-        parts.append(o.__name__)
-    elif isinstance(o, types.FunctionType):
+    if isclass(o) or isinstance(o, types.FunctionType):
         parts.append(o.__name__)
     else:
         parts.append(o.__class__.__name__)
     return ".".join(parts)
 
 
-def import_by_name(name):
+def import_by_name(name: str) -> Any:
     """dynamically load a class from a string
 
     es:
@@ -110,7 +109,7 @@ def import_by_name(name):
     return _cache[name]
 
 
-def stringify(value):
+def stringify(value: Sequence[Any]) -> str:
     ret = []
     for v in value:
         if isinstance(v, str) and v:

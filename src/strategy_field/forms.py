@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Sequence
 
 from django.core.exceptions import ValidationError
 from django.forms.fields import ChoiceField, TypedMultipleChoiceField
@@ -12,26 +12,26 @@ if TYPE_CHECKING:
 
 
 class StrategyFormField(ChoiceField):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.registry = kwargs.pop("registry")
         self.empty_value = kwargs.pop("empty_value", "")
         super().__init__(*args, **kwargs)
 
-    def prepare_value(self, value) -> str | None:
+    def prepare_value(self, value: str | type) -> str | None:
         if isinstance(value, str):
             return value
         if value:
             return fqn(value)
 
-    def bound_data(self, data, initial):
+    def bound_data(self, data: type | str, initial: Any) -> str:
         if isinstance(data, str):
             return data
         return fqn(data)
 
-    def valid_value(self, value):
+    def valid_value(self, value: str) -> bool:
         return value in self.registry
 
-    def _coerce(self, value):
+    def _coerce(self, value: str) -> type:
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         try:
@@ -46,18 +46,18 @@ class StrategyFormField(ChoiceField):
                 params={"value": f"'{value}'"},
             ) from None
 
-    def clean(self, value):
+    def clean(self, value: Any) -> type:
         value = super().clean(value)
         return self._coerce(value)
 
 
 class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.registry: Registry = kwargs.pop("registry")
         kwargs["coerce"] = self.coerce
         super().__init__(*args, **kwargs)
 
-    def prepare_value(self, value):
+    def prepare_value(self, value: str | Sequence[str]) -> list[str] | None:
         ret = value
         if isinstance(value, str):
             ret = [value]
@@ -66,7 +66,7 @@ class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
         if ret:
             return ret.split(",")
 
-    def coerce(self, value):
+    def coerce(self, value: str) -> type | None:
         try:
             if value in self.registry:
                 return self.registry.get_by_name(value)
@@ -78,5 +78,5 @@ class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
                 params={"value": f"'{value}'"},
             ) from None
 
-    def valid_value(self, value):
+    def valid_value(self, value: str) -> bool:
         return value in self.registry

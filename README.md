@@ -1,5 +1,11 @@
 # django-strategy-field
 
+[![Pypi](https://badge.fury.io/py/django-strategy-field.svg)](https://badge.fury.io/py/django-strategy-field)
+[![coverage](https://codecov.io/github/saxix/django-strategy-field/coverage.svg?branch=develop)](https://codecov.io/github/saxix/django-strategy-field?branch=develop)
+[![Test](https://github.com/saxix/django-strategy-field/actions/workflows/test.yml/badge.svg)](https://github.com/saxix/django-strategy-field/actions/workflows/test.yml)
+[![Django](https://img.shields.io/pypi/frameworkversions/django/django-strategy-field)](https://pypi.org/project/django-strategy-field/)
+
+
 Set of custom fields useful to implement the [Strategy Pattern](http://www.oodesign.com/strategy-pattern.html) with Django models.
 
 The Strategies are displayed in SelectBoxes as standard choice field

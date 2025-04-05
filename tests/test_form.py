@@ -8,7 +8,7 @@ from strategy_field.forms import StrategyFormField
 from strategy_field.utils import fqn
 
 
-class TestModelForm(forms.ModelForm):
+class TstModelForm(forms.ModelForm):
     class Meta:
         model = DemoModel
         fields = ("sender",)
@@ -37,5 +37,5 @@ def test_formfield_empty(registry):
 
 
 def test_form():
-    form = TestModelForm({"sender": "abc"})
+    form = TstModelForm({"sender": "abc"})
     assert not form.is_valid()

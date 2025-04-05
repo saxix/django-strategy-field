@@ -92,36 +92,18 @@ format.preview = true
 format.docstring-code-line-length = 120
 format.docstring-code-format = true
 lint.select = [
-  "A",
-  "ARG",
-  "B",
-  "C90",
-  "COM",
-  "DJ",
-  "E",
-  "ERA",
-  "F",
-  "I",
-  "ICN",
-  "ISC",
-  "N",
-  "PIE",
-  "PL",
-  "PLE",
-  "PLR",
-  "PLW",
-  "PYI",
-  "Q",
-  "RET",
-  "S",
-  "T10",
-  "UP",
-  "W",
+  "ALL",
 ]
 lint.ignore = [
+  "ANN401",
   "ARG002",
   "COM812",
+  "D",
+  "EM",
+  "FBT",
   "RET503",
+  "TID",
+  "TRY",
 ]
 lint.per-file-ignores."src/strategy_field/version.py" = [
   "ALL",
@@ -143,16 +125,6 @@ Makefile
 *.sqlite
 .tox/*
 """
-
-[tool.mypy]
-plugins = "mypy_django_plugin.main"
-mypy_path = "tests/demoapp"
-[[tool.mypy.overrides]]
-module = "environ.*"
-ignore_missing_imports = true
-
-[tool.django-stubs]
-django_settings_module = "demo.settings"
 
 [tool.uv]
 package = true
