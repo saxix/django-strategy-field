@@ -1,12 +1,12 @@
 import io
 import json
 
-from demo.models import DemoModel, Strategy1
+from demo.models import DemoModel, Strategy2
 from django.core.management import call_command
 
 
 def test_dumpdata(db):
-    r = DemoModel.objects.create(sender=Strategy1)
+    r = DemoModel.objects.create(sender=Strategy2)
     out = io.StringIO()
     call_command("dumpdata", "demo.DemoModel", stdout=out)
     dump = json.loads(out.getvalue())
@@ -14,6 +14,6 @@ def test_dumpdata(db):
         {
             "model": "demo.demomodel",
             "pk": r.pk,
-            "fields": {"sender": "demo.models.Strategy1"},
+            "fields": {"sender": "demo.models.Strategy2"},
         }
     ]

@@ -1,4 +1,4 @@
-from demo.models import Strategy1
+from demo.models import Strategy2
 
 from strategy_field.fields import (
     MultipleStrategyClassFieldDescriptor,
@@ -38,7 +38,7 @@ def test_strategyclassfielddescriptor():
         type(
             "Field",
             (MockField,),
-            {"name": "errored", "import_error": lambda *a: Strategy1},
+            {"name": "errored", "import_error": lambda *a: Strategy2},
         )
     )
 

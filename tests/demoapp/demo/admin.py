@@ -28,6 +28,10 @@ class DemoModelProxyAdmin(admin.ModelAdmin):
     form = DemoModelForm
 
 
+class DemoAllModelAdmin(admin.ModelAdmin):
+    list_display = ("pk", "choice", "multiple", "custom", "custom_multiple")
+
+
 class MyChangeList(ChangeList):
     pass
 
@@ -45,7 +49,7 @@ class DemoModelNoneAdmin(admin.ModelAdmin):
 
 for s in (admin.site,):
     s.register(DemoModelProxy, DemoModelProxyAdmin)
-    s.register(DemoAllModel)
+    s.register(DemoAllModel, DemoAllModelAdmin)
     s.register(DemoMultipleModel)
     s.register(DemoModel)
     s.register(DemoCustomModel)

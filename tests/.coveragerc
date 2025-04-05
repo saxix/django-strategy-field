@@ -25,6 +25,7 @@ exclude_lines =
     raise ImproperlyConfigure
     if TYPE_CHECKING:
 
+
 ignore_errors = True
 
 [html]

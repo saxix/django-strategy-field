@@ -1,5 +1,5 @@
 import pytest
-from demo.models import DemoModel, DemoModelNone, Strategy, Strategy1
+from demo.models import DemoModel, DemoModelNone, Strategy1, Strategy2
 
 from strategy_field.utils import (
     fqn,
@@ -13,7 +13,7 @@ from strategy_field.utils import (
 
 def test_get_class():
     assert get_class(None) is None
-    assert get_class("") == ""
+    assert get_class("") is None
     assert get_class(fqn(DemoModel)) == DemoModel
     assert get_class(DemoModel) == DemoModel
     assert get_class(DemoModel()) == DemoModel
@@ -24,10 +24,10 @@ def test_get_class():
 
 def test_get_display_string():
     assert get_display_string(DemoModel) == "demo.models.DemoModel"
-    assert get_display_string(Strategy, "label") == "strategy"
-    assert get_display_string(Strategy1, "label") == "demo.models.Strategy1"
-    assert get_display_string(Strategy, "verbose_name") == "Verbose Name"
-    assert get_display_string(Strategy, "none") == "demo.models.Strategy"
+    assert get_display_string(Strategy1, "label") == "strategy"
+    assert get_display_string(Strategy2, "label") == "demo.models.Strategy2"
+    assert get_display_string(Strategy1, "verbose_name") == "Verbose Name"
+    assert get_display_string(Strategy1, "none") == "demo.models.Strategy1"
 
 
 def test_get_attr():

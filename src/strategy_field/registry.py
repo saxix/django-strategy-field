@@ -11,7 +11,7 @@ from .utils import fqn, get_class, get_display_string, import_by_name
 logger = logging.getLogger(__name__)
 
 
-class Registry(list[type]):
+class Registry(list):
     def __init__(self, base_class: type, *args: Any, **kwargs: Any) -> None:
         self._klass = base_class
         self._label_attribute = kwargs.get("label_attribute")
@@ -19,7 +19,7 @@ class Registry(list[type]):
         list.__init__(self, *args[:])
 
     @cached_property
-    def klass(self) -> type:
+    def klass(self) -> Any:
         if isinstance(self._klass, str):
             return import_by_name(self._klass)
         return self._klass
@@ -27,7 +27,7 @@ class Registry(list[type]):
     def get_name(self, entry: type) -> str:
         return get_display_string(entry, self._label_attribute)
 
-    def get_by_name(self, entry: str) -> type:
+    def get_by_name(self, entry: str) -> Any:
         return get_class(entry)
 
     def is_valid(self, value: str) -> bool:
@@ -47,7 +47,7 @@ class Registry(list[type]):
             self._choices = sorted((fqn(klass), self.get_name(klass)) for klass in self)
         return self._choices
 
-    def append(self, class_or_fqn: type | str) -> str | type | None:
+    def register(self, class_or_fqn: type | str) -> Any:
         cls = import_by_name(class_or_fqn) if isinstance(class_or_fqn, str) else class_or_fqn
 
         if cls == self.klass:
@@ -63,12 +63,19 @@ class Registry(list[type]):
         self._choices = None
         return class_or_fqn
 
-    register = append
+    def append(self, class_or_fqn: type | str) -> None:
+        self.register(class_or_fqn)
 
-    def __contains__(self, y: str) -> bool:
+    def __contains__(self, y: Any) -> bool:
         if isinstance(y, str):
             try:
-                y = import_by_name(y)
+                return super().__contains__(import_by_name(y))
             except (ImportError, ValueError):
                 return False
+        elif isclass(y):
+            return super().__contains__(y)
+        elif self._klass and isinstance(y, self._klass):
+            return super().__contains__(type(y))
+        elif isinstance(y, object):
+            return super().__contains__(type(y))
         return super().__contains__(y)

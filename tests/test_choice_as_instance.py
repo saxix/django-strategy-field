@@ -1,6 +1,6 @@
 # !qa: E501
 import pytest
-from demo.models import DemoCustomModel, Strategy, Strategy1
+from demo.models import DemoCustomModel, Strategy1, Strategy2
 from django.forms.models import modelform_factory
 from django.urls import reverse
 
@@ -15,24 +15,24 @@ def pytest_generate_tests(metafunc):
             values = [
                 lambda o: [fqn(o.sender)],
                 lambda o: [o.sender],
-                lambda o: [fqn(Strategy), fqn(Strategy1)],
-                lambda o: [Strategy, Strategy1],
+                lambda o: [fqn(Strategy1), fqn(Strategy2)],
+                lambda o: [Strategy1, Strategy2],
             ]
             ids = [
-                fqn(Strategy),
+                fqn(Strategy1),
                 "<context.sender instance>",
-                str([fqn(Strategy)]),
-                str([Strategy, Strategy1]),
+                str([fqn(Strategy1)]),
+                str([Strategy1, Strategy2]),
             ]
         elif func_name == ("test_model_save"):
             values = [
                 lambda o: fqn(o.sender),
                 lambda o: o.sender,
-                lambda o: Strategy(o, "b"),
+                lambda o: Strategy1(o, "b"),
             ]
-            ids = [fqn(Strategy), "<context.sender instance>", "Strategy1(context)"]
+            ids = [fqn(Strategy1), "<context.sender instance>", "Strategy1(context)"]
         else:
-            values = [lambda o: fqn(Strategy)]
+            values = [lambda o: fqn(Strategy1)]
             ids = ["fqn(Strategy)"]
             if "democustommodel" in metafunc.fixturenames:
                 values.extend([lambda o: fqn(o.sender), lambda o: o.sender])
@@ -42,18 +42,18 @@ def pytest_generate_tests(metafunc):
 
 
 def test_field():
-    d = DemoCustomModel(sender=Strategy)
-    assert isinstance(d.sender, Strategy)
+    d = DemoCustomModel(sender=Strategy1)
+    assert isinstance(d.sender, Strategy1)
     assert d.sender == d.sender
     assert d.sender.context == d
 
 
 @pytest.mark.django_db
 def test_model_save(target_factory):
-    d = DemoCustomModel(sender=Strategy)
+    d = DemoCustomModel(sender=Strategy1)
     d.sender = target_factory(d)
     d.save()
-    assert isinstance(d.sender, Strategy)
+    assert isinstance(d.sender, Strategy1)
     assert d.sender == d.sender
     assert d.sender.context == d
 
@@ -61,13 +61,13 @@ def test_model_save(target_factory):
 @pytest.mark.django_db
 def test_model_get_or_create(target_factory):
     d, __ = DemoCustomModel.objects.get_or_create(sender=target_factory(None))
-    assert isinstance(d.sender, Strategy)
+    assert isinstance(d.sender, Strategy1)
 
 
 @pytest.mark.django_db
 def test_model_load(democustommodel):
     d = DemoCustomModel.objects.get(pk=democustommodel.pk)
-    assert isinstance(d.sender, Strategy)
+    assert isinstance(d.sender, Strategy1)
 
 
 @pytest.mark.django_db
@@ -95,11 +95,8 @@ def test_form_default(democustommodel):
     form = form_class(instance=democustommodel)
     assert form.fields["sender"].choices == [
         ("", "---------"),
-        ("demo.models.Strategy", "demo.models.Strategy"),
-        (
-            "demo.models.Strategy1",
-            "demo.models.Strategy1",
-        ),
+        ("demo.models.Strategy1", "demo.models.Strategy1"),
+        ("demo.models.Strategy2", "demo.models.Strategy2"),
     ]
 
 
@@ -108,9 +105,9 @@ def test_admin_demomodel_add(webapp, admin_user):
     res = webapp.get("/demo/democustommodel/add/", user=admin_user)
     form = res.forms["democustommodel_form"]
 
-    form["sender"] = "demo.models.Strategy"
+    form["sender"] = "demo.models.Strategy1"
     form.submit().follow()
-    assert DemoCustomModel.objects.filter(sender="demo.models.Strategy").count() == 1
+    assert DemoCustomModel.objects.filter(sender="demo.models.Strategy1").count() == 1
 
 
 @pytest.mark.django_db
@@ -119,9 +116,9 @@ def test_admin_demomodel_edit(webapp, admin_user, democustommodel):
     res = webapp.get(url, user=admin_user)
     form = res.forms["democustommodel_form"]
 
-    form["sender"] = "demo.models.Strategy"
+    form["sender"] = "demo.models.Strategy1"
     form.submit().follow()
-    assert DemoCustomModel.objects.filter(sender="demo.models.Strategy").count() == 1
+    assert DemoCustomModel.objects.filter(sender="demo.models.Strategy1").count() == 1
 
 
 @pytest.mark.django_db

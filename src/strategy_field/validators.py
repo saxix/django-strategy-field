@@ -19,35 +19,40 @@ class ClassnameValidator(BaseValidator):
     message = _("Ensure this value is valid class name (it is %(show_value)s).")
     code = "classname"
 
-    def __call__(self, value: Any) -> bool:
+    def __call__(self, value: Any) -> None:
         cleaned = self.clean(value)
-        params = {"show_value": cleaned, "value": value}
+        params = {"show_value": cleaned}
         try:
             get_class(cleaned)
         except (ImportError, TypeError, StrategyNameError):
             raise ValidationError(self.message, code=self.code, params=params) from None
-        return True
 
 
 @deconstructible
 class RegistryValidator(ClassnameValidator):
     message = _("Invalid entry `%(show_value)s`")
+    message_many = _("Invalid entries `%(show_value)s`")
+
     code = "registry"
 
     def __init__(self, registry: Registry, message: str | None = None) -> None:
         super().__init__(registry, message)
         self.registry = registry  # aliasing self.limit_value for readability
 
-    def __call__(self, value: Any) -> bool:
+    def __call__(self, value: Any) -> None:
         cleaned = self.clean(value)
-        params = {"show_value": cleaned, "value": value}
+        params = {"show_value": cleaned}
         try:
             if isinstance(value, (list, tuple)):
-                return all(issubclass(get_class(c), self.registry.klass) for c in cleaned)
-            value = get_class(cleaned)
+                errs = [c for c in cleaned if c not in self.registry]
+                if len(errs) == 1:
+                    raise ValidationError(self.message, code=self.code, params={"show_value": errs[0]}) from None
+                if len(errs) > 1:
+                    raise ValidationError(
+                        self.message_many, code=self.code, params={"show_value": ", ".join(errs)}
+                    ) from None
+            elif not issubclass(get_class(value), self.registry.klass):
+                raise ValidationError(self.message, code=self.code, params=params) from None
+
         except (ImportError, TypeError, StrategyNameError):
             raise ValidationError(self.message, code=self.code, params=params) from None
-
-        if not issubclass(value, self.registry.klass):
-            raise ValidationError(self.message, code=self.code, params=params) from None
-        return True

@@ -22,16 +22,16 @@ class StrategyFormField(ChoiceField):
             return value
         if value:
             return fqn(value)
-
-    def bound_data(self, data: type | str, initial: Any) -> str:
-        if isinstance(data, str):
-            return data
-        return fqn(data)
+        return None
+    # def bound_data(self, data: type | str, initial: Any) -> str:
+    #     if isinstance(data, str):
+    #         return data
+    #     return fqn(data)
 
     def valid_value(self, value: str) -> bool:
         return value in self.registry
 
-    def _coerce(self, value: str) -> type:
+    def _coerce(self, value: str) -> Any:
         if value == self.empty_value or value in self.empty_values:
             return self.empty_value
         try:
@@ -59,24 +59,13 @@ class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
 
     def prepare_value(self, value: str | Sequence[str]) -> list[str] | None:
         ret = value
-        if isinstance(value, str):
-            ret = [value]
         if isinstance(value, (list, tuple)):
             ret = stringify(value)
         if ret:
             return ret.split(",")
 
     def coerce(self, value: str) -> type | None:
-        try:
-            if value in self.registry:
-                return self.registry.get_by_name(value)
-            raise ValidationError
-        except (ValueError, TypeError, ValidationError):
-            raise ValidationError(
-                self.error_messages["invalid_choice"],
-                code="invalid_choice",
-                params={"value": f"'{value}'"},
-            ) from None
+        return self.registry.get_by_name(value)
 
     def valid_value(self, value: str) -> bool:
         return value in self.registry

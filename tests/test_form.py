@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from strategy_field.forms import StrategyFormField
+from strategy_field.forms import StrategyFormField, StrategyMultipleChoiceFormField
 from strategy_field.utils import fqn
 
 
@@ -39,3 +39,14 @@ def test_formfield_empty(registry):
 def test_form():
     form = TstModelForm({"sender": "abc"})
     assert not form.is_valid()
+
+
+def test_formfield_multiple_valid(registry):
+    f = StrategyMultipleChoiceFormField(registry=registry, choices=registry.as_choices())
+    assert f.clean(["demo.models.Sender1"])
+
+
+def test_formfield_multiple_error(registry):
+    f = StrategyMultipleChoiceFormField(registry=registry, choices=registry.as_choices())
+    with pytest.raises(ValidationError):
+        assert f.clean(["demo.models.Sender1", "invalid"])

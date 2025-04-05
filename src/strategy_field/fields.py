@@ -2,13 +2,18 @@ from __future__ import annotations
 
 import logging
 from inspect import isclass
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any, Iterable, Protocol, Sequence
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db.models import Field, Model
 from django.db.models.fields import BLANK_CHOICE_DASH
-from django.db.models.lookups import Contains, IContains, In, Lookup
+from django.db.models.lookups import (
+    Contains,
+    IContains,
+    In,
+    Lookup, Exact, IExact,
+)
 from django.utils.text import capfirst
 
 from .exceptions import StrategyClassError, StrategyNameError
@@ -27,18 +32,22 @@ NOCONTEXT = object()
 logger = logging.getLogger(__name__)
 
 
+class StrategyDescriptor(Protocol):
+    def __init__(self, field: AbstractStrategyField) -> None: ...  # pragma: no cover
+    def __get__(self, instance: Any, owner: type[BaseDatabaseWrapper]) -> Any: ...  # pragma: no cover
+    def __set__(self, obj: Model, original: str) -> None: ...  # pragma: no cover
+
+
 class StrategyClassFieldDescriptor:
-    def __init__(self, field: AbstractStrategyField) -> None:
+    def __init__(self, field: StrategyField) -> None:
         self.field = field
 
-    def __get__(
-        self, obj: models.Model | None, value: type[models.Model] | None = None
-    ) -> AbstractStrategyField | None:
+    def __get__(self, obj: Model | None, value: type[Model] | None = None) -> StrategyClassField | None:
         if obj is None:
             return None
         return obj.__dict__.get(self.field.name)
 
-    def __set__(self, obj: models.Model, original: str) -> None:
+    def __set__(self, obj: Model, original: str) -> None:
         if not original:
             value = None
         else:
@@ -67,10 +76,10 @@ class StrategyClassFieldDescriptor:
 
 
 class MultipleStrategyClassFieldDescriptor:
-    def __init__(self, field: AbstractStrategyField) -> None:
+    def __init__(self, field: StrategyField) -> None:
         self.field = field
 
-    def __get__(self, obj: models.Model, __: type[ModelBase] | None = None) -> list[AbstractStrategyField] | None:
+    def __get__(self, obj: Model, __: type[ModelBase] | None = None) -> list[type] | None:
         if obj is None:
             return None
         value = obj.__dict__.get(self.field.name)
@@ -93,12 +102,15 @@ class MultipleStrategyClassFieldDescriptor:
 
         return ret
 
-    def __set__(self, obj: models.Model, value: str) -> None:
+    def __set__(self, obj: Model, value: Any) -> None:
         obj.__dict__[self.field.name] = value
 
 
-class AbstractStrategyField(models.Field):
+class AbstractStrategyField(Field):
+    descriptor: type[StrategyDescriptor]
+
     registry = None
+    form_class: type[StrategyFormField | StrategyMultipleChoiceFormField]
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.import_error = kwargs.pop("import_error", None)
@@ -111,10 +123,10 @@ class AbstractStrategyField(models.Field):
             self.validators.append(RegistryValidator(self.registry))
 
     @property
-    def flatchoices(self) -> None:
+    def flatchoices(self) -> None:  # type:ignore[override] #  this is needed to display in admin #
         return None
 
-    def contribute_to_class(self, cls: type[models.Model], name: str, private_only: bool = False) -> None:
+    def contribute_to_class(self, cls: type[Model], name: str, private_only: bool = False) -> None:
         self.set_attributes_from_name(name)
         self.model = cls
         if callable(self.registry):
@@ -137,12 +149,12 @@ class AbstractStrategyField(models.Field):
     def get_db_prep_save(self, value: Any, connection: BaseDatabaseWrapper) -> Any:
         return super().get_db_prep_value(value, connection)
 
-    def get_prep_value(self, value: str | None) -> str | None:
+    def get_prep_value(self, value: Any) -> Any:
         if value is None:
             return None
         return fqn(value)
 
-    def value_to_string(self, obj: models.Model) -> str:
+    def value_to_string(self, obj: Model) -> str:
         value = self.value_from_object(obj)
         return fqn(value)
 
@@ -167,13 +179,13 @@ class AbstractStrategyField(models.Field):
         include_blank: bool = True,
         blank_choice: _ChoicesList = BLANK_CHOICE_DASH,
         limit_choices_to: _LimitChoicesTo | None = None,
-        **kwargs: Any,
+        ordering: Sequence[str] = (),
     ) -> BlankChoiceIterator | _ChoicesList:
         first_choice = blank_choice if include_blank else []
 
         return first_choice + self.choices
 
-    def validate(self, value: Any, model_instance: models.Model | None) -> None:
+    def validate(self, value: Any, model_instance: Model | None) -> None:
         if fqn(value) not in self.registry:
             raise ValidationError(f"{value} is not a valid choice")
 
@@ -226,7 +238,7 @@ class StrategyClassField(AbstractStrategyField):
     form_class = StrategyFormField
     descriptor = StrategyClassFieldDescriptor
 
-    def validate(self, value: Any, model_instance: models.Model | None) -> None:
+    def validate(self, value: Any, model_instance: Model | None) -> None:
         if fqn(value) not in self.registry:
             raise ValidationError(f"{value} is not a valid choice")
 
@@ -235,7 +247,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
     descriptor = MultipleStrategyClassFieldDescriptor
     form_class = StrategyMultipleChoiceFormField
 
-    def validate(self, values: Any, model_instance: models.Model | None) -> None:
+    def validate(self, values: Any, model_instance: Model | None) -> None:
         for value in values:
             if value not in self.registry:
                 raise ValidationError(f"{value} is not a valid choice")
@@ -244,7 +256,7 @@ class MultipleStrategyClassField(AbstractStrategyField):
         value = list(filter(lambda x: x, value)) if value is not None else None
         return super().get_db_prep_save(value, connection)
 
-    def get_prep_value(self, value: Sequence[Any] | str) -> str | None:
+    def get_prep_value(self, value: Any) -> Any:
         if value is None:
             return None
         if isinstance(value, (list, tuple)):
@@ -263,18 +275,18 @@ class MultipleStrategyClassField(AbstractStrategyField):
         include_blank: bool = True,
         blank_choice: _ChoicesList = BLANK_CHOICE_DASH,
         limit_choices_to: _LimitChoicesTo | None = None,
-        **kwargs: Any,
+        ordering: Sequence[str] = (),
     ) -> BlankChoiceIterator | _ChoicesList:
         return AbstractStrategyField.get_choices(self, False, blank_choice)
 
 
 class StrategyFieldDescriptor(StrategyClassFieldDescriptor):
-    def __get__(self, obj: models.Model, value: type[ModelBase] | None = None) -> AbstractStrategyField:
+    def __get__(self, obj: Model | None, value: type[Model] | None = None) -> StrategyField | None:
         if obj is None:
             return None
         return obj.__dict__.get(self.field.name)
 
-    def __set__(self, obj: models.Model, original: str | None) -> None:
+    def __set__(self, obj: Model, original: str | None) -> None:
         if not original:
             value = None
         else:
@@ -312,11 +324,11 @@ class StrategyField(StrategyClassField):
         self.factory = kwargs.pop("factory", lambda klass, obj: klass(obj))
         super().__init__(*args, **kwargs)
 
-    def validate(self, value: Any, model_instance: models.Model | None) -> None:
+    def validate(self, value: Any, model_instance: Model | None) -> None:
         if fqn(value) not in self.registry:
             raise ValidationError(f"{value} is not a valid choice")
 
-    def pre_save(self, model_instance: models.Model, add: bool) -> str | None:
+    def pre_save(self, model_instance: Model, add: bool) -> str | None:
         value = getattr(model_instance, self.attname)
         if value:
             return fqn(value)
@@ -324,7 +336,7 @@ class StrategyField(StrategyClassField):
 
 
 class MultipleStrategyFieldDescriptor(MultipleStrategyClassFieldDescriptor):
-    def __get__(self, obj: models.Model, __: type[ModelBase] | None = None) -> AbstractStrategyField:
+    def __get__(self, obj: Model, __: type[ModelBase] | None = None) -> list[type]:
         if obj is None:
             return []
         value = obj.__dict__.get(self.field.name)
@@ -353,7 +365,7 @@ class MultipleStrategyFieldDescriptor(MultipleStrategyClassFieldDescriptor):
             return ret
         return []
 
-    def __set__(self, obj: models.Model, value: list[str]) -> None:
+    def __set__(self, obj: Model, value: Any) -> None:
         obj.__dict__[self.field.name] = value
 
 
@@ -364,18 +376,32 @@ class MultipleStrategyField(MultipleStrategyClassField):
         self.factory = kwargs.pop("factory", lambda klass, obj: klass(obj))
         super().__init__(*args, **kwargs)
 
-    def validate(self, values: Any, model_instance: models.Model | None) -> None:
+    def validate(self, values: Any, model_instance: Model | None) -> None:
         for value in values:
             if type(value) not in self.registry:
                 raise ValidationError(f"{value} is not a valid choice")
 
-    def get_lookup(self, lookup_name: str) -> StrategyClassField:
+    def get_lookup(self, lookup_name: str) -> type[Lookup[Any]] | None:
         if lookup_name == "in":
             raise TypeError(f"Lookup type {lookup_name} not supported.")
         return super().get_lookup(lookup_name)
 
 
-class StrategyFieldLookupMixin:
+class StrategyFieldLookupMixin(Lookup):
+    def get_prep_lookup(self) -> str | None:
+        value = super().get_prep_lookup()
+        if value is None:
+            return None
+        if isinstance(value, str):
+            pass
+        elif isinstance(value, (list, tuple)):
+            value = stringify(value)
+        elif isclass(value) or isinstance(value, (self.lhs.output_field.registry.klass, object)):
+            value = fqn(value)
+        return value
+
+
+class MultipleStrategyFieldLookupMixin(Lookup):
     def get_prep_lookup(self) -> str | None:
         value = super().get_prep_lookup()
         if value is None:
@@ -397,22 +423,23 @@ class StrategyFieldIContains(StrategyFieldLookupMixin, Contains):
     pass
 
 
-class StrategyFieldIn(StrategyFieldLookupMixin, In):
+class MultipleStrategyFieldContains(MultipleStrategyFieldLookupMixin, Contains):
     pass
 
 
-class MultipleStrategyFieldContains(StrategyFieldLookupMixin, Contains):
+class MultipleStrategyFieldExact(MultipleStrategyFieldLookupMixin, Exact):
     pass
 
-
-class MultipleStrategyFieldIn(StrategyFieldLookupMixin, In):
+class MultipleStrategyFieldIExact(MultipleStrategyFieldLookupMixin, IExact):
     pass
-
 
 StrategyField.register_lookup(StrategyFieldContains)
 StrategyField.register_lookup(StrategyFieldIContains)
-MultipleStrategyField.register_lookup(MultipleStrategyFieldContains)
 
 StrategyClassField.register_lookup(StrategyFieldContains)
 StrategyClassField.register_lookup(StrategyFieldIContains)
+
 MultipleStrategyClassField.register_lookup(MultipleStrategyFieldContains)
+MultipleStrategyClassField.register_lookup(MultipleStrategyFieldExact)
+MultipleStrategyClassField.register_lookup(MultipleStrategyFieldIExact)
+MultipleStrategyField.register_lookup(MultipleStrategyFieldContains)

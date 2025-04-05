@@ -1,5 +1,7 @@
+import datetime
+
 import pytest
-from demo.models import AbstractSender, DemoModel, Sender1, Sender2
+from demo.models import AbstractSender, DemoModel, Sender1, Sender2, DemoCallableModel
 
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn
@@ -29,6 +31,8 @@ def test_registry_bypass_class_check():
     assert Sender1 in r
     assert AbstractSender in r
     assert DemoModel in r
+    assert DemoModel() in r
+    assert 22 not in r
 
 
 def test_registry_string():

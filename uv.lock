@@ -331,7 +331,7 @@ wheels = [
 
 [[package]]
 name = "django-strategy-field"
-version = "3.2.dev5+g9099fdf.d20250404"
+version = "3.2.dev7+g67ba1bc.d20250405"
 source = { editable = "." }
 
 [package.dev-dependencies]

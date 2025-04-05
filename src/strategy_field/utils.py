@@ -32,9 +32,9 @@ class ModulesCache(dict):
 _cache = ModulesCache()
 
 
-def default_classloader(value: str | type | None) -> type | None:
+def default_classloader(value: str | type | None) -> Any:
     if not value:
-        return value
+        return None
     if isinstance(value, str):
         return import_by_name(value)
     if isclass(value):
@@ -49,7 +49,7 @@ def default_classloader(value: str | type | None) -> type | None:
 importer = None
 
 
-def get_class(value: str) -> type:
+def get_class(value: str) -> Any:
     global importer  # noqa: PLW0603
     if importer is None:
         importer = import_string(config.CLASSLOADER)
@@ -62,8 +62,8 @@ def get_display_string(klass: type, display_attribute: str | None = None) -> str
         if attr is None:
             return fqn(klass)
         if callable(attr):
-            return attr()
-        return attr
+            return str(attr())
+        return str(attr)
 
     return fqn(klass)
 
@@ -76,7 +76,7 @@ def get_attr(obj: Any, attr: str, default: Any = None) -> Any:
     return get_attr(getattr(obj, parts[0], default), ".".join(parts[1:]), default)
 
 
-def fqn(o: Any) -> str | None:
+def fqn(o: Any) -> str:
     """Returns the fully qualified class name of an object or a class
 
     :param o: object or class

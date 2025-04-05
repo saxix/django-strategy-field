@@ -48,11 +48,9 @@ class AbstractStrategy:
         self.context = context
         self.label = label
 
-    def __str__(self):
-        return "oooooo"
 
 
-class Strategy(AbstractStrategy):
+class Strategy1(AbstractStrategy):
     label = "strategy"
     none = None
 
@@ -60,9 +58,12 @@ class Strategy(AbstractStrategy):
     def verbose_name(cls):
         return "Verbose Name"
 
+    def __str__(self):
+        return "Verbose Strategy1"
 
-class Strategy1(AbstractStrategy):
-    pass
+class Strategy2(AbstractStrategy):
+    def __str__(self):
+        return "Verbose Strategy2"
 
 
 class StrategyRegistry(Registry):
@@ -80,8 +81,8 @@ class StrategyRegistry(Registry):
 
 
 registry1 = StrategyRegistry(AbstractStrategy)
-registry1.register(Strategy)
 registry1.register(Strategy1)
+registry1.register(Strategy2)
 
 
 class DemoAllModel(models.Model):

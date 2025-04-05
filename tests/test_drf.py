@@ -6,7 +6,7 @@ from demo.models import (
     DemoMultipleModel,
     Sender1,
     Sender2,
-    Strategy,
+    Strategy1,
 )
 from factory.django import DjangoModelFactory
 from rest_framework.reverse import reverse
@@ -33,7 +33,7 @@ def record():
 
 @pytest.mark.django_db
 def test_get_single(webapp, record):
-    x = DemoModelNoneFactory(sender=Strategy)
+    x = DemoModelNoneFactory(sender=Strategy1)
     res = webapp.get("/api/s/" + str(x.id) + "/")
     assert res.json["sender"] == fqn(x.sender)
 
