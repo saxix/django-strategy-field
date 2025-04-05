@@ -74,7 +74,7 @@ def test_model_load(democustommodel):
 def test_form_save(democustommodel):
     form_class = modelform_factory(DemoCustomModel, exclude=[])
     form = form_class({"sender": fqn(democustommodel.sender)}, instance=democustommodel)
-    form.is_valid()
+    assert form.is_valid(), form.errors
     instance = form.save()
     assert instance.sender == democustommodel.sender
 

@@ -11,7 +11,7 @@ from .utils import fqn, get_class, get_display_string, import_by_name
 logger = logging.getLogger(__name__)
 
 
-class Registry(list):
+class Registry(list[type]):
     def __init__(self, base_class: type, *args: Any, **kwargs: Any) -> None:
         self._klass = base_class
         self._label_attribute = kwargs.get("label_attribute")

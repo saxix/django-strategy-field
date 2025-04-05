@@ -114,7 +114,6 @@ def test_form(demo_multiple_model, registry):
 @pytest.mark.django_db
 def test_form_save(demo_multiple_model):
     form_class = modelform_factory(DemoMultipleModel, exclude=[])
-
     form = form_class({"sender": [fqn(demo_multiple_model.sender[0])]}, instance=demo_multiple_model)
     assert form.is_valid(), form.errors
     instance = form.save()

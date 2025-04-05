@@ -173,8 +173,9 @@ class AbstractStrategyField(models.Field):
 
         return first_choice + self.choices
 
-    def validate(self, value: Any, model_instance: models.Model | None) -> bool:
-        return value in self.registry
+    def validate(self, value: Any, model_instance: models.Model | None) -> None:
+        if fqn(value) not in self.registry:
+            raise ValidationError(f"{value} is not a valid choice")
 
     def formfield(
         self,
@@ -225,10 +226,19 @@ class StrategyClassField(AbstractStrategyField):
     form_class = StrategyFormField
     descriptor = StrategyClassFieldDescriptor
 
+    def validate(self, value: Any, model_instance: models.Model | None) -> None:
+        if fqn(value) not in self.registry:
+            raise ValidationError(f"{value} is not a valid choice")
+
 
 class MultipleStrategyClassField(AbstractStrategyField):
     descriptor = MultipleStrategyClassFieldDescriptor
     form_class = StrategyMultipleChoiceFormField
+
+    def validate(self, values: Any, model_instance: models.Model | None) -> None:
+        for value in values:
+            if value not in self.registry:
+                raise ValidationError(f"{value} is not a valid choice")
 
     def get_db_prep_save(self, value: Any, connection: BaseDatabaseWrapper, prepared: bool = False) -> Any:
         value = list(filter(lambda x: x, value)) if value is not None else None
@@ -302,6 +312,10 @@ class StrategyField(StrategyClassField):
         self.factory = kwargs.pop("factory", lambda klass, obj: klass(obj))
         super().__init__(*args, **kwargs)
 
+    def validate(self, value: Any, model_instance: models.Model | None) -> None:
+        if fqn(value) not in self.registry:
+            raise ValidationError(f"{value} is not a valid choice")
+
     def pre_save(self, model_instance: models.Model, add: bool) -> str | None:
         value = getattr(model_instance, self.attname)
         if value:
@@ -349,6 +363,11 @@ class MultipleStrategyField(MultipleStrategyClassField):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.factory = kwargs.pop("factory", lambda klass, obj: klass(obj))
         super().__init__(*args, **kwargs)
+
+    def validate(self, values: Any, model_instance: models.Model | None) -> None:
+        for value in values:
+            if type(value) not in self.registry:
+                raise ValidationError(f"{value} is not a valid choice")
 
     def get_lookup(self, lookup_name: str) -> StrategyClassField:
         if lookup_name == "in":
