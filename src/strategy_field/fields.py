@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from inspect import isclass
-from typing import TYPE_CHECKING, Any, Iterable, Protocol, Sequence
+from typing import TYPE_CHECKING, Any, Protocol, Sequence
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -10,9 +10,10 @@ from django.db.models import Field, Model
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.db.models.lookups import (
     Contains,
+    Exact,
     IContains,
-    In,
-    Lookup, Exact, IExact,
+    IExact,
+    Lookup,
 )
 from django.utils.text import capfirst
 
@@ -430,8 +431,10 @@ class MultipleStrategyFieldContains(MultipleStrategyFieldLookupMixin, Contains):
 class MultipleStrategyFieldExact(MultipleStrategyFieldLookupMixin, Exact):
     pass
 
+
 class MultipleStrategyFieldIExact(MultipleStrategyFieldLookupMixin, IExact):
     pass
+
 
 StrategyField.register_lookup(StrategyFieldContains)
 StrategyField.register_lookup(StrategyFieldIContains)

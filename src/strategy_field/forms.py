@@ -23,10 +23,6 @@ class StrategyFormField(ChoiceField):
         if value:
             return fqn(value)
         return None
-    # def bound_data(self, data: type | str, initial: Any) -> str:
-    #     if isinstance(data, str):
-    #         return data
-    #     return fqn(data)
 
     def valid_value(self, value: str) -> bool:
         return value in self.registry
