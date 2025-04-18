@@ -20,16 +20,7 @@ fullclean:
 	$(MAKE) clean
 
 
-docs:
-	sphinx-build -b html docs/ ~build/docs/ >/dev/null
-	docs/intersphinx.py get ~build/docs/objects.inv -p ${MAIN_MODULE} -i docs/intershpinx.rst
-	sphinx-build -n docs/ ~build/docs/
-ifdef BROWSE
-	firefox ${BUILDDIR}/docs/index.html
-endif
-
-
 demo:
-	cd tests/demo && ./manage.py makemigrations
-	cd tests/demo && ./manage.py migrate
-	cd tests/demo && ./manage.py runserver
+	cd tests/demoapp && ./manage.py makemigrations
+	cd tests/demoapp && ./manage.py migrate
+	cd tests/demoapp && ./manage.py runserver
