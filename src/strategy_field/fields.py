@@ -183,10 +183,6 @@ class AbstractStrategyField(Field):
 
         return first_choice + self.choices
 
-    # def validate(self, value: Any, model_instance: Model | None) -> None:
-    #     if fqn(value) not in self.registry:
-    #         raise ValidationError(f"{value} is not a valid choice")
-
     def formfield(
         self,
         form_class: type[forms.Field] | None = None,

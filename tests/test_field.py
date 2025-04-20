@@ -1,13 +1,12 @@
-from unittest.mock import Mock
 from contextlib import nullcontext as does_not_raise
+from unittest.mock import Mock
 
 import pytest
+from demo.models import DemoModelNoRegistry, Strategy1, registry1
 from django.core.exceptions import ValidationError
-
-from demo.models import DemoModelNoRegistry, registry1, Strategy1
 from django.core.mail.backends.dummy import EmailBackend
 
-from strategy_field.fields import StrategyClassField, StrategyField, MultipleStrategyClassField, MultipleStrategyField
+from strategy_field.fields import MultipleStrategyClassField, MultipleStrategyField, StrategyClassField, StrategyField
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn
 
@@ -59,11 +58,14 @@ def test_deconstruct(cls, kwargs):
 
 
 @pytest.mark.parametrize("cls", [StrategyClassField, StrategyField, MultipleStrategyClassField, MultipleStrategyField])
-@pytest.mark.parametrize("value,expectation", [
-    (Strategy1, does_not_raise()),
-    (Strategy1(Mock()), does_not_raise()),
-    ("a.b.c", pytest.raises(ValidationError)),
-])
+@pytest.mark.parametrize(
+    "value,expectation",
+    [
+        (Strategy1, does_not_raise()),
+        (Strategy1(Mock()), does_not_raise()),
+        ("a.b.c", pytest.raises(ValidationError)),
+    ],
+)
 def test_validate(cls, value, expectation):
     f = cls(registry=registry1)
     with expectation:

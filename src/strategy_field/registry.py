@@ -74,6 +74,4 @@ class Registry(list):
                 return False
         elif isclass(y):
             return super().__contains__(y)
-        # elif (self._klass and isinstance(y, self._klass)) or isinstance(y, object):
         return super().__contains__(type(y))
-        # return super().__contains__(y)
