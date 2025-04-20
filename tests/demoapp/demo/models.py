@@ -49,7 +49,6 @@ class AbstractStrategy:
         self.label = label
 
 
-
 class Strategy1(AbstractStrategy):
     label = "strategy"
     none = None
@@ -60,6 +59,7 @@ class Strategy1(AbstractStrategy):
 
     def __str__(self):
         return "Verbose Strategy1"
+
 
 class Strategy2(AbstractStrategy):
     def __str__(self):

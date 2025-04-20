@@ -1,8 +1,9 @@
+from contextlib import nullcontext as does_not_raise
+
 import pytest
 from django.core.exceptions import ValidationError
 
 from strategy_field.validators import ClassnameValidator, RegistryValidator
-from contextlib import nullcontext as does_not_raise
 
 
 def test_classnamevalidator():

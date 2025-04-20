@@ -1,7 +1,6 @@
-# Django settings for demo project.
-import os
+from pathlib import Path
 
-here = os.path.dirname(__file__)
+here = Path(__file__).parent
 
 DEBUG = True
 
@@ -58,7 +57,7 @@ SITE_ID = 1
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-MEDIA_ROOT = os.path.join(here, "media")
+MEDIA_ROOT = Path(here) / "media"
 MEDIA_URL = ""
 STATIC_ROOT = ""
 STATIC_URL = "/static/"

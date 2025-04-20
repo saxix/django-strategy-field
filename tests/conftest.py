@@ -1,6 +1,11 @@
+from typing import TYPE_CHECKING
+
 import pytest
 
 from strategy_field.utils import fqn
+
+if TYPE_CHECKING:
+    from demo.models import DemoAllModel
 
 
 @pytest.fixture
@@ -44,13 +49,15 @@ def democustommodel():
 
 @pytest.fixture
 def demo_all_model() -> "DemoAllModel":
-    from demo.models import DemoAllModel, Sender1, Sender2, Strategy1, Strategy2
+    from demo.models import DemoAllModel, Sender1, Strategy1, Strategy2
 
-    return DemoAllModel.objects.get_or_create(choice=Sender1,
-                                              multiple=[Sender1, Strategy2],
-                                              custom=fqn(Strategy1),
-                                              custom_multiple=[Strategy1, Strategy2],
-                                              )[0]
+    return DemoAllModel.objects.get_or_create(
+        choice=Sender1,
+        multiple=[Sender1, Strategy2],
+        custom=fqn(Strategy1),
+        custom_multiple=[Strategy1, Strategy2],
+    )[0]
+
 
 @pytest.fixture
 def demo_multiplecustom_model():

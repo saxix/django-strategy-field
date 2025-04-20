@@ -109,13 +109,18 @@ lint.per-file-ignores."src/strategy_field/version.py" = [
   "ALL",
 ]
 lint.per-file-ignores."tests/**/*.py" = [
+  "ANN",
   "ARG",
   "DJ",
   "E",
+  "INP",
   "PLR2004",
   "PLW",
+  "PT",
+  "RUF012",
   "S",
   "S101",
+  "SLF001",
   "UP",
 ]
 

@@ -1,3 +1,8 @@
+Release 3.2.1
+=============
+* add Django admin StrategyFieldListFilter
+
+
 Release 3.2
 ===========
 * add support Django 5.2

@@ -1,4 +1,4 @@
-from demo.models import DemoCustomModel, DemoModel, Strategy2, DemoAllModel
+from demo.models import DemoAllModel, DemoCustomModel, DemoModel, Strategy2
 
 
 def test_class_set_value():

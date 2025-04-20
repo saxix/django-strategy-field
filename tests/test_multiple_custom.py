@@ -1,7 +1,8 @@
 import pytest
-from demo.models import DemoMultipleCustomModel, Strategy1, Strategy2, DemoAllModel
+from demo.models import DemoAllModel, DemoMultipleCustomModel, Strategy1, Strategy2
 from django.forms.models import modelform_factory
 from django.urls import reverse
+
 from strategy_field.utils import fqn
 
 
@@ -102,10 +103,6 @@ def test_form_default(demo_multiplecustom_model):
         ("demo.models.Strategy1", "demo.models.Strategy1"),
         ("demo.models.Strategy2", "demo.models.Strategy2"),
     ]
-    # assert form.as_table() == u'<tr><th><label for="id_sender">Sender:</label></th>' \
-    #                           u'<td><select multiple="multiple" id="id_sender" name="sender">\n' \
-    #                           u'<option value="demo.models.Strategy" selected="selected">demo.models.Strategy</option>\n' \
-    #                           u'<option value="demo.models.Strategy1">demo.models.Strategy1</option>\n</select></td></tr>'
 
 
 @pytest.mark.django_db
