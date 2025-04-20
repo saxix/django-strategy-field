@@ -43,3 +43,15 @@ def test_admin_edit(webapp, admin_user, demo_all_model):
     assert pq("#result_list tbody tr td.field-multiple").text() == "<class 'demo.models.Sender2'>"
     assert pq("#result_list tbody tr td.field-custom").text() == "Verbose Strategy1"
     assert pq("#result_list tbody tr td.field-custom_multiple").text() == "Verbose Strategy1"
+
+
+def test_admin_changelist(webapp, admin_user, demo_all_model):
+    url = reverse("admin:demo_demoallmodel_changelist")
+    res = webapp.get(url, user=admin_user)
+    res = res.click("demo.models.Sender1")
+    pq = PyQuery(res.content)
+    assert pq("#result_list tbody tr td.field-choice").text() == "<class 'demo.models.Sender1'>"
+    res = res.click("demo.models.Sender2")
+    assert "0 demo all models" in res.text
+    res = res.click("demo.models.Sender1")
+    assert "1 demo all model" in res.text

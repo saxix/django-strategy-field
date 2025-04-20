@@ -1,6 +1,15 @@
+from unittest.mock import Mock
+from contextlib import nullcontext as does_not_raise
+
 import pytest
-from demo.models import DemoModelNoRegistry
+from django.core.exceptions import ValidationError
+
+from demo.models import DemoModelNoRegistry, registry1, Strategy1
 from django.core.mail.backends.dummy import EmailBackend
+
+from strategy_field.fields import StrategyClassField, StrategyField, MultipleStrategyClassField, MultipleStrategyField
+from strategy_field.registry import Registry
+from strategy_field.utils import fqn
 
 
 class Dummy:
@@ -40,3 +49,22 @@ def test_wrong_type():
     d = DemoModelNoRegistry(instance=1)
     d.save()
     assert d.instance is None
+
+
+@pytest.mark.parametrize("cls", [StrategyClassField, StrategyField])
+@pytest.mark.parametrize("kwargs", [{}, {"registry": Registry(None)}, {"choices": []}])
+def test_deconstruct(cls, kwargs):
+    f = cls(**kwargs)
+    assert f.deconstruct() == (None, fqn(cls), [], {})
+
+
+@pytest.mark.parametrize("cls", [StrategyClassField, StrategyField, MultipleStrategyClassField, MultipleStrategyField])
+@pytest.mark.parametrize("value,expectation", [
+    (Strategy1, does_not_raise()),
+    (Strategy1(Mock()), does_not_raise()),
+    ("a.b.c", pytest.raises(ValidationError)),
+])
+def test_validate(cls, value, expectation):
+    f = cls(registry=registry1)
+    with expectation:
+        f.validate(value, Mock())

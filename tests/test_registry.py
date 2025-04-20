@@ -1,5 +1,7 @@
+from decimal import Decimal
+
 import pytest
-from demo.models import AbstractSender, DemoModel, Sender1, Sender2
+from demo.models import AbstractSender, DemoModel, Sender1, Sender2, SenderNotRegistered
 
 from strategy_field.registry import Registry
 from strategy_field.utils import fqn
@@ -77,11 +79,28 @@ def test_registry_as_choices(monkeypatch):
     ]
 
 
-def test_registry_contains():
-    r = Registry("demo.models.AbstractSender")
-
+@pytest.mark.parametrize("entry", [Sender1, fqn(Sender1), Sender1()])
+def test_registry_contains(entry):
+    r = Registry(AbstractSender)
     r.register(Sender1)
     r.register(fqn(Sender2))
-    assert Sender1 in r
-    assert fqn(Sender1) in r
-    assert "a.b.c" not in r
+    assert entry in r
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [
+        SenderNotRegistered,
+        fqn(SenderNotRegistered),
+        SenderNotRegistered(),
+        None,
+        "a.b.c",
+        100,
+        Decimal(10),
+        1.1,
+        b"bytes",
+    ],
+)
+def test_registry_not_contains(entry):
+    r = Registry(AbstractSender)
+    assert entry not in r

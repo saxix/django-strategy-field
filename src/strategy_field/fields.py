@@ -162,9 +162,6 @@ class AbstractStrategyField(Field):
     def get_internal_type(self) -> str:
         return "CharField"
 
-    def _check_choices(self) -> list:
-        return []
-
     def _get_choices(self) -> list[tuple[AbstractStrategyField, str]]:
         if self.registry:
             return self.registry.as_choices()
@@ -186,9 +183,9 @@ class AbstractStrategyField(Field):
 
         return first_choice + self.choices
 
-    def validate(self, value: Any, model_instance: Model | None) -> None:
-        if fqn(value) not in self.registry:
-            raise ValidationError(f"{value} is not a valid choice")
+    # def validate(self, value: Any, model_instance: Model | None) -> None:
+    #     if fqn(value) not in self.registry:
+    #         raise ValidationError(f"{value} is not a valid choice")
 
     def formfield(
         self,
@@ -249,6 +246,8 @@ class MultipleStrategyClassField(AbstractStrategyField):
     form_class = StrategyMultipleChoiceFormField
 
     def validate(self, values: Any, model_instance: Model | None) -> None:
+        if not isinstance(values, (list, tuple)):
+            values = [values]
         for value in values:
             if value not in self.registry:
                 raise ValidationError(f"{value} is not a valid choice")
@@ -378,8 +377,10 @@ class MultipleStrategyField(MultipleStrategyClassField):
         super().__init__(*args, **kwargs)
 
     def validate(self, values: Any, model_instance: Model | None) -> None:
+        if not isinstance(values, (list, tuple)):
+            values = [values]
         for value in values:
-            if type(value) not in self.registry:
+            if value not in self.registry:
                 raise ValidationError(f"{value} is not a valid choice")
 
     def get_lookup(self, lookup_name: str) -> type[Lookup[Any]] | None:
@@ -446,3 +447,6 @@ MultipleStrategyClassField.register_lookup(MultipleStrategyFieldContains)
 MultipleStrategyClassField.register_lookup(MultipleStrategyFieldExact)
 MultipleStrategyClassField.register_lookup(MultipleStrategyFieldIExact)
 MultipleStrategyField.register_lookup(MultipleStrategyFieldContains)
+
+##
+from . import admin  # noqa: E402, F401

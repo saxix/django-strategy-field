@@ -30,6 +30,7 @@ class DemoModelProxyAdmin(admin.ModelAdmin):
 
 class DemoAllModelAdmin(admin.ModelAdmin):
     list_display = ("pk", "choice", "multiple", "custom", "custom_multiple")
+    list_filter = ("choice", "custom")
 
 
 class MyChangeList(ChangeList):
