@@ -30,7 +30,7 @@ The StrategyField can be accessed as instance of the model with an attribute
 
 
     class Event(models.Model):
-        backend = StrategyField()
+        sender = StrategyField()
 
     Event(sender='django.core.mail.backends.filebased.EmailBackend')
 
