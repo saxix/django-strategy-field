@@ -16,3 +16,4 @@ coverage.xml
 ~build/
 .eggs
 src/strategy_field/version.py
+__pycache__

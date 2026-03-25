@@ -14,7 +14,6 @@ authors = [
   { name = "sax", email = "s.apostolico@gmail.com" },
 ]
 requires-python = ">=3.8"
-
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Web Environment",
@@ -32,10 +31,10 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Software Development :: Libraries :: Application Frameworks",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-
 dynamic = [ "version" ]
 urls.downloads = "https://github.com/saxix/django-strategy-field"
 urls.homepage = "https://github.com/saxix/django-strategy-field"
@@ -58,27 +57,24 @@ dev = [
   "tox",
 ]
 
-[tool.distutils.bdist_wheel]
-universal = 1
-
-[tool.distutils.egg_info]
-tag-build = ""
-tag-date = 0
-tag-svn-revision = 0
+[tool.distutils]
+bdist_wheel.universal = 1
+egg_info.tag-build = ""
+egg_info.tag-date = 0
+egg_info.tag-svn-revision = 0
 
 [tool.hatch]
 build.hooks.vcs.version-file = "src/strategy_field/version.py"
+build.targets.sdist.ignore-vcs = true
+build.targets.sdist.include = [
+  "src/strategy_field/**/*.*",
+]
+build.targets.wheel.packages = [ "src/strategy_field" ]
 version.source = "vcs"
 raw-options = { root = "../.." }
 
-[tool.hatch.build.targets.sdist]
-ignore-vcs = true
-include = [
-  "src/strategy_field/**/*.*",
-]
-
-[tool.hatch.build.targets.wheel]
-packages = [ "src/strategy_field" ]
+[tool.uv]
+package = true
 
 [tool.ruff]
 target-version = "py38"
@@ -130,6 +126,3 @@ Makefile
 *.sqlite
 .tox/*
 """
-
-[tool.uv]
-package = true

@@ -59,7 +59,7 @@ def test_deconstruct(cls, kwargs):
 
 @pytest.mark.parametrize("cls", [StrategyClassField, StrategyField, MultipleStrategyClassField, MultipleStrategyField])
 @pytest.mark.parametrize(
-    "value,expectation",
+    ("value", "expectation"),
     [
         (Strategy1, does_not_raise()),
         (Strategy1(Mock()), does_not_raise()),

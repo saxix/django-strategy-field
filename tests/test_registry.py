@@ -18,7 +18,7 @@ def test_registry():
 
 def test_registry_check_classes():
     r = Registry(AbstractSender)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="is not a subtype of"):
         r.register(DemoModel)
 
 

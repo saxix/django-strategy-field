@@ -77,7 +77,7 @@ def get_attr(obj: Any, attr: str, default: Any = None) -> Any:
 
 
 def fqn(o: Any) -> str:
-    """Returns the fully qualified class name of an object or a class
+    """Return the fully qualified class name of an object or a class.
 
     :param o: object or class
     :return: class name
@@ -96,7 +96,7 @@ def fqn(o: Any) -> str:
 
 
 def import_by_name(name: str) -> Any:
-    """dynamically load a class from a string
+    """Load dynamically a class from a string.
 
     es:
         klass = import_by_name('my_package.my_module.my_class')

@@ -59,6 +59,7 @@ class StrategyMultipleChoiceFormField(TypedMultipleChoiceField):
             ret = stringify(value)
         if ret:
             return ret.split(",")
+        return None
 
     def coerce(self, value: str) -> type | None:
         return self.registry.get_by_name(value)

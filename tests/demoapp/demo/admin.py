@@ -21,7 +21,7 @@ class DemoModelForm(ModelForm):
     class Meta:
         model = DemoModelProxy
         widgets = {"sender": TextInput}
-        fields = "__all__"
+        fields = ("sender",)
 
 
 class DemoModelProxyAdmin(admin.ModelAdmin):
@@ -44,8 +44,7 @@ class DemoModelNoneAdmin(admin.ModelAdmin):
         return MyChangeList
 
     def strategy(self, obj):
-        if obj.sender:
-            return fqn(obj.sender)
+        return fqn(obj.sender) if obj.sender else None
 
 
 for s in (admin.site,):

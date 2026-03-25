@@ -72,11 +72,12 @@ class StrategyRegistry(Registry):
         if isinstance(value, str):
             value = value.split(",")
         for v in value:
-            if isinstance(v, str):
-                v = import_by_name(v)
-            if not issubclass(v, self.klass):
-                raise ValueError(fqn(v))
-            ret.append(v(obj))
+            klass = v
+            if isinstance(klass, str):
+                klass = import_by_name(klass)
+            if not issubclass(klass, self.klass):
+                raise ValueError(fqn(klass))
+            ret.append(klass(obj))
         return ret
 
 
@@ -91,9 +92,15 @@ class DemoAllModel(models.Model):
     custom = StrategyField(registry=registry1)
     custom_multiple = MultipleStrategyField(registry=registry1)
 
+    def __str__(self):
+        return f"{self.choice}"
+
 
 class DemoModel(models.Model):
     sender = StrategyClassField(registry=registry)
+
+    def __str__(self):
+        return f"{self.sender}"
 
 
 def aa():
@@ -106,13 +113,22 @@ def aa():
 class DemoCallableModel(models.Model):
     sender = StrategyClassField(registry=aa())
 
+    def __str__(self):
+        return f"{self.sender}"
+
 
 class DemoModelNone(models.Model):
     sender = StrategyClassField(registry=registry, null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.sender}"
+
 
 class DemoModelDefault(models.Model):
     sender = StrategyClassField(null=True, registry=registry, default="demo.models.Sender1")
+
+    def __str__(self):
+        return f"{self.sender}"
 
 
 def cc():
@@ -122,26 +138,42 @@ def cc():
 class DemoModelCallableDefault(models.Model):
     sender = StrategyClassField(registry=registry, null=True, default=cc)
 
+    def __str__(self):
+        return f"{self.sender}"
+
 
 class DemoModelProxy(DemoModel):
     class Meta:
         proxy = True
 
+    def __str__(self):
+        return f"{self.sender}"
+
 
 class DemoMultipleModel(models.Model):
     sender = MultipleStrategyClassField(registry=registry, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.sender}"
 
 
 class DemoCustomModel(models.Model):
     sender = StrategyField(registry=registry1)
 
+    def __str__(self):
+        return f"{self.sender}"
+
 
 class DemoMultipleCustomModel(models.Model):
     sender = MultipleStrategyField(registry=registry1)
 
+    def __str__(self):
+        return f"{self.sender}"
+
 
 class DemoModelContext(models.Model):
-    pass
+    def __str__(self):
+        return "demo"
 
 
 # funny code. just for tests
@@ -154,3 +186,6 @@ def factory(klass, context):
 class DemoModelNoRegistry(models.Model):
     klass = StrategyClassField(blank=True, null=True)
     instance = StrategyField(factory=factory, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.klass}"

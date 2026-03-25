@@ -17,14 +17,14 @@ if TYPE_CHECKING:
 class StrategyFieldListFilter(ChoicesFieldListFilter):
     field: AbstractStrategyField
 
-    def choices(self, changelist: ChangeList) -> Generator[dict[str, Any], None]:
+    def choices(self, changelist: ChangeList) -> Generator[dict[str, Any]]:
         registry: Registry = self.field.registry
         yield {
             "selected": self.lookup_val is None,
             "query_string": changelist.get_query_string(remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]),
             "display": _("All"),
         }
-        values = sorted(self.field.registry, key=lambda field: registry.get_name(field))
+        values = sorted(self.field.registry, key=registry.get_name)
 
         for field in values:
             yield {

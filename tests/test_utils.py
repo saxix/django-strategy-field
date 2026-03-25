@@ -17,7 +17,7 @@ def test_get_class():
     assert get_class(fqn(DemoModel)) == DemoModel
     assert get_class(DemoModel) == DemoModel
     assert get_class(DemoModel()) == DemoModel
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="x"):
         assert get_class("x")
     assert get_class(2) is None
 
@@ -60,13 +60,13 @@ def test_fqn():
     assert fqn(DemoModel) == "demo.models.DemoModel"
     assert fqn("demo.models.DemoModel") == "demo.models.DemoModel"
     assert fqn(fqn) == "strategy_field.utils.fqn"
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="2"):
         assert fqn(2)
 
 
 def test_fqn2():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="None"):
         assert fqn(None)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="2"):
         assert fqn(2)
